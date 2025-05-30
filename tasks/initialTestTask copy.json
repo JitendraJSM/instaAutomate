@@ -1,0 +1,21 @@
+[
+  {
+    "expression": "this.state.profileTarget = 2*1"
+  },
+  {
+    "parentModuleName": "chrome",
+    "actionName": "initializeBrowser"
+  },
+  {
+    "preCondition": "chrome://new-tab-page/",
+    "parentModuleName": "page",
+    "actionName": "navigateTo",
+    "argumentsString": "https://www.youtube.com",
+    "doNotParseArgumentString": true
+  },
+  {
+    "parentModuleName": "devOrTest",
+    "actionName": "consoleLog",
+    "argumentsString": "this.state"
+  }
+]
