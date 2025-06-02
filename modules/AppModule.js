@@ -13,14 +13,16 @@ const Monitor = require("./MonitorModule.js");
 const executeAction = require("./appExecutor.js");
 const appLoggerInit = require("../functionsLibrary/appLogger.js");
 const utils = require("../utils/utils.js");
+const EventEmitter = require("events");
 
 // === Functions Library Imports ===
 const chrome = require("../functionsLibrary/chrome.js");
 const devOrTest = require("../functionsLibrary/devOrTest.js");
 const instaAuto = require("../functionsLibrary/instaAuto.js");
 
-class App {
+class App extends EventEmitter {
   constructor() {
+    super();
     // == functionsLibraries ==
     this.utils = utils;
     this.chrome = chrome;
@@ -52,7 +54,9 @@ class App {
       // console.log(`The action called ${this.actionList[this.currentActionIndex].callback.name} failed.`);
 
       if (this.errorHandler == null) {
-        console.log(`Error Handler is not defined. Please define as: app.addGlobalErrorHandler(error)`);
+        console.log(
+          `Error Handler is not defined. Please define as: app.addGlobalErrorHandler(error)`
+        );
         // console.log(error);
       } else this.errorHandler(error);
     } else if (this.currentActionIndex < this.actionList.length) {
@@ -78,7 +82,10 @@ class App {
     this.currentActionIndex = 0;
 
     // Execute tasks while we have valid index
-    while (this.currentActionIndex >= 0 && this.currentActionIndex < this.task.length) {
+    while (
+      this.currentActionIndex >= 0 &&
+      this.currentActionIndex < this.task.length
+    ) {
       this.currentAction = this.task[this.currentActionIndex];
       // console.log(
       //   `before executing the action: ${this.currentAction.actionName} the currentActionIndex is: ${this.currentActionIndex}`
@@ -120,7 +127,9 @@ class App {
         // Only return result if it should be stored in state
         return shouldStoreState ? result : undefined;
       } catch (error) {
-        await utils.log(`Action '${actionName}' failed with error: ${error.message}`);
+        await utils.log(
+          `Action '${actionName}' failed with error: ${error.message}`
+        );
         throw error;
       }
     };

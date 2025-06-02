@@ -1,8 +1,7 @@
 {
-  "profileTarget": 2,
   "postsCount": 1,
   "followersCount": 2,
-  "followingsCount": 6,
+  "followingsCount": 8,
   "mutualFollowersCount": 0,
   "ai_agent_type": null,
   "biography": "",
@@ -24,7 +23,7 @@
   "fbid": "17841474954198317",
   "followed_by_viewer": false,
   "edge_follow": {
-    "count": 6
+    "count": 8
   },
   "follows_viewer": false,
   "full_name": "Manisha Sen",
@@ -65,8 +64,8 @@
     "edges": []
   },
   "pinned_channels_list_count": 0,
-  "profile_pic_url": "https://instagram.fjdh4-1.fna.fbcdn.net/v/t51.2885-19/500771664_17843063745498474_2386522269947300610_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.fjdh4-1.fna.fbcdn.net&_nc_cat=106&_nc_oc=Q6cZ2QF9xh8TQ-jsiyjRzE0mxZKl89lWFGnAIHqw6HcvIqnlOOv6ItkcrwalijdU2pb37-Q&_nc_ohc=hyCKjmJZsJsQ7kNvwEkT4Ia&_nc_gid=KfaXMR-Lss7fPLwIAN46Lw&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfJkk0irNr8k62lSK7UQgqebE0ZdR_PQ3ZGKqZRYl3ZaYA&oe=6842FD40&_nc_sid=8b3546",
-  "profile_pic_url_hd": "https://instagram.fjdh4-1.fna.fbcdn.net/v/t51.2885-19/500771664_17843063745498474_2386522269947300610_n.jpg?stp=dst-jpg_s320x320_tt6&_nc_ht=instagram.fjdh4-1.fna.fbcdn.net&_nc_cat=106&_nc_oc=Q6cZ2QF9xh8TQ-jsiyjRzE0mxZKl89lWFGnAIHqw6HcvIqnlOOv6ItkcrwalijdU2pb37-Q&_nc_ohc=hyCKjmJZsJsQ7kNvwEkT4Ia&_nc_gid=KfaXMR-Lss7fPLwIAN46Lw&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfLwM8yLwWNKDkAREZ6EGjwznZflpgixByEy5w5ZGlxlOg&oe=6842FD40&_nc_sid=8b3546",
+  "profile_pic_url": "https://instagram.fjdh4-1.fna.fbcdn.net/v/t51.2885-19/500771664_17843063745498474_2386522269947300610_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.fjdh4-1.fna.fbcdn.net&_nc_cat=106&_nc_oc=Q6cZ2QFuIQo-sdq70-wDKc5uXdag4nSkL1vpCIHMVHsgUFfIIQ4yOcru8gb-JI8V09Hc8Mw&_nc_ohc=hyCKjmJZsJsQ7kNvwEkT4Ia&_nc_gid=jEZT2oDScZ0smCTNu2aBHA&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfJQwXSy61WMEwpTkJeyqT4SyMIJRlMfwQ9M18qu5spjUQ&oe=6842FD40&_nc_sid=8b3546",
+  "profile_pic_url_hd": "https://instagram.fjdh4-1.fna.fbcdn.net/v/t51.2885-19/500771664_17843063745498474_2386522269947300610_n.jpg?stp=dst-jpg_s320x320_tt6&_nc_ht=instagram.fjdh4-1.fna.fbcdn.net&_nc_cat=106&_nc_oc=Q6cZ2QFuIQo-sdq70-wDKc5uXdag4nSkL1vpCIHMVHsgUFfIIQ4yOcru8gb-JI8V09Hc8Mw&_nc_ohc=hyCKjmJZsJsQ7kNvwEkT4Ia&_nc_gid=jEZT2oDScZ0smCTNu2aBHA&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfKmTVytxWP5iJ6-CAVzTY5uZi_HD-kZlMhybM-C6Wkvig&oe=6842FD40&_nc_sid=8b3546",
   "requested_by_viewer": false,
   "should_show_category": false,
   "should_show_public_contacts": false,
@@ -89,6 +88,8 @@
     "rizwan.idrishi.378"
   ],
   "followings": [
+    "ritika_paswan._",
+    "diwanshi1619",
     "kajal2860singh",
     "sn0640004",
     "atulkapoor231",
@@ -96,5 +97,9 @@
     "rizwan.idrishi.378",
     "nawazsharif226_salon"
   ],
-  "lastUpdate": "2025-06-02T04:53:07.366Z"
+  "automatedFollow": [],
+  "automatedUnfollow": [],
+  "like": [],
+  "comment": [],
+  "lastUpdate": "2025-06-02T05:46:08.588Z"
 }
