@@ -37,11 +37,7 @@ const hourMs = 60 * 60 * 1000;
 // ======= Event Listeners =======
 const startListeners = async function () {
   this.on("follow", async (userObject) => {
-    try {
-      await updateDatabaseOnFollow.call(this, userObject);
-    } catch (error) {
-      console.error("Error updating database:", error);
-    }
+    await updateDatabaseOnFollow.call(this, userObject);
   });
 };
 
@@ -65,19 +61,22 @@ const addNewProfile = async function () {
   await fs.writeFile("./data/instaData/profilesData.json", JSON.stringify(this.state.profilesData, null, 2));
   return true;
 };
-const updateUserData = async function () {
+const updateUserData = async function (needUpadte) {
   let userData;
   const userDataPath = `./data/instaData/${this.state.currentProfile.userName}-data.json`;
-  let needUpadte = true;
-  // Check if user data file exists
-  if (await fs.pathExists(userDataPath)) {
-    userData = JSON.parse(await fs.readFile(userDataPath));
-    if (userData.lastUpdate) {
-      // Check if last update was more than 24 hours ago (86400000 ms = 1 day)
-      const timeDiff = new Date() - new Date(userData.lastUpdate);
-      if (timeDiff < 86400000) needUpadte = false;
+  if (!needUpadte) {
+    needUpadte = true;
+    // Check if user data file exists
+    if (await fs.pathExists(userDataPath)) {
+      userData = JSON.parse(await fs.readFile(userDataPath));
+      if (userData.lastUpdate) {
+        // Check if last update was more than 24 hours ago (86400000 ms = 1 day)
+        const timeDiff = new Date() - new Date(userData.lastUpdate);
+        if (timeDiff < 86400000) needUpadte = false;
+      }
     }
   }
+
   if (needUpadte) {
     console.log(`UserData of ${this.state.currentProfile.userName} needs to be updated.`);
 
@@ -104,10 +103,17 @@ const updateUserData = async function () {
   } else console.log(`UserData of ${this.state.currentProfile.userName} does not need an updated.`);
 };
 const updateDatabaseOnFollow = async function (userObject) {
-  // this.state.currentProfile.automatedFollow.push({ userName, date: new Date().toISOString()});
-  // Also update this.state.currentProfile.followers
+  this.state.currentProfile.automatedFollow = [];
+  this.state.currentProfile.automatedFollow.push(userObject);
+  if (!this.state.currentProfile.dueTasks) this.state.currentProfile.dueTasks = [];
+  this.state.currentProfile.dueTasks.push({ updateUserData: true });
+  await fs.writeFile(`./data/instaData/${this.state.currentProfile.userName}-data.json`, JSON.stringify(this.state.currentProfile, null, 2));
+
   // Also update this.state.currentProfile.dueTasks
   // Also update this.state.profilesData.find(pro=>pro.userName===this.state.currentProfile.userName).dueTasks
+  this.state.profilesData.find((profile) => profile.userName === this.state.currentProfile.userName).dueTasks.push({ updateUserData: true });
+  await fs.writeFile("./data/instaData/profilesData.json", JSON.stringify(this.state.profilesData, null, 2));
+  console.log(`updateDatabaseOnFollow function completed.`);
 };
 
 // ======= Main Functions =======
@@ -190,7 +196,7 @@ const performDueTasks = async function () {
   await this.instaAuto.updateUserData.call(this);
   console.log(`instaAuto.updateUserData() completed.`);
   console.log(`Let's try follow function`);
-  await follow.call(this, "nishu_tanna_");
+  await follow.call(this, "priya___paswan6968");
   console.log(`follow function executed.`);
 };
 

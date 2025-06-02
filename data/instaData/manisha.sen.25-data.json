@@ -1,105 +1,17 @@
 {
-  "postsCount": 1,
-  "followersCount": 2,
-  "followingsCount": 8,
-  "mutualFollowersCount": 0,
-  "ai_agent_type": null,
-  "biography": "",
-  "bio_links": [],
-  "fb_profile_biolink": null,
-  "biography_with_entities": {
-    "raw_text": "",
-    "entities": []
-  },
-  "blocked_by_viewer": false,
-  "restricted_by_viewer": false,
-  "country_block": false,
-  "eimu_id": "17843062932498474",
-  "external_url": null,
-  "external_url_linkshimmed": null,
-  "edge_followed_by": {
-    "count": 2
-  },
-  "fbid": "17841474954198317",
-  "followed_by_viewer": false,
-  "edge_follow": {
-    "count": 8
-  },
-  "follows_viewer": false,
-  "full_name": "Manisha Sen",
-  "group_metadata": null,
-  "has_ar_effects": false,
-  "has_clips": false,
-  "has_guides": false,
-  "has_chaining": false,
-  "has_channel": false,
-  "has_blocked_viewer": false,
-  "highlight_reel_count": 0,
-  "has_requested_viewer": false,
-  "hide_like_and_view_counts": false,
-  "id": "74946538473",
-  "is_business_account": false,
-  "is_professional_account": false,
-  "is_supervision_enabled": true,
-  "is_guardian_of_viewer": false,
-  "is_supervised_by_viewer": false,
-  "is_supervised_user": false,
-  "is_embeds_disabled": false,
-  "is_joined_recently": true,
-  "guardian_id": null,
-  "business_address_json": null,
-  "business_contact_method": "UNKNOWN",
-  "business_email": null,
-  "business_phone_number": null,
-  "business_category_name": null,
-  "overall_category_name": null,
-  "category_enum": null,
-  "category_name": null,
-  "is_private": false,
-  "is_verified": false,
-  "is_verified_by_mv4b": false,
-  "is_regulated_c18": false,
-  "edge_mutual_followed_by": {
-    "count": 0,
-    "edges": []
-  },
-  "pinned_channels_list_count": 0,
-  "profile_pic_url": "https://instagram.fjdh4-1.fna.fbcdn.net/v/t51.2885-19/500771664_17843063745498474_2386522269947300610_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.fjdh4-1.fna.fbcdn.net&_nc_cat=106&_nc_oc=Q6cZ2QFuIQo-sdq70-wDKc5uXdag4nSkL1vpCIHMVHsgUFfIIQ4yOcru8gb-JI8V09Hc8Mw&_nc_ohc=hyCKjmJZsJsQ7kNvwEkT4Ia&_nc_gid=jEZT2oDScZ0smCTNu2aBHA&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfJQwXSy61WMEwpTkJeyqT4SyMIJRlMfwQ9M18qu5spjUQ&oe=6842FD40&_nc_sid=8b3546",
-  "profile_pic_url_hd": "https://instagram.fjdh4-1.fna.fbcdn.net/v/t51.2885-19/500771664_17843063745498474_2386522269947300610_n.jpg?stp=dst-jpg_s320x320_tt6&_nc_ht=instagram.fjdh4-1.fna.fbcdn.net&_nc_cat=106&_nc_oc=Q6cZ2QFuIQo-sdq70-wDKc5uXdag4nSkL1vpCIHMVHsgUFfIIQ4yOcru8gb-JI8V09Hc8Mw&_nc_ohc=hyCKjmJZsJsQ7kNvwEkT4Ia&_nc_gid=jEZT2oDScZ0smCTNu2aBHA&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfKmTVytxWP5iJ6-CAVzTY5uZi_HD-kZlMhybM-C6Wkvig&oe=6842FD40&_nc_sid=8b3546",
-  "requested_by_viewer": false,
-  "should_show_category": false,
-  "should_show_public_contacts": false,
-  "show_account_transparency_details": true,
-  "transparency_label": null,
-  "transparency_product": null,
-  "username": "manisha.sen.25",
-  "connected_fb_page": null,
-  "pronouns": [],
-  "edge_owner_to_timeline_media": {
-    "count": 1,
-    "page_info": {
-      "has_next_page": true,
-      "end_cursor": ""
-    },
-    "edges": []
-  },
-  "followers": [
-    "nawazsharif226_salon",
-    "rizwan.idrishi.378"
+  "profileTarget": "2",
+  "userName": "manisha.sen.25",
+  "password": "hhjsm001",
+  "type": "agent",
+  "automatedFollow": [
+    {
+      "userName": "priya___paswan6968",
+      "date": "2025-06-02T06:58:09.161Z"
+    }
   ],
-  "followings": [
-    "ritika_paswan._",
-    "diwanshi1619",
-    "kajal2860singh",
-    "sn0640004",
-    "atulkapoor231",
-    "hemantrajput701827",
-    "rizwan.idrishi.378",
-    "nawazsharif226_salon"
-  ],
-  "automatedFollow": [],
-  "automatedUnfollow": [],
-  "like": [],
-  "comment": [],
-  "lastUpdate": "2025-06-02T05:46:08.588Z"
+  "dueTasks": [
+    {
+      "updateUserData": true
+    }
+  ]
 }

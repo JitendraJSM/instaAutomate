@@ -9,6 +9,20 @@
     "profileTarget": "2",
     "userName": "manisha.sen.25",
     "password": "hhjsm001",
-    "type": "agent"
+    "type": "agent",
+    "automatedFollow": [
+      {
+        "userName": "priya___paswan6968",
+        "date": "2025-06-02T06:58:09.161Z"
+      }
+    ],
+    "dueTasks": [
+      {
+        "updateUserData": true
+      },
+      {
+        "updateUserData": true
+      }
+    ]
   }
 ]
