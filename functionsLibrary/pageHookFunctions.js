@@ -50,13 +50,14 @@ const navigateTo = async function (url) {
   }
 };
 // ==== 👇🏻 for Testing & Debugging 👇🏻 ====
-const waitForElementRobust = async function (textOrSelector, text) {
-  text = false;
-  let selectorString = text === true ? `::-p-text(${textOrSelector})` : textOrSelector;
+const waitForElementRobust = async function (textOrSelector, text = false) {
+  // text = false;
+  let selectorString =
+    text === true ? `::-p-text(${textOrSelector})` : textOrSelector;
+  console.log(`selectorString: ${selectorString}`);
 
   const element = await this.page.locator(selectorString).waitHandle();
   if (!element) {
-    console.log(`Element not found for: ${selectorString}.`);
     return false;
   } else return element;
 };
@@ -74,19 +75,26 @@ const waitForElementRobust = async function (textOrSelector, text) {
  * @throws Will throw an error if the element cannot be found or its bounding box is not available.
  */
 const clickNotClickable = async function (textOrSelectorOrElement, text) {
+  console.log(`textOrSelectorOrElement: ${textOrSelectorOrElement}`);
+
   await this.page.waitForPageLoad();
   await this.utils.randomDelay(0.75);
 
   const waitSearchnClick = async (page, textOrSelectorOrElement, text) => {
-    let element = typeof textOrSelectorOrElement === "string" ? await page.waitForElementRobust(textOrSelectorOrElement, text) : textOrSelectorOrElement;
-
+    let element =
+      typeof textOrSelectorOrElement === "string"
+        ? await page.waitForElementRobust(textOrSelectorOrElement, text)
+        : textOrSelectorOrElement;
     const boundingBox = await element.boundingBox();
+    console.log(`element's boundingbox is : `);
+    console.log(boundingBox);
     if (boundingBox) {
       const { x, y, width, height } = boundingBox;
       await page.mouse.click(x + width / 2, y + height / 2);
       // await page.log("act", `Clicked on ${textOrSelectorOrElement} done.`);
       return true; // Exit on success
-    } else throw Error(`Bounding Box not found for: ${textOrSelectorOrElement}.`);
+    } else
+      throw Error(`Bounding Box not found for: ${textOrSelectorOrElement}.`);
   };
 
   await this.utils.robustPolling(
@@ -132,7 +140,11 @@ const typeHuman = async function (selector, stringToType) {
 
   for (let char of stringToType) {
     // Simulate typing delay
-    const delay = Math.floor(Math.random() * (options.maximumDelayInMs - options.minimumDelayInMs + 1)) + options.minimumDelayInMs;
+    const delay =
+      Math.floor(
+        Math.random() *
+          (options.maximumDelayInMs - options.minimumDelayInMs + 1)
+      ) + options.minimumDelayInMs;
 
     // Introduce a typo based on the typo chance
     let typedChar = char;
@@ -150,7 +162,13 @@ const typeHuman = async function (selector, stringToType) {
         await inputField.type(typedChar, { delay });
 
         // Simulate backspacing to remove the typo
-        const backspaceDelay = Math.floor(Math.random() * (options.backspaceMaximumDelayInMs - options.backspaceMinimumDelayInMs + 1)) + options.backspaceMinimumDelayInMs;
+        const backspaceDelay =
+          Math.floor(
+            Math.random() *
+              (options.backspaceMaximumDelayInMs -
+                options.backspaceMinimumDelayInMs +
+                1)
+          ) + options.backspaceMinimumDelayInMs;
         await this.utils.delay(backspaceDelay);
 
         // Type backspace to remove the last character (the typo)
@@ -169,7 +187,9 @@ const typeHuman = async function (selector, stringToType) {
 
 const checkVisibilityBeforeClick = async function (selector) {
   return await this.page.evaluate((selector) => {
-    const subBTN = Array.from(document.querySelectorAll(selector)).find((el) => el.checkVisibility());
+    const subBTN = Array.from(document.querySelectorAll(selector)).find((el) =>
+      el.checkVisibility()
+    );
     // subBTN.click();
     // return subBTN.textContent;
     return subBTN;
@@ -189,7 +209,12 @@ const checkVisibilityBeforeClick = async function (selector) {
  * @param {number} timeoutMs - The timeout in milliseconds after which the method will return false. Default is 30000.
  * @returns {(string | false)} The new URL if the URL changed, false otherwise.
  */
-const waitForURLChange = async function (beforePageURL, maxAttempts = 5, delayMs = 3000, timeoutMs = 30000) {
+const waitForURLChange = async function (
+  beforePageURL,
+  maxAttempts = 5,
+  delayMs = 3000,
+  timeoutMs = 30000
+) {
   let flag;
   try {
     flag = await utils.robustPolling(
@@ -298,7 +323,9 @@ const listAllElementsTextAndSelector = async function () {
     const tagName = await element.evaluate((el) => el.tagName);
     const textContent = await element.evaluate((el) => el.textContent);
     const selector = await element.evaluate((el) => el.outerHTML);
-    console.log(`Element: ${tagName}, Text: ${textContent}, Selector: ${selector}`);
+    console.log(
+      `Element: ${tagName}, Text: ${textContent}, Selector: ${selector}`
+    );
   }
 };
 
@@ -310,7 +337,9 @@ const hookMethodsOnPage = async function (page) {
   page.clickNotClickable = catchAsync(clickNotClickable.bind(this));
   page.getText = catchAsync(getText.bind(this));
   page.typeHuman = catchAsync(typeHuman.bind(this));
-  page.checkVisibilityBeforeClick = catchAsync(checkVisibilityBeforeClick.bind(this));
+  page.checkVisibilityBeforeClick = catchAsync(
+    checkVisibilityBeforeClick.bind(this)
+  );
   page.waitForURLChange = catchAsync(waitForURLChange.bind(this));
 
   // ==== 👇🏻 for Testing & Debugging 👇🏻 ====
@@ -318,7 +347,9 @@ const hookMethodsOnPage = async function (page) {
   page.listAllFrames = catchAsync(listAllFrames.bind(this));
   page.listAllElements = catchAsync(listAllElements.bind(this));
   page.listAllElementsText = catchAsync(listAllElementsText.bind(this));
-  page.listAllElementsTextAndSelector = catchAsync(listAllElementsTextAndSelector.bind(this));
+  page.listAllElementsTextAndSelector = catchAsync(
+    listAllElementsTextAndSelector.bind(this)
+  );
   // ==== 👇🏻 Event Handler 👇🏻 ====
   page.on("framenavigated", async (frame) => {
     if (frame === this.page.mainFrame()) {
@@ -330,7 +361,9 @@ const hookMethodsOnPage = async function (page) {
       };
       for (const url of Object.keys(randomPageHandlers)) {
         try {
-          const randomPage = (await this.browser.pages()).find((p) => p.url() === url || p.url().includes(url));
+          const randomPage = (await this.browser.pages()).find(
+            (p) => p.url() === url || p.url().includes(url)
+          );
 
           if (randomPage) {
             await this.appLogger.logMSG(`== Random Page : ${randomPage.url()}`);

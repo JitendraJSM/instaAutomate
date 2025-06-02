@@ -26,7 +26,11 @@ exports.getBrowser = async (options) => {
   options.windowPosition ||= [728, 0];
   options.environment ||= process.env.ENVIRONMENT;
 
-  const wsUrl = await getDebuggerUrl(options.profileTarget, options.windowSize, options.windowPosition);
+  const wsUrl = await getDebuggerUrl(
+    options.profileTarget,
+    options.windowSize,
+    options.windowPosition
+  );
 
   await writeWSinFile(wsUrl); // Only for testing purpose
 
@@ -55,7 +59,9 @@ async function getDebuggerUrl(profileTarget, windowSize, windowPosition) {
     await openChromeInstance(profileTarget, windowSize, windowPosition);
 
     // Polling the function: Get webSocketDebuggerUrl
-    data = JSON.parse(await utils.robustPolling(getUrl, {}, port)).webSocketDebuggerUrl;
+    data = JSON.parse(
+      await utils.robustPolling(getUrl, {}, port)
+    ).webSocketDebuggerUrl;
     return data;
   } catch (error) {
     console.log(`Error in getDebuggerUrl function : `, error.message);
@@ -74,7 +80,9 @@ async function getUrl() {
 async function openChromeInstance(profileTarget, windowSize, windowPosition) {
   let [w, h] = windowSize;
   let [x, y] = windowPosition;
-  console.log(`In openChromeInstance function, Profile to be opened has target: ${profileTarget}`);
+  console.log(
+    `In openChromeInstance function, Profile to be opened has target: ${profileTarget}`
+  );
 
   const chromePath = `C:/Program Files/Google/Chrome/Application/chrome.exe`;
 
@@ -84,9 +92,9 @@ async function openChromeInstance(profileTarget, windowSize, windowPosition) {
   // Example openCommand = `"C:\Program Files\Google\Chrome\Application\chrome.exe"  --user-data-dir="C:\Automation-App-by-JN-Data" --profile-directory="Profile 10" --remote-debugging-port=9222 --window-size=814,859 --window-position=793,0`;
   // const openCommand = `"${chromePath}"  --profile-directory="Profile ${profileTarget}" --remote-debugging-port=${port} --window-size=${w},${h} --window-position=${x},${y}`;
   // for newer chrome v136 and above
-  // const openCommand = `"${chromePath}" --user-data-dir="C:/Automation-App-by-JN-Data"  --profile-directory="Profile ${profileTarget}" --remote-debugging-port=${port} --window-size=${w},${h} --window-position=${x},${y}`;
+  const openCommand = `"${chromePath}" --user-data-dir="C:/Automation-App-by-JN-Data"  --profile-directory="Profile ${profileTarget}" --remote-debugging-port=${port} --window-size=${w},${h} --window-position=${x},${y}`;
 
-  const openCommand = `"${chromePath}" --user-data-dir="E:/Automated-Chrome-Data"  --profile-directory="Profile ${profileTarget}" --remote-debugging-port=${port} --window-size=${w},${h} --window-position=${x},${y}`;
+  // const openCommand = `"${chromePath}" --user-data-dir="E:/Automated-Chrome-Data"  --profile-directory="Profile ${profileTarget}" --remote-debugging-port=${port} --window-size=${w},${h} --window-position=${x},${y}`;
 
   const chromeProcess = spawn(openCommand, [], {
     shell: true,
@@ -120,7 +128,11 @@ async function pptrConnect(wsUrl, initialURL) {
 
   let page;
 
-  page = pages.find((p) => p.url().includes(initialURL)) || pages.find((p) => p.url() === "about:blank" || p.url() === "chrome://new-tab-page/");
+  page =
+    pages.find((p) => p.url().includes(initialURL)) ||
+    pages.find(
+      (p) => p.url() === "about:blank" || p.url() === "chrome://new-tab-page/"
+    );
 
   if (!page) {
     console.log("No blank page or Chat Page found, Opening a new Page.");

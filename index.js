@@ -7,7 +7,6 @@ const initialTestTask = require("./tasks/initialTestTask.json");
 initialTestTask.taskName = "initialTestTask";
 
 // === Testing Purpose ===
-const instaAutoFunc = require("./example.js");
 
 async function main() {
   console.log(`Main function Started.`);

@@ -1,24 +1,6 @@
 [
   {
-    "expression": "this.state.profileTarget = 21*1"
-  },
-  {
-    "parentModuleName": "chrome",
-    "actionName": "initializeBrowser"
-  },
-  {
     "parentModuleName": "instaAuto",
-    "actionName": "getInstaDB",
-    "shouldStoreState": "myInstaUserData"
-  },
-  {
-    "parentModuleName": "instaAuto",
-    "actionName": "scrapeUserData",
-    "shouldStoreState": "scrapeUserData"
-  },
-  {
-    "parentModuleName": "instaAuto",
-    "actionName": "getListOfFollowersOrFollowings",
-    "shouldStoreState": "FollowersOrFollowings"
+    "actionName": "instaAutomation"
   }
 ]
