@@ -100,6 +100,9 @@ const randomDelay = async (maxSec = 0.45, minSec = 0.25) => {
 };
 exports.randomDelay = randomDelay;
 
+const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+exports.getRandomNumber = getRandomNumber;
+
 const getDateTime = () => {
   const date = new Date();
   const options = {

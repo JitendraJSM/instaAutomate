@@ -45,6 +45,7 @@ const startListeners = async function () {
 const readProfilesData = async function () {
   return JSON.parse(await fs.readFile("./data/instaData/profilesData.json"));
 };
+
 const addNewProfile = async function () {
   const newProfile = {};
   newProfile.profileTarget = await this.utils.askUser("Enter profile target: ");
@@ -61,6 +62,7 @@ const addNewProfile = async function () {
   await fs.writeFile("./data/instaData/profilesData.json", JSON.stringify(this.state.profilesData, null, 2));
   return true;
 };
+
 const updateUserData = async function (needUpadte) {
   let userData;
   const userDataPath = `./data/instaData/${this.state.currentProfile.userName}-data.json`;
@@ -102,6 +104,7 @@ const updateUserData = async function (needUpadte) {
     await fs.writeFile(userDataPath, JSON.stringify(this.state.currentProfile, null, 2));
   } else console.log(`UserData of ${this.state.currentProfile.userName} does not need an updated.`);
 };
+
 const updateDatabaseOnFollow = async function (userObject) {
   const tempProfileData = JSON.parse(await fs.readFile(`./data/instaData/${this.state.currentProfile.userName}-data.json`));
 
@@ -128,86 +131,6 @@ const updateDatabaseOnFollow = async function (userObject) {
 };
 
 // ======= Main Functions =======
-const instaAutomation = async function () {
-  this.state.profilesData = await readProfilesData();
-  await startListeners.call(this);
-
-  const userInput = await this.utils.askUser(`Do you want to add new profile? (y/n): `);
-  if (userInput.toLowerCase() === "y") {
-    const addNewProfileResponse = await addNewProfile.call(this);
-    if (!addNewProfileResponse) throw new Error(`Failed to add new profile`);
-  }
-
-  this.state.profilesToLoop = this.state.profilesData.filter((profile) => profile.type === "agent");
-  // console.log(this.state.profilesToLoop);
-  if (this.state.profilesToLoop.length === 0) throw new Error(`No profiles to loop`);
-
-  this.state.currentProfileIndex = 0;
-  while (this.state.currentProfileIndex < this.state.profilesToLoop.length) {
-    this.state.currentProfile = this.state.profilesToLoop[this.state.currentProfileIndex];
-
-    console.log(`currentProfile to loop over is as: `);
-    console.log(this.state.currentProfile);
-    // console.log(`Before this.tasks`);
-    // console.log(this.task);
-
-    await performDueTasks.call(this);
-    // console.log(`After this.tasks`);
-    // console.log(this.task);
-
-    // const currentProfile = profilesToLoop[currenttProfileIndex];
-    // this.state.currentProfile = currentProfile;
-    // await this.instaAuto.updateUserData.call(this);
-    // Close browser
-    // await this.browser.close();
-
-    // Change IP address
-    // let ipChanged = false;
-    // while (!ipChanged) {
-    //   const currentIP = await this.utils.getCurrentIP();
-    //   await this.utils.triggerAirplaneModeToggle();
-    //   await sleep(180000); // Wait 3 minutes
-    //   const newIP = await this.utils.getCurrentIP();
-    //   ipChanged = currentIP !== newIP;
-    // }
-
-    this.state.currentProfileIndex++;
-  }
-  // console.log(`---- All Tasks Added ----`);
-};
-
-const performDueTasks = async function () {
-  // const lastTask = this.task.pop();
-  // const agentPreDueTasks = [
-  //   {
-  //     expression: `this.state.profileTarget = ${this.state.currentProfile.profileTarget}*1`,
-  //   },
-  //   {
-  //     parentModuleName: "chrome",
-  //     actionName: "initializeBrowser",
-  //   },
-  //   {
-  //     parentModuleName: "instaAuto",
-  //     actionName: "updateUserData",
-  //   },
-  //   {
-  //     parentModuleName: "instaAuto",
-  //     actionName: "follow",
-  //     argumentsString: `ritika_paswan._`,
-  //     doNotParseArgumentString: true, // must be true if arugumentString contains dot or /
-  //   },
-  // ];
-  // this.task = [...this.task, ...agentPreDueTasks, lastTask];
-  // console.log(`let's returning from instaAutomation to main tasks-----`);
-  // return;
-  // agentPreDueTasks are as below
-  this.state.profileTarget = this.state.currentProfile.profileTarget;
-  await this.chrome.initializeBrowser.call(this);
-  await this.instaAuto.updateUserData.call(this);
-  // await follow.call(this, "riya9669singh");
-  await follow.call(this, "sona_sengupta_");
-};
-
 const goInstaHome = async function () {
   try {
     if (this.page.url().includes(`https://www.instagram.com`)) await this.page.clickNotClickable(`[aria-label="Home"]`);
@@ -383,9 +306,9 @@ const getListOfFollowersOrFollowings = async function (targetUserId, needFollowe
   return { followers, followings };
 };
 
-const scrapeContentOfUser = async function () {};
-
-const follow = async function (userName) {
+const follow = async function (userName, likeOptions) {
+  await like.call(this, { userName });
+  process.exit();
   await goInstaHome.call(this);
   await this.page.clickNotClickable('[aria-label="Search"]');
   await this.page.clickNotClickable('input[aria-label="Search input"]');
@@ -416,6 +339,140 @@ const follow = async function (userName) {
   const userObject = { userName, date: new Date().toISOString() };
   this.emit("follow", userObject);
 };
+
+const like = async function (likeOptions) {
+  const { userName, minNumberOfPostsToLike = 1, maxNumberOfPostsToLike = 5 } = likeOptions;
+  // 0. Check the User Page is opened or not if not then open it.
+  if (this.page.url() !== `https://www.instagram.com/${userName}`) await this.page.navigateTo(`https://www.instagram.com/${userName}/`);
+
+  // 1. Get all available posts elements.
+  const likeSelector = `a[href^="/roshnigupta0075/reel/"], a[href^="/roshnigupta0075/p/"]`;
+  const postsElementsArr = await this.page.$$(likeSelector);
+
+  if (postsElementsArr.length === 0) {
+    console.log(`No posts found for ${userName}`);
+    return;
+  }
+
+  // 2. Get a random number that how many posts to like.
+  if (postsElementsArr.length < maxNumberOfPostsToLike) maxNumberOfPostsToLike = postsElementsArr.length;
+  const numberOfPostsToLike = this.utils.getRandomNumber(minNumberOfPostsToLike, maxNumberOfPostsToLike);
+
+  for (let i = 0; i < numberOfPostsToLike; i++) {
+    // Get a random post index that hasn't been liked yet
+    const randomPostIndex = this.utils.getRandomNumber(0, postsElementsArr.length - 1);
+    const postElement = postsElementsArr[randomPostIndex];
+
+    // Remove the selected post from array so it's not picked again
+    postsElementsArr.splice(randomPostIndex, 1);
+
+    // Click on the post to open it
+    await this.page.clickNotClickable(postElement);
+    await this.utils.randomDelay(2, 1);
+
+    // Click like button if not already liked
+    const likeButton = await this.page.locator(`[aria-label$="ike"][height="24"][width="24"]`).waitHandle();
+    const ariaLabel = await this.page.evaluate((element) => element.ariaLabel, likeButton);
+
+    if (ariaLabel !== "Unlike") {
+      await this.page.clickNotClickable(likeButton);
+      await this.utils.randomDelay(1, 0.5);
+    }
+
+    // Close the post modal
+    await this.page.clickNotClickable(`[aria-label="Close"]`);
+    await this.utils.randomDelay(2, 1);
+  }
+
+  // 2. Select an posts to like.
+  // 3. Click on that selected post to open.
+  // 4. Click on like button.
+  // 5. Close post.
+};
+
+const performDueTasks = async function () {
+  // const lastTask = this.task.pop();
+  // const agentPreDueTasks = [
+  //   {
+  //     expression: `this.state.profileTarget = ${this.state.currentProfile.profileTarget}*1`,
+  //   },
+  //   {
+  //     parentModuleName: "chrome",
+  //     actionName: "initializeBrowser",
+  //   },
+  //   {
+  //     parentModuleName: "instaAuto",
+  //     actionName: "updateUserData",
+  //   },
+  //   {
+  //     parentModuleName: "instaAuto",
+  //     actionName: "follow",
+  //     argumentsString: `ritika_paswan._`,
+  //     doNotParseArgumentString: true, // must be true if arugumentString contains dot or /
+  //   },
+  // ];
+  // this.task = [...this.task, ...agentPreDueTasks, lastTask];
+  // console.log(`let's returning from instaAutomation to main tasks-----`);
+  // return;
+  // agentPreDueTasks are as below
+  this.state.profileTarget = this.state.currentProfile.profileTarget;
+  await this.chrome.initializeBrowser.call(this);
+  await this.instaAuto.updateUserData.call(this);
+  // await follow.call(this, "riya9669singh");
+  // await follow.call(this, "sona_sengupta_");
+  await follow.call(this, "roshnigupta0075");
+};
+
+// ======= Controller Functions =======
+const instaAutomation = async function () {
+  this.state.profilesData = await readProfilesData();
+  await startListeners.call(this);
+
+  const userInput = await this.utils.askUser(`Do you want to add new profile? (y/n): `);
+  if (userInput.toLowerCase() === "y") {
+    const addNewProfileResponse = await addNewProfile.call(this);
+    if (!addNewProfileResponse) throw new Error(`Failed to add new profile`);
+  }
+
+  this.state.profilesToLoop = this.state.profilesData.filter((profile) => profile.type === "agent");
+  // console.log(this.state.profilesToLoop);
+  if (this.state.profilesToLoop.length === 0) throw new Error(`No profiles to loop`);
+
+  this.state.currentProfileIndex = 0;
+  while (this.state.currentProfileIndex < this.state.profilesToLoop.length) {
+    this.state.currentProfile = this.state.profilesToLoop[this.state.currentProfileIndex];
+
+    console.log(`currentProfile to loop over is as: `);
+    console.log(this.state.currentProfile);
+    // console.log(`Before this.tasks`);
+    // console.log(this.task);
+
+    await performDueTasks.call(this);
+    // console.log(`After this.tasks`);
+    // console.log(this.task);
+
+    // const currentProfile = profilesToLoop[currenttProfileIndex];
+    // this.state.currentProfile = currentProfile;
+    // await this.instaAuto.updateUserData.call(this);
+    // Close browser
+    // await this.browser.close();
+
+    // Change IP address
+    // let ipChanged = false;
+    // while (!ipChanged) {
+    //   const currentIP = await this.utils.getCurrentIP();
+    //   await this.utils.triggerAirplaneModeToggle();
+    //   await sleep(180000); // Wait 3 minutes
+    //   const newIP = await this.utils.getCurrentIP();
+    //   ipChanged = currentIP !== newIP;
+    // }
+
+    this.state.currentProfileIndex++;
+  }
+  // console.log(`---- All Tasks Added ----`);
+};
+
+const scrapeContentOfUser = async function () {};
 
 // =========================================================
 const Instauto = async function (db, browser, options) {
@@ -1337,6 +1394,7 @@ module.exports = {
   instaAutomation: catchAsync(instaAutomation),
   updateUserData: catchAsync(updateUserData),
   follow: catchAsync(follow),
+  like: catchAsync(like),
   startListeners: catchAsync(startListeners),
   scrapeUserData: catchAsync(scrapeUserData),
   getListOfFollowersOrFollowings: catchAsync(getListOfFollowersOrFollowings),
