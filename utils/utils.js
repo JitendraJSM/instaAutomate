@@ -59,10 +59,7 @@ const robustPolling = async (func, options = {}, ...args) => {
     let attempts = 0;
     const startTime = Date.now();
 
-    while (
-      infintiePolling ||
-      (attempts < maxAttempts && Date.now() - startTime < timeoutMs)
-    ) {
+    while (infintiePolling || (attempts < maxAttempts && Date.now() - startTime < timeoutMs)) {
       attempts++;
       try {
         const result = await func(...args);
@@ -73,9 +70,7 @@ const robustPolling = async (func, options = {}, ...args) => {
           return;
         }
       } catch (err) {
-        errMSG =
-          err.message ||
-          "Error msg not defined in Options Object passed to robustPolling func";
+        errMSG = err.message || "Error msg not defined in Options Object passed to robustPolling func";
         console.log(`Attempt ${attempts} failed with error:`, errMSG);
       }
 
@@ -84,9 +79,7 @@ const robustPolling = async (func, options = {}, ...args) => {
 
     // Handle end of polling based on rejectOnEnd flag
     if (rejectOnEnd) {
-      reject(
-        `Function failed after ${attempts} attempts. with Error: ${errMSG}`
-      );
+      reject(`Function failed after ${attempts} attempts. with Error: ${errMSG}`);
     } else {
       resolve(null);
     }
@@ -103,9 +96,7 @@ exports.robustPolling = robustPolling;
  * @param {number} minSec The minimum delay in seconds. default is 0.25 seconds.
  */
 const randomDelay = async (maxSec = 0.45, minSec = 0.25) => {
-  await delay(
-    (Math.floor(Math.random() * (maxSec - minSec) * 10) + minSec * 10) * 100
-  );
+  await delay((Math.floor(Math.random() * (maxSec - minSec) * 10) + minSec * 10) * 100);
 };
 exports.randomDelay = randomDelay;
 
@@ -120,9 +111,7 @@ const getDateTime = () => {
     hour12: true,
     timeZone: "Asia/Kolkata",
   };
-  const indianDateTime = date
-    .toLocaleString("en-IN", options)
-    .replace(/\//g, "-");
+  const indianDateTime = date.toLocaleString("en-IN", options).replace(/\//g, "-");
   return indianDateTime;
 };
 exports.getDateTime = getDateTime;
@@ -147,6 +136,14 @@ async function log(message) {
   fs.appendFileSync(pathToLogFile, message + "\n");
 }
 exports.log = log;
+
+/**
+ * Removes duplicate objects from an array by comparing their JSON string representations
+ * @param {Array<Object>} tasks - Array of task objects to deduplicate
+ * @returns {Array<Object>} Array with duplicate objects removed
+ */
+const removeDuplicates = (tasks) => tasks.filter((task, index, self) => index === self.findIndex((t) => JSON.stringify(t) === JSON.stringify(task)));
+exports.removeDuplicates = removeDuplicates;
 
 // --------------------------------------------------------------
 // async function nextAvailableChromeProfile() {

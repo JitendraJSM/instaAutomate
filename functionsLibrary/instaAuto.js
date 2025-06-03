@@ -103,21 +103,31 @@ const updateUserData = async function (needUpadte) {
   } else console.log(`UserData of ${this.state.currentProfile.userName} does not need an updated.`);
 };
 const updateDatabaseOnFollow = async function (userObject) {
-  this.state.currentProfile.automatedFollow = [];
+  const tempProfileData = JSON.parse(await fs.readFile(`./data/instaData/${this.state.currentProfile.userName}-data.json`));
+
+  // Neccessary Checks
+  /* The creatation of automatedFollow Array is for new user only */
+  if (!this.state.currentProfile.automatedFollow) this.state.currentProfile.automatedFollow = [];
+  /* Sometimes in development you manullay unfollow a user that was previously automated followed and hence in automatedFollowed array but when script again perform automated follow on that same user it creates a duplicate array element for that same user but with different date so the below is check for that*/
+  const index = this.state.currentProfile.automatedFollow.findIndex((profile) => profile.userName === userObject.userName);
+  if (index !== -1) {
+    this.state.currentProfile.automatedFollow.splice(index, 1);
+  }
+
   this.state.currentProfile.automatedFollow.push(userObject);
+
+  /* The creatation of dueTasks Array is for new user only */
   if (!this.state.currentProfile.dueTasks) this.state.currentProfile.dueTasks = [];
   this.state.currentProfile.dueTasks.push({ updateUserData: true });
-  await fs.writeFile(`./data/instaData/${this.state.currentProfile.userName}-data.json`, JSON.stringify(this.state.currentProfile, null, 2));
+  this.state.currentProfile.dueTasks = this.utils.removeDuplicates(this.state.currentProfile.dueTasks);
+  await fs.writeFile(`./data/instaData/${this.state.currentProfile.userName}-data.json`, JSON.stringify({ ...tempProfileData, ...this.state.currentProfile }, null, 2));
 
-  // Also update this.state.currentProfile.dueTasks
-  // Also update this.state.profilesData.find(pro=>pro.userName===this.state.currentProfile.userName).dueTasks
-  this.state.profilesData.find((profile) => profile.userName === this.state.currentProfile.userName).dueTasks.push({ updateUserData: true });
+  this.state.profilesData.find((profile) => profile.userName === this.state.currentProfile.userName).dueTasks = this.state.currentProfile.dueTasks;
   await fs.writeFile("./data/instaData/profilesData.json", JSON.stringify(this.state.profilesData, null, 2));
-  console.log(`updateDatabaseOnFollow function completed.`);
+  // console.log(`updateDatabaseOnFollow function completed.`);
 };
 
 // ======= Main Functions =======
-
 const instaAutomation = async function () {
   this.state.profilesData = await readProfilesData();
   await startListeners.call(this);
@@ -163,7 +173,7 @@ const instaAutomation = async function () {
 
     this.state.currentProfileIndex++;
   }
-  console.log(`---- All Tasks Added ----`);
+  // console.log(`---- All Tasks Added ----`);
 };
 
 const performDueTasks = async function () {
@@ -191,17 +201,26 @@ const performDueTasks = async function () {
   // console.log(`let's returning from instaAutomation to main tasks-----`);
   // return;
   // agentPreDueTasks are as below
-  // this.state.profileTarget = this.state.currentProfile.profileTarget;
+  this.state.profileTarget = this.state.currentProfile.profileTarget;
   await this.chrome.initializeBrowser.call(this);
   await this.instaAuto.updateUserData.call(this);
-  console.log(`instaAuto.updateUserData() completed.`);
-  console.log(`Let's try follow function`);
-  await follow.call(this, "priya___paswan6968");
-  console.log(`follow function executed.`);
+  // await follow.call(this, "riya9669singh");
+  await follow.call(this, "sona_sengupta_");
 };
 
 const goInstaHome = async function () {
-  if (this.page.url() !== `https://www.instagram.com/${this.state.currentProfile.userName}`) await this.page.navigateTo(`https://www.instagram.com/${this.state.currentProfile.userName}`);
+  try {
+    if (this.page.url().includes(`https://www.instagram.com`)) await this.page.clickNotClickable(`[aria-label="Home"]`);
+    else throw new Error("Failed to click home button");
+    console.log(`Home button clicked.`);
+  } catch (error) {
+    console.log(`*-*-*-*-*- in goInstaHome function userName is as: ${this.state.currentProfile.userName}`);
+    if (this.page.url() !== `https://www.instagram.com/${this.state.currentProfile.userName}`) await this.page.navigateTo(`https://www.instagram.com/${this.state.currentProfile.userName}/`);
+  }
+  console.log(`let's Wait........`);
+
+  await this.utils.randomDelay(1.25, 0.25);
+  this.page.waitForPageLoad();
 };
 
 const scrapeUserData = async function (userName, needFollowers = true, needFollowings = true) {
@@ -378,16 +397,27 @@ const follow = async function (userName) {
 
   await this.page.clickNotClickable(`span ::-p-text(${userName})`);
   await this.utils.randomDelay(3, 1);
+
+  const followBTN = await this.page.locator(`button ::-p-text(Follow)`).waitHandle();
+  let followButtonTextBefore = await this.page.getText(followBTN);
+  if (followButtonTextBefore === "Following") {
+    console.log(`Already following ${userName}`);
+    return;
+  }
+
   await this.page.clickNotClickable(`::-p-text(Follow)`);
+
+  async function waitForFollowingDone(followBTN) {
+    let followButtonTextAfter = await this.page.getText(followBTN);
+    return followButtonTextAfter === "Following";
+  }
+  await this.monitor.robustPolling(waitForFollowingDone.bind(this), { rejectOnEnd: false, waitForFunctionCompletion: true }, followBTN);
+
   const userObject = { userName, date: new Date().toISOString() };
   this.emit("follow", userObject);
 };
 
 // =========================================================
-
-const instaAutomate = async function () {
-  if (this.page.url() !== "https://www.instagram.com/") await this.page.navigateTo("https://www.instagram.com/");
-};
 const Instauto = async function (db, browser, options) {
   // ======= Destructuring Constantc Options from Options Object =======
   const {
@@ -1304,7 +1334,6 @@ Instauto.JSONDB = JSONDB;
 const catchAsync = require("../utils/catchAsync.js");
 module.exports = {
   readProfilesData: catchAsync(readProfilesData),
-  instaAutomate: catchAsync(instaAutomate),
   instaAutomation: catchAsync(instaAutomation),
   updateUserData: catchAsync(updateUserData),
   follow: catchAsync(follow),
