@@ -307,8 +307,6 @@ const getListOfFollowersOrFollowings = async function (targetUserId, needFollowe
 };
 
 const follow = async function (userName, likeOptions) {
-  await like.call(this, { userName });
-  process.exit();
   await goInstaHome.call(this);
   await this.page.clickNotClickable('[aria-label="Search"]');
   await this.page.clickNotClickable('input[aria-label="Search input"]');
@@ -321,7 +319,12 @@ const follow = async function (userName, likeOptions) {
   await this.page.clickNotClickable(`span ::-p-text(${userName})`);
   await this.utils.randomDelay(3, 1);
 
+  await like.call(this, { userName });
+
   const followBTN = await this.page.locator(`button ::-p-text(Follow)`).waitHandle();
+  // Bring followBTN into view
+  await this.page.evaluate((element) => element.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" }), followBTN);
+  await this.utils.randomDelay(1.5, 0.9);
   let followButtonTextBefore = await this.page.getText(followBTN);
   if (followButtonTextBefore === "Following") {
     console.log(`Already following ${userName}`);
@@ -344,10 +347,12 @@ const like = async function (likeOptions) {
   const { userName, minNumberOfPostsToLike = 1, maxNumberOfPostsToLike = 5 } = likeOptions;
   // 0. Check the User Page is opened or not if not then open it.
   if (this.page.url() !== `https://www.instagram.com/${userName}`) await this.page.navigateTo(`https://www.instagram.com/${userName}/`);
+  console.log(`navigation done`);
 
   // 1. Get all available posts elements.
   const likeSelector = `a[href^="/roshnigupta0075/reel/"], a[href^="/roshnigupta0075/p/"]`;
   const postsElementsArr = await this.page.$$(likeSelector);
+  console.log(`postsElementsArr is as: ${postsElementsArr.length}`);
 
   if (postsElementsArr.length === 0) {
     console.log(`No posts found for ${userName}`);
@@ -361,33 +366,45 @@ const like = async function (likeOptions) {
   for (let i = 0; i < numberOfPostsToLike; i++) {
     // Get a random post index that hasn't been liked yet
     const randomPostIndex = this.utils.getRandomNumber(0, postsElementsArr.length - 1);
+    console.log(`randomPostIndex is as: ${randomPostIndex}`);
+
     const postElement = postsElementsArr[randomPostIndex];
 
     // Remove the selected post from array so it's not picked again
     postsElementsArr.splice(randomPostIndex, 1);
 
+    // Bring postElement into view
+    await this.page.evaluate((element) => element.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" }), postElement);
+    await this.utils.randomDelay(2, 1);
     // Click on the post to open it
     await this.page.clickNotClickable(postElement);
     await this.utils.randomDelay(2, 1);
 
     // Click like button if not already liked
-    const likeButton = await this.page.locator(`[aria-label$="ike"][height="24"][width="24"]`).waitHandle();
-    const ariaLabel = await this.page.evaluate((element) => element.ariaLabel, likeButton);
-
-    if (ariaLabel !== "Unlike") {
-      await this.page.clickNotClickable(likeButton);
-      await this.utils.randomDelay(1, 0.5);
-    }
+    const hitTheLikeButton = async function () {
+      const likeButton = await this.page.locator(`[aria-label$="ike"][height="24"][width="24"]`).waitHandle();
+      const getAriaLabel = async () => await this.page.evaluate((element) => element.ariaLabel, likeButton);
+      const likeButtonAriaLabel = await getAriaLabel();
+      console.log(`ariaLabel is as: ${likeButtonAriaLabel}`);
+      console.log(`Like button clicked for ${userName} post ${i + 1} of ${numberOfPostsToLike} like`);
+      if (likeButtonAriaLabel === "Like") {
+        await this.page.clickNotClickable(likeButton);
+        await this.utils.randomDelay(1.5, 1);
+      } else if (likeButtonAriaLabel === "Unlike") {
+        console.log(`Already liked this post.`);
+        return true;
+      }
+      const result = (await getAriaLabel()) === "Unlike";
+      return result;
+    };
+    //  Monitor is added as this scripts works so fast that even the click on like button is not completed, so monitor just confirms that like button is clicked.
+    await this.monitor.robustPolling(hitTheLikeButton.bind(this), { maxAttempts: 5, intervalMs: 1000, rejectOnEnd: false, waitForFunctionCompletion: true }); // todo: add a delay between like and following.
 
     // Close the post modal
     await this.page.clickNotClickable(`[aria-label="Close"]`);
     await this.utils.randomDelay(2, 1);
   }
-
-  // 2. Select an posts to like.
-  // 3. Click on that selected post to open.
-  // 4. Click on like button.
-  // 5. Close post.
+  console.log(`Random Post likes is Completed.`);
 };
 
 const performDueTasks = async function () {
