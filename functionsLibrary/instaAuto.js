@@ -48,26 +48,60 @@ const readProfilesData = async function () {
 };
 const writeProfilesData = async (profilesData) => await fs.writeFile(profilesDataPath(), JSON.stringify(profilesData, null, 2));
 
-const addDueTasks = async function (userName, dueTaskObj) {
+const addDueTask = async function (userName, dueTaskObj) {
   const profilesData = await readProfilesData();
-  let typeOfProfile = "agent";
-  console.log(`---- type of Profile before is as: ${typeOfProfile}`);
-  const currentData = `${typeOfProfile}sDataPath`(userName);
-  console.log(`currentData : ${currentData}`);
 
-  console.log(`it's ok.`);
-  process.exit();
-
-  profilesData.forEach((profile) => {
+  profilesData.forEach(async (profile) => {
     if (profile.userName === `${userName}`) {
       if (!profile.dueTasks) profile.dueTasks = [];
       profile.dueTasks.push(dueTaskObj);
-      typeOfProfile = profile.type;
+      let typeOfProfile = profile.type;
       profile.dueTasks = utils.removeDuplicates(profile.dueTasks);
+      const getDataPath = typeOfProfile === "agent" ? agentsDataPath : scrapersDataPath;
+      const dataPath = getDataPath(userName);
+
+      const userData = JSON.parse(await fs.readFile(dataPath));
+      userData.dueTasks.push(dueTaskObj);
+      userData.dueTasks = utils.removeDuplicates(userData.dueTasks);
+      await fs.writeFile(dataPath, JSON.stringify(userData, null, 2));
     }
   });
-  console.log(`type of Profile before is as: ${typeOfProfile}`);
   await writeProfilesData(profilesData);
+  console.log(`Added task for user: ${userName}`);
+};
+
+const removeDueTask = async function (userName, dueTaskObj) {
+  const profilesData = await readProfilesData();
+
+  profilesData.forEach(async (profile) => {
+    if (profile.userName === userName) {
+      if (profile.dueTasks) {
+        // Remove the task by filtering
+        profile.dueTasks = profile.dueTasks.filter((task) => JSON.stringify(task) !== JSON.stringify(dueTaskObj));
+        console.log(`1`);
+
+        let typeOfProfile = profile.type;
+        const getDataPath = typeOfProfile === "agent" ? agentsDataPath : scrapersDataPath;
+        const dataPath = getDataPath(userName);
+        console.log(`2`);
+
+        // Update user-specific data file
+        const userData = JSON.parse(await fs.readFile(dataPath));
+        console.log(`3`);
+
+        if (userData.dueTasks) {
+          userData.dueTasks = userData.dueTasks.filter((task) => JSON.stringify(task) !== JSON.stringify(dueTaskObj));
+          console.log(`4`);
+
+          await fs.writeFile(dataPath, JSON.stringify(userData, null, 2));
+          console.log(`5`);
+        }
+      }
+    }
+  });
+
+  await writeProfilesData(profilesData);
+  console.log(`Removed task for user: ${userName}`);
 };
 
 const addNewProfile = async function () {
@@ -478,7 +512,9 @@ const performDueTasks = async function () {
 
 // ======= Controller Functions =======
 const instaAutomation = async function () {
-  await addDueTasks("manisha.sen.25", { follow: true, userName: "jitendra_swami_007" });
+  // await addDueTasks("manisha.sen.25", { follow: true, userName: "jitendra_swami_007" });
+  // await addDueTasks("manisha.sen.25", { follow: true, userName: "jitendra_swami_008" });
+  await removeDueTask("manisha.sen.25", { follow: true, userName: "jitendra_swami_007" });
   // await addDueTasks("manisha.sen.25", {
   //   updateUserData: true,
   // });
