@@ -35,14 +35,6 @@
     "dueTasks": [
       {
         "updateUserData": true
-      },
-      {
-        "follow": true,
-        "userName": "jitendra_swami_007"
-      },
-      {
-        "follow": true,
-        "userName": "jitendra_swami_008"
       }
     ]
   }
