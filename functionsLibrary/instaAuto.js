@@ -40,13 +40,16 @@ const startListeners = async function () {
 
 // ======= DB Functions =======
 const profilesDataPath = () => `./data/instaData/profilesData.json`;
-const agentsDataPath = (userName) => `./data/instaData/agentsData/${userName}-data.json`;
-const scrapersDataPath = (userName) => `./data/instaData/scrapersData/${userName}-data.json`;
+const agentsDataPath = (userName) =>
+  `./data/instaData/agentsData/${userName}-data.json`;
+const scrapersDataPath = (userName) =>
+  `./data/instaData/scrapersData/${userName}-data.json`;
 
 const readProfilesData = async function () {
   return JSON.parse(await fs.readFile("./data/instaData/profilesData.json"));
 };
-const writeProfilesData = async (profilesData) => await fs.writeFile(profilesDataPath(), JSON.stringify(profilesData, null, 2));
+const writeProfilesData = async (profilesData) =>
+  await fs.writeFile(profilesDataPath(), JSON.stringify(profilesData, null, 2));
 
 const addDueTask = async function (userName, dueTaskObj) {
   const profilesData = await readProfilesData();
@@ -57,7 +60,8 @@ const addDueTask = async function (userName, dueTaskObj) {
       profile.dueTasks.push(dueTaskObj);
       let typeOfProfile = profile.type;
       profile.dueTasks = utils.removeDuplicates(profile.dueTasks);
-      const getDataPath = typeOfProfile === "agent" ? agentsDataPath : scrapersDataPath;
+      const getDataPath =
+        typeOfProfile === "agent" ? agentsDataPath : scrapersDataPath;
       const dataPath = getDataPath(userName);
 
       const userData = JSON.parse(await fs.readFile(dataPath));
@@ -77,11 +81,14 @@ const removeDueTask = async function (userName, dueTaskObj) {
     if (profile.userName === userName) {
       if (profile.dueTasks) {
         // Remove the task by filtering
-        profile.dueTasks = profile.dueTasks.filter((task) => JSON.stringify(task) !== JSON.stringify(dueTaskObj));
+        profile.dueTasks = profile.dueTasks.filter(
+          (task) => JSON.stringify(task) !== JSON.stringify(dueTaskObj)
+        );
         console.log(`1`);
 
         let typeOfProfile = profile.type;
-        const getDataPath = typeOfProfile === "agent" ? agentsDataPath : scrapersDataPath;
+        const getDataPath =
+          typeOfProfile === "agent" ? agentsDataPath : scrapersDataPath;
         const dataPath = getDataPath(userName);
         console.log(`2`);
 
@@ -90,7 +97,9 @@ const removeDueTask = async function (userName, dueTaskObj) {
         console.log(`3`);
 
         if (userData.dueTasks) {
-          userData.dueTasks = userData.dueTasks.filter((task) => JSON.stringify(task) !== JSON.stringify(dueTaskObj));
+          userData.dueTasks = userData.dueTasks.filter(
+            (task) => JSON.stringify(task) !== JSON.stringify(dueTaskObj)
+          );
           console.log(`4`);
 
           await fs.writeFile(dataPath, JSON.stringify(userData, null, 2));
@@ -107,15 +116,33 @@ const removeDueTask = async function (userName, dueTaskObj) {
 const addNewProfile = async function () {
   const newProfile = {};
   newProfile.profileTarget = await this.utils.askUser("Enter profile target: ");
-  if (this.state.profilesData.find((profile) => profile.profileTarget == newProfile.profileTarget)) throw new Error(`Profile with target ${newProfile.profileTarget} already exists`);
+  if (
+    this.state.profilesData.find(
+      (profile) => profile.profileTarget == newProfile.profileTarget
+    )
+  )
+    throw new Error(
+      `Profile with target ${newProfile.profileTarget} already exists`
+    );
   newProfile.userName = await this.utils.askUser(`Enter user name:`);
-  if (this.state.profilesData.find((profile) => profile.userName == newProfile.userName)) throw new Error(`Profile with user name: ${newProfile.userName} already exists`);
+  if (
+    this.state.profilesData.find(
+      (profile) => profile.userName == newProfile.userName
+    )
+  )
+    throw new Error(
+      `Profile with user name: ${newProfile.userName} already exists`
+    );
   newProfile.password = await this.utils.askUser(`Enter password:`);
-  const userInput = await this.utils.askUser("Enter type of profile: 1 for 'agent', 2 for 'scrper'");
+  const userInput = await this.utils.askUser(
+    "Enter type of profile: 1 for 'agent', 2 for 'scrper'"
+  );
   if (userInput === "1") newProfile.type = "agent";
   else if (userInput === "2") newProfile.type = "scraper";
   else throw new Error(`Invalid input`);
-  const beforeWritingProfilesData = JSON.parse(JSON.stringify(this.state.profilesData));
+  const beforeWritingProfilesData = JSON.parse(
+    JSON.stringify(this.state.profilesData)
+  );
   try {
     this.state.profilesData.push(newProfile);
     if (newProfile.type === "agent") {
@@ -125,9 +152,15 @@ const addNewProfile = async function () {
           follow: true,
           userName: `${newProfile.userName}`,
         });
-        newProfile.dueTasks.push({ follow: true, userName: `${profile.userName}` });
+        newProfile.dueTasks.push({
+          follow: true,
+          userName: `${profile.userName}`,
+        });
       });
-      await fs.writeFile("./data/instaData/profilesData.json", JSON.stringify(this.state.profilesData, null, 2));
+      await fs.writeFile(
+        "./data/instaData/profilesData.json",
+        JSON.stringify(this.state.profilesData, null, 2)
+      );
     }
   } catch (error) {}
   return true;
@@ -150,18 +183,27 @@ const updateUserData = async function (needUpadte) {
   }
 
   if (needUpadte) {
-    console.log(`UserData of ${this.state.currentProfile.userName} needs to be updated.`);
+    console.log(
+      `UserData of ${this.state.currentProfile.userName} needs to be updated.`
+    );
 
-    const scrapedUserData = await scrapeUserData.call(this, this.state.currentProfile.userName);
+    const scrapedUserData = await scrapeUserData.call(
+      this,
+      this.state.currentProfile.userName
+    );
 
     this.state.currentProfile.userName = scrapedUserData.userName;
     this.state.currentProfile.password = scrapedUserData.password;
     this.state.currentProfile.type = scrapedUserData.type;
     this.state.currentProfile.profileTarget = this.state.profileTarget;
-    this.state.currentProfile.postsCount = scrapedUserData.edge_owner_to_timeline_media.count;
-    this.state.currentProfile.followersCount = scrapedUserData.edge_followed_by.count;
-    this.state.currentProfile.followingsCount = scrapedUserData.edge_follow.count;
-    this.state.currentProfile.mutualFollowersCount = scrapedUserData.edge_mutual_followed_by.count;
+    this.state.currentProfile.postsCount =
+      scrapedUserData.edge_owner_to_timeline_media.count;
+    this.state.currentProfile.followersCount =
+      scrapedUserData.edge_followed_by.count;
+    this.state.currentProfile.followingsCount =
+      scrapedUserData.edge_follow.count;
+    this.state.currentProfile.mutualFollowersCount =
+      scrapedUserData.edge_mutual_followed_by.count;
     this.state.currentProfile = {
       ...this.state.currentProfile,
       ...scrapedUserData,
@@ -171,18 +213,31 @@ const updateUserData = async function (needUpadte) {
     this.state.currentProfile.like = [];
     this.state.currentProfile.comment = [];
     this.state.currentProfile.lastUpdate = new Date().toISOString();
-    await fs.writeFile(userDataPath, JSON.stringify(this.state.currentProfile, null, 2));
-  } else console.log(`UserData of ${this.state.currentProfile.userName} does not need an updated.`);
+    await fs.writeFile(
+      userDataPath,
+      JSON.stringify(this.state.currentProfile, null, 2)
+    );
+  } else
+    console.log(
+      `UserData of ${this.state.currentProfile.userName} does not need an updated.`
+    );
 };
 
 const updateDatabaseOnFollow = async function (userObject) {
-  const tempProfileData = JSON.parse(await fs.readFile(`./data/instaData/${this.state.currentProfile.userName}-data.json`));
+  const tempProfileData = JSON.parse(
+    await fs.readFile(
+      `./data/instaData/${this.state.currentProfile.userName}-data.json`
+    )
+  );
 
   // Neccessary Checks
   /* The creatation of automatedFollow Array is for new user only */
-  if (!this.state.currentProfile.automatedFollow) this.state.currentProfile.automatedFollow = [];
+  if (!this.state.currentProfile.automatedFollow)
+    this.state.currentProfile.automatedFollow = [];
   /* Sometimes in development you manullay unfollow a user that was previously automated followed and hence in automatedFollowed array but when script again perform automated follow on that same user it creates a duplicate array element for that same user but with different date so the below is check for that*/
-  const index = this.state.currentProfile.automatedFollow.findIndex((profile) => profile.userName === userObject.userName);
+  const index = this.state.currentProfile.automatedFollow.findIndex(
+    (profile) => profile.userName === userObject.userName
+  );
   if (index !== -1) {
     this.state.currentProfile.automatedFollow.splice(index, 1);
   }
@@ -190,25 +245,49 @@ const updateDatabaseOnFollow = async function (userObject) {
   this.state.currentProfile.automatedFollow.push(userObject);
 
   /* The creatation of dueTasks Array is for new user only */
-  if (!this.state.currentProfile.dueTasks) this.state.currentProfile.dueTasks = [];
+  if (!this.state.currentProfile.dueTasks)
+    this.state.currentProfile.dueTasks = [];
   this.state.currentProfile.dueTasks.push({ updateUserData: true });
-  this.state.currentProfile.dueTasks = this.utils.removeDuplicates(this.state.currentProfile.dueTasks);
-  await fs.writeFile(`./data/instaData/${this.state.currentProfile.userName}-data.json`, JSON.stringify({ ...tempProfileData, ...this.state.currentProfile }, null, 2));
+  this.state.currentProfile.dueTasks = this.utils.removeDuplicates(
+    this.state.currentProfile.dueTasks
+  );
+  await fs.writeFile(
+    `./data/instaData/${this.state.currentProfile.userName}-data.json`,
+    JSON.stringify(
+      { ...tempProfileData, ...this.state.currentProfile },
+      null,
+      2
+    )
+  );
 
-  this.state.profilesData.find((profile) => profile.userName === this.state.currentProfile.userName).dueTasks = this.state.currentProfile.dueTasks;
-  await fs.writeFile("./data/instaData/profilesData.json", JSON.stringify(this.state.profilesData, null, 2));
+  this.state.profilesData.find(
+    (profile) => profile.userName === this.state.currentProfile.userName
+  ).dueTasks = this.state.currentProfile.dueTasks;
+  await fs.writeFile(
+    "./data/instaData/profilesData.json",
+    JSON.stringify(this.state.profilesData, null, 2)
+  );
   // console.log(`updateDatabaseOnFollow function completed.`);
 };
 
 // ======= Main Functions =======
 const goInstaHome = async function () {
   try {
-    if (this.page.url().includes(`https://www.instagram.com`)) await this.page.clickNotClickable(`[aria-label="Home"]`);
+    if (this.page.url().includes(`https://www.instagram.com`))
+      await this.page.clickNotClickable(`[aria-label="Home"]`);
     else throw new Error("Failed to click home button");
     console.log(`Home button clicked.`);
   } catch (error) {
-    console.log(`*-*-*-*-*- in goInstaHome function userName is as: ${this.state.currentProfile.userName}`);
-    if (this.page.url() !== `https://www.instagram.com/${this.state.currentProfile.userName}`) await this.page.navigateTo(`https://www.instagram.com/${this.state.currentProfile.userName}/`);
+    console.log(
+      `*-*-*-*-*- in goInstaHome function userName is as: ${this.state.currentProfile.userName}`
+    );
+    if (
+      this.page.url() !==
+      `https://www.instagram.com/${this.state.currentProfile.userName}`
+    )
+      await this.page.navigateTo(
+        `https://www.instagram.com/${this.state.currentProfile.userName}/`
+      );
   }
   console.log(`let's Wait........`);
 
@@ -216,11 +295,16 @@ const goInstaHome = async function () {
   this.page.waitForPageLoad();
 };
 
-const scrapeUserData = async function (userName, needFollowers = true, needFollowings = true) {
+const scrapeUserData = async function (
+  userName,
+  needFollowers = true,
+  needFollowings = true
+) {
   // const userName = "diwanshi1619";
   // const userName = "best.frnds.jsm";
   /* It is not needed to navigate to user before scraping but it is better so not get banned.*/
-  if (this.page.url() !== `https://www.instagram.com/${userName}`) await this.page.navigateTo(`https://www.instagram.com/${userName}`);
+  if (this.page.url() !== `https://www.instagram.com/${userName}`)
+    await this.page.navigateTo(`https://www.instagram.com/${userName}`);
 
   let scrapedData;
   // --- Logic for scraping data is copied from "getUserDataFromInterceptedRequest" function of instaAuto git repo of mifi.
@@ -228,11 +312,16 @@ const scrapeUserData = async function (userName, needFollowers = true, needFollo
     console.log("Unable to intercept request, will send manually");
     try {
       await this.page.evaluate(async (username2) => {
-        const response = await window.fetch(`https://i.instagram.com/api/v1/users/web_profile_info/?username=${encodeURIComponent(username2.toLowerCase())}`, {
-          mode: "cors",
-          credentials: "include",
-          headers: { "x-ig-app-id": "936619743392459" },
-        });
+        const response = await window.fetch(
+          `https://i.instagram.com/api/v1/users/web_profile_info/?username=${encodeURIComponent(
+            username2.toLowerCase()
+          )}`,
+          {
+            mode: "cors",
+            credentials: "include",
+            headers: { "x-ig-app-id": "936619743392459" },
+          }
+        );
         await response.json(); // else it will not finish the request
       }, userName);
       // todo `https://i.instagram.com/api/v1/users/${userId}/info/`
@@ -249,7 +338,11 @@ const scrapeUserData = async function (userName, needFollowers = true, needFollo
           const request = response.request();
           return (
             request.method() === "GET" &&
-            new RegExp(`https:\\/\\/i\\.instagram\\.com\\/api\\/v1\\/users\\/web_profile_info\\/\\?username=${encodeURIComponent(userName.toLowerCase())}`).test(request.url())
+            new RegExp(
+              `https:\\/\\/i\\.instagram\\.com\\/api\\/v1\\/users\\/web_profile_info\\/\\?username=${encodeURIComponent(
+                userName.toLowerCase()
+              )}`
+            ).test(request.url())
           );
         },
         { timeout: 30000 }
@@ -267,16 +360,27 @@ const scrapeUserData = async function (userName, needFollowers = true, needFollo
   console.log("the scraped data is as: ");
   console.log(`User name is: ${scrapedData.username}`);
   console.log(`User's id is: ${scrapedData.id}`);
-  console.log(`Number of Posts are: ${scrapedData.edge_owner_to_timeline_media.count}`);
+  console.log(
+    `Number of Posts are: ${scrapedData.edge_owner_to_timeline_media.count}`
+  );
   console.log(`followers are: ${scrapedData.edge_followed_by.count}`);
   console.log(`followings are: ${scrapedData.edge_follow.count}`);
-  console.log(`mutual followers are: ${scrapedData.edge_mutual_followed_by.count}`);
-  console.log(`1st mutual follower: ${scrapedData.edge_mutual_followed_by.edges[0]}`);
+  console.log(
+    `mutual followers are: ${scrapedData.edge_mutual_followed_by.count}`
+  );
+  console.log(
+    `1st mutual follower: ${scrapedData.edge_mutual_followed_by.edges[0]}`
+  );
 
   // Logic to get followers and followings also
 
   if (needFollowers || needFollowings) {
-    const { followers, followings } = await getListOfFollowersOrFollowings.call(this, scrapedData.id, needFollowers, needFollowings);
+    const { followers, followings } = await getListOfFollowersOrFollowings.call(
+      this,
+      scrapedData.id,
+      needFollowers,
+      needFollowings
+    );
     scrapedData.followers = followers;
     scrapedData.followings = followings;
   }
@@ -284,16 +388,26 @@ const scrapeUserData = async function (userName, needFollowers = true, needFollo
   return scrapedData;
 };
 
-const getListOfFollowersOrFollowings = async function (targetUserId, needFollowers, needFollowings) {
+const getListOfFollowersOrFollowings = async function (
+  targetUserId,
+  needFollowers,
+  needFollowings
+) {
   console.log(`Starting to get list of followers or followings...`);
 
   let page = this.page;
   const instagramBaseUrl = "https://www.instagram.com";
 
   async function getPageJson() {
-    return JSON.parse(await (await (await page.$("pre")).getProperty("textContent")).jsonValue());
+    return JSON.parse(
+      await (await (await page.$("pre")).getProperty("textContent")).jsonValue()
+    );
   }
-  async function* graphqlQueryUsers({ queryHash, getResponseProp, graphqlVariables: graphqlVariablesIn }) {
+  async function* graphqlQueryUsers({
+    queryHash,
+    getResponseProp,
+    graphqlVariables: graphqlVariablesIn,
+  }) {
     const graphqlUrl = `${instagramBaseUrl}/graphql/query/?query_hash=${queryHash}`;
 
     const graphqlVariables = {
@@ -336,9 +450,12 @@ const getListOfFollowersOrFollowings = async function (targetUserId, needFollowe
   }
   function getFollowersOrFollowingGenerator({ userId, getFollowers = false }) {
     return graphqlQueryUsers({
-      getResponseProp: (json) => json.data.user[getFollowers ? "edge_followed_by" : "edge_follow"],
+      getResponseProp: (json) =>
+        json.data.user[getFollowers ? "edge_followed_by" : "edge_follow"],
       graphqlVariables: { id: userId },
-      queryHash: getFollowers ? "37479f2b8209594dde7facb0d904896a" : "58712303d941c6855d4e888c5f0cd22f",
+      queryHash: getFollowers
+        ? "37479f2b8209594dde7facb0d904896a"
+        : "58712303d941c6855d4e888c5f0cd22f",
     });
   }
   async function getFollowersOrFollowing({ userId, getFollowers = false }) {
@@ -391,9 +508,19 @@ const follow = async function (userName, likeOptions) {
 
   await like.call(this, { userName });
 
-  const followBTN = await this.page.locator(`button ::-p-text(Follow)`).waitHandle();
+  const followBTN = await this.page
+    .locator(`button ::-p-text(Follow)`)
+    .waitHandle();
   // Bring followBTN into view
-  await this.page.evaluate((element) => element.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" }), followBTN);
+  await this.page.evaluate(
+    (element) =>
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "center",
+      }),
+    followBTN
+  );
   await this.utils.randomDelay(1.5, 0.9);
   let followButtonTextBefore = await this.page.getText(followBTN);
   if (followButtonTextBefore === "Following") {
@@ -407,16 +534,25 @@ const follow = async function (userName, likeOptions) {
     let followButtonTextAfter = await this.page.getText(followBTN);
     return followButtonTextAfter === "Following";
   }
-  await this.monitor.robustPolling(waitForFollowingDone.bind(this), { rejectOnEnd: false, waitForFunctionCompletion: true }, followBTN);
+  await this.monitor.robustPolling(
+    waitForFollowingDone.bind(this),
+    { rejectOnEnd: false, waitForFunctionCompletion: true },
+    followBTN
+  );
 
   const userObject = { userName, date: new Date().toISOString() };
   this.emit("follow", userObject);
 };
 
 const like = async function (likeOptions) {
-  const { userName, minNumberOfPostsToLike = 1, maxNumberOfPostsToLike = 5 } = likeOptions;
+  const {
+    userName,
+    minNumberOfPostsToLike = 1,
+    maxNumberOfPostsToLike = 5,
+  } = likeOptions;
   // 0. Check the User Page is opened or not if not then open it.
-  if (this.page.url() !== `https://www.instagram.com/${userName}`) await this.page.navigateTo(`https://www.instagram.com/${userName}/`);
+  if (this.page.url() !== `https://www.instagram.com/${userName}`)
+    await this.page.navigateTo(`https://www.instagram.com/${userName}/`);
   console.log(`navigation done`);
 
   // 1. Get all available posts elements.
@@ -430,12 +566,19 @@ const like = async function (likeOptions) {
   }
 
   // 2. Get a random number that how many posts to like.
-  if (postsElementsArr.length < maxNumberOfPostsToLike) maxNumberOfPostsToLike = postsElementsArr.length;
-  const numberOfPostsToLike = this.utils.getRandomNumber(minNumberOfPostsToLike, maxNumberOfPostsToLike);
+  if (postsElementsArr.length < maxNumberOfPostsToLike)
+    maxNumberOfPostsToLike = postsElementsArr.length;
+  const numberOfPostsToLike = this.utils.getRandomNumber(
+    minNumberOfPostsToLike,
+    maxNumberOfPostsToLike
+  );
 
   for (let i = 0; i < numberOfPostsToLike; i++) {
     // Get a random post index that hasn't been liked yet
-    const randomPostIndex = this.utils.getRandomNumber(0, postsElementsArr.length - 1);
+    const randomPostIndex = this.utils.getRandomNumber(
+      0,
+      postsElementsArr.length - 1
+    );
     console.log(`randomPostIndex is as: ${randomPostIndex}`);
 
     const postElement = postsElementsArr[randomPostIndex];
@@ -444,7 +587,15 @@ const like = async function (likeOptions) {
     postsElementsArr.splice(randomPostIndex, 1);
 
     // Bring postElement into view
-    await this.page.evaluate((element) => element.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" }), postElement);
+    await this.page.evaluate(
+      (element) =>
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+          inline: "center",
+        }),
+      postElement
+    );
     await this.utils.randomDelay(2, 1);
     // Click on the post to open it
     await this.page.clickNotClickable(postElement);
@@ -452,11 +603,18 @@ const like = async function (likeOptions) {
 
     // Click like button if not already liked
     const hitTheLikeButton = async function () {
-      const likeButton = await this.page.locator(`[aria-label$="ike"][height="24"][width="24"]`).waitHandle();
-      const getAriaLabel = async () => await this.page.evaluate((element) => element.ariaLabel, likeButton);
+      const likeButton = await this.page
+        .locator(`[aria-label$="ike"][height="24"][width="24"]`)
+        .waitHandle();
+      const getAriaLabel = async () =>
+        await this.page.evaluate((element) => element.ariaLabel, likeButton);
       const likeButtonAriaLabel = await getAriaLabel();
       console.log(`ariaLabel is as: ${likeButtonAriaLabel}`);
-      console.log(`Like button clicked for ${userName} post ${i + 1} of ${numberOfPostsToLike} like`);
+      console.log(
+        `Like button clicked for ${userName} post ${
+          i + 1
+        } of ${numberOfPostsToLike} like`
+      );
       if (likeButtonAriaLabel === "Like") {
         await this.page.clickNotClickable(likeButton);
         await this.utils.randomDelay(1.5, 1);
@@ -468,7 +626,12 @@ const like = async function (likeOptions) {
       return result;
     };
     //  Monitor is added as this scripts works so fast that even the click on like button is not completed, so monitor just confirms that like button is clicked.
-    await this.monitor.robustPolling(hitTheLikeButton.bind(this), { maxAttempts: 5, intervalMs: 1000, rejectOnEnd: false, waitForFunctionCompletion: true }); // todo: add a delay between like and following.
+    await this.monitor.robustPolling(hitTheLikeButton.bind(this), {
+      maxAttempts: 5,
+      intervalMs: 1000,
+      rejectOnEnd: false,
+      waitForFunctionCompletion: true,
+    }); // todo: add a delay between like and following.
 
     // Close the post modal
     await this.page.clickNotClickable(`[aria-label="Close"]`);
@@ -514,7 +677,14 @@ const performDueTasks = async function () {
 const instaAutomation = async function () {
   // await addDueTasks("manisha.sen.25", { follow: true, userName: "jitendra_swami_007" });
   // await addDueTasks("manisha.sen.25", { follow: true, userName: "jitendra_swami_008" });
-  await removeDueTask("manisha.sen.25", { follow: true, userName: "jitendra_swami_007" });
+  await removeDueTask("manisha.sen.25", {
+    follow: true,
+    userName: "jitendra_swami_007",
+  });
+  await removeDueTask("manisha.sen.25", {
+    follow: true,
+    userName: "jitendra_swami_008",
+  });
   // await addDueTasks("manisha.sen.25", {
   //   updateUserData: true,
   // });
@@ -523,19 +693,25 @@ const instaAutomation = async function () {
   this.state.profilesData = await readProfilesData();
   await startListeners.call(this);
 
-  const userInput = await this.utils.askUser(`Do you want to add new profile? (y/n): `);
+  const userInput = await this.utils.askUser(
+    `Do you want to add new profile? (y/n): `
+  );
   if (userInput.toLowerCase() === "y") {
     const addNewProfileResponse = await addNewProfile.call(this);
     if (!addNewProfileResponse) throw new Error(`Failed to add new profile`);
   }
 
-  this.state.profilesToLoop = this.state.profilesData.filter((profile) => profile.type === "agent");
+  this.state.profilesToLoop = this.state.profilesData.filter(
+    (profile) => profile.type === "agent"
+  );
   // console.log(this.state.profilesToLoop);
-  if (this.state.profilesToLoop.length === 0) throw new Error(`No profiles to loop`);
+  if (this.state.profilesToLoop.length === 0)
+    throw new Error(`No profiles to loop`);
 
   this.state.currentProfileIndex = 0;
   while (this.state.currentProfileIndex < this.state.profilesToLoop.length) {
-    this.state.currentProfile = this.state.profilesToLoop[this.state.currentProfileIndex];
+    this.state.currentProfile =
+      this.state.profilesToLoop[this.state.currentProfileIndex];
 
     console.log(`currentProfile to loop over is as: `);
     console.log(this.state.currentProfile);

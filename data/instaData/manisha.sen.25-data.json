@@ -4,6 +4,10 @@
   "dueTasks": [
     {
       "updateUserData": true
+    },
+    {
+      "follow": true,
+      "userName": "jitendra_swami_008"
     }
   ],
   "postsCount": 1,

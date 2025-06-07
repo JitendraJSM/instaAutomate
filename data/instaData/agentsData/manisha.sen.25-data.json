@@ -1,0 +1,134 @@
+{
+  "profileTarget": "2",
+  "automatedFollow": [],
+  "dueTasks": [
+    {
+      "updateUserData": true
+    },
+    {
+      "follow": true,
+      "userName": "jitendra_swami_007"
+    },
+    {
+      "follow": true,
+      "userName": "jitendra_swami_008"
+    }
+  ],
+  "postsCount": 1,
+  "followersCount": 3,
+  "followingsCount": 22,
+  "mutualFollowersCount": 0,
+  "ai_agent_type": null,
+  "biography": "",
+  "bio_links": [],
+  "fb_profile_biolink": null,
+  "biography_with_entities": {
+    "raw_text": "",
+    "entities": []
+  },
+  "blocked_by_viewer": false,
+  "restricted_by_viewer": false,
+  "country_block": false,
+  "eimu_id": "17843062932498474",
+  "external_url": null,
+  "external_url_linkshimmed": null,
+  "edge_followed_by": {
+    "count": 3
+  },
+  "fbid": "17841474954198317",
+  "followed_by_viewer": false,
+  "edge_follow": {
+    "count": 22
+  },
+  "follows_viewer": false,
+  "full_name": "Manisha Sen",
+  "group_metadata": null,
+  "has_ar_effects": false,
+  "has_clips": false,
+  "has_guides": false,
+  "has_chaining": false,
+  "has_channel": false,
+  "has_blocked_viewer": false,
+  "highlight_reel_count": 0,
+  "has_requested_viewer": false,
+  "hide_like_and_view_counts": false,
+  "id": "74946538473",
+  "is_business_account": false,
+  "is_professional_account": false,
+  "is_supervision_enabled": true,
+  "is_guardian_of_viewer": false,
+  "is_supervised_by_viewer": false,
+  "is_supervised_user": false,
+  "is_embeds_disabled": false,
+  "is_joined_recently": true,
+  "guardian_id": null,
+  "business_address_json": null,
+  "business_contact_method": "UNKNOWN",
+  "business_email": null,
+  "business_phone_number": null,
+  "business_category_name": null,
+  "overall_category_name": null,
+  "category_enum": null,
+  "category_name": null,
+  "is_private": false,
+  "is_verified": false,
+  "is_verified_by_mv4b": false,
+  "is_regulated_c18": false,
+  "edge_mutual_followed_by": {
+    "count": 0,
+    "edges": []
+  },
+  "pinned_channels_list_count": 0,
+  "profile_pic_url": "https://instagram.fjdh2-1.fna.fbcdn.net/v/t51.2885-19/500771664_17843063745498474_2386522269947300610_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.fjdh2-1.fna.fbcdn.net&_nc_cat=106&_nc_oc=Q6cZ2QH9z4MxG8ze-UoyF2aWeUDMPk-QzJifXDpOzPaUwo1FC8hD4mfIN9IrkGNk4o1KZVKlT27o6LmvSs6hHb0-oo3v&_nc_ohc=hyCKjmJZsJsQ7kNvwFzzI9S&_nc_gid=Ls_u9RYs9tkLgdWGtby9uQ&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfKM6TnAuEQ1tL2XheJSUFgxKJYqDng6CXuYGALC0vv6bw&oe=6844F780&_nc_sid=8b3546",
+  "profile_pic_url_hd": "https://instagram.fjdh2-1.fna.fbcdn.net/v/t51.2885-19/500771664_17843063745498474_2386522269947300610_n.jpg?stp=dst-jpg_s320x320_tt6&_nc_ht=instagram.fjdh2-1.fna.fbcdn.net&_nc_cat=106&_nc_oc=Q6cZ2QH9z4MxG8ze-UoyF2aWeUDMPk-QzJifXDpOzPaUwo1FC8hD4mfIN9IrkGNk4o1KZVKlT27o6LmvSs6hHb0-oo3v&_nc_ohc=hyCKjmJZsJsQ7kNvwFzzI9S&_nc_gid=Ls_u9RYs9tkLgdWGtby9uQ&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfIUjcnR88tE4dKlQZlfC6iMJ08NgI8sjG2QFsNPz-vzMA&oe=6844F780&_nc_sid=8b3546",
+  "requested_by_viewer": false,
+  "should_show_category": false,
+  "should_show_public_contacts": false,
+  "show_account_transparency_details": true,
+  "transparency_label": null,
+  "transparency_product": null,
+  "username": "manisha.sen.25",
+  "connected_fb_page": null,
+  "pronouns": [],
+  "edge_owner_to_timeline_media": {
+    "count": 1,
+    "page_info": {
+      "has_next_page": true,
+      "end_cursor": ""
+    },
+    "edges": []
+  },
+  "followers": [
+    "laltu.rajwar.1460",
+    "nawazsharif226_salon",
+    "rizwan.idrishi.378"
+  ],
+  "followings": [
+    "roshnigupta0075",
+    "_.sneha047._",
+    "sona_sengupta_",
+    "riya9669singh",
+    "_.itsnancyyy03._",
+    "rajmoushami893",
+    "laltu.rajwar.1460",
+    "tanu_shree__09",
+    "itz___crazy__bandi",
+    "priya___paswan6968",
+    "prity__mehra___",
+    "sanjanasharma7298",
+    "nishu_tanna_",
+    "poonam_pal2010",
+    "ritika_paswan._",
+    "diwanshi1619",
+    "kajal2860singh",
+    "sn0640004",
+    "atulkapoor231",
+    "hemantrajput701827",
+    "rizwan.idrishi.378",
+    "nawazsharif226_salon"
+  ],
+  "automatedUnfollow": [],
+  "like": [],
+  "comment": [],
+  "lastUpdate": "2025-06-03T17:15:38.859Z"
+}
