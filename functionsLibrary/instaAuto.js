@@ -77,7 +77,7 @@ const addDueTask = async function (userName, dueTaskObj) {
 const removeDueTask = async function (userName, dueTaskObj) {
   const profilesData = await readProfilesData();
 
-  profilesData.forEach(async (profile) => {
+  for (const profile of profilesData) {
     if (profile.userName === userName) {
       if (profile.dueTasks) {
         // Remove the task by filtering
@@ -107,7 +107,7 @@ const removeDueTask = async function (userName, dueTaskObj) {
         }
       }
     }
-  });
+  }
 
   await writeProfilesData(profilesData);
   console.log(`Removed task for user: ${userName}`);
