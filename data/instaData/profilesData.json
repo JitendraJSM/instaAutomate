@@ -32,7 +32,7 @@
       },
       {
         "follow": true,
-        "userName": "best.frnds.jsm"
+        "userName": "kajalmahioffical143"
       }
     ]
   },
@@ -45,6 +45,26 @@
       {
         "follow": true,
         "userName": "manisha.sen.25"
+      },
+      {
+        "follow": true,
+        "userName": "kajalmahioffical143"
+      }
+    ]
+  },
+  {
+    "profileTarget": "22",
+    "userName": "kajalmahioffical143",
+    "password": "hhjsm001",
+    "type": "agent",
+    "dueTasks": [
+      {
+        "follow": true,
+        "userName": "manisha.sen.25"
+      },
+      {
+        "follow": true,
+        "userName": "best.frnds.jsm"
       }
     ]
   }

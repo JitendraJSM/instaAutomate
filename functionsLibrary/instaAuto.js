@@ -269,7 +269,6 @@ const goInstaHome = async function () {
     console.log(`Home Button of Instagram is not availble so going to navigate home page for : ${this.state.currentProfile.userName}`);
     if (this.page.url() !== `https://www.instagram.com/${this.state.currentProfile.userName}`) await this.page.navigateTo(`https://www.instagram.com/${this.state.currentProfile.userName}/`);
   }
-  console.log(`let's Wait........`);
 
   await this.utils.randomDelay(1.25, 0.25);
   this.page.waitForPageLoad();

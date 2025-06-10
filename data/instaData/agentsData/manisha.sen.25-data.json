@@ -7,15 +7,11 @@
     },
     {
       "follow": true,
-      "userName": "jitendra_swami_007"
-    },
-    {
-      "follow": true,
-      "userName": "jitendra_swami_008"
-    },
-    {
-      "follow": true,
       "userName": "best.frnds.jsm"
+    },
+    {
+      "follow": true,
+      "userName": "kajalmahioffical143"
     }
   ],
   "postsCount": 1,
@@ -102,11 +98,7 @@
     },
     "edges": []
   },
-  "followers": [
-    "laltu.rajwar.1460",
-    "nawazsharif226_salon",
-    "rizwan.idrishi.378"
-  ],
+  "followers": ["laltu.rajwar.1460", "nawazsharif226_salon", "rizwan.idrishi.378"],
   "followings": [
     "roshnigupta0075",
     "_.sneha047._",
