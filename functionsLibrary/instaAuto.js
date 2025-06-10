@@ -23,13 +23,8 @@ const utils = require("../utils/utils.js");
   2.3   Close the chrome browser.
 */
 // ======= Imports =======
-const fs = require("fs-extra");
 
-// ======= Constants =======
-const botWorkShiftHours = 16;
-
-const dayMs = 24 * 60 * 60 * 1000;
-const hourMs = 60 * 60 * 1000;
+const db = require("./instAutoDB.js");
 
 // ======= Event Listeners =======
 const startListeners = async function () {
@@ -39,107 +34,6 @@ const startListeners = async function () {
 };
 
 // ======= DB Functions =======
-const profilesDataPath = () => `./data/instaData/profilesData.json`;
-const agentsDataPath = (userName) => `./data/instaData/agentsData/${userName}-data.json`;
-const scrapersDataPath = (userName) => `./data/instaData/scrapersData/${userName}-data.json`;
-
-const getDataPath = async () => {};
-
-const readUserProfileData = async (userProfile) => {
-  // Determine the path of user profile
-  const getDataPath = userProfile.type === "agent" ? agentsDataPath : scrapersDataPath;
-  const userDataPath = getDataPath(userProfile.userName);
-  // Check if file exists
-  const doesfileExist = await fs.pathExists(userDataPath);
-  if (!doesfileExist) {
-    throw new Error(`User data file does not exist for user: ${userProfile.userName}`);
-  }
-  // Read the user data from the file
-  const userData = JSON.parse(await fs.readFile(userDataPath));
-  console.log(`User data for ${userProfile.userName} read from ${userDataPath}`);
-  return userData;
-};
-
-const writeUserProfileData = async (userData) => {
-  if (!userData || !userData.userName || !userData.type) throw new Error(`Invalid userData object provided. It must contain userName and type properties.`);
-
-  //  Determine the path of user profile
-  const typeOfProfile = userData.type;
-  const getDataPath = typeOfProfile === "agent" ? agentsDataPath : scrapersDataPath;
-  const userDataPath = getDataPath(userData.userName);
-
-  // Check if file exists
-  const doesfileExist = await fs.pathExists(userDataPath);
-  if (doesfileExist) {
-    const storedUserData = JSON.parse(await fs.readFile(userDataPath));
-    //  if userData exists then combine userData with storedUserData
-    userData = { ...storedUserData, ...userData };
-  }
-  // Write the user data to the file
-  await fs.writeFile(userDataPath, JSON.stringify(userData, null, 2));
-
-  return userData;
-};
-
-const readProfilesData = async function () {
-  return JSON.parse(await fs.readFile("./data/instaData/profilesData.json"));
-};
-
-const writeProfilesData = async (profilesData) => await fs.writeFile(profilesDataPath(), JSON.stringify(profilesData, null, 2));
-
-const addDueTask = async function (userName, dueTaskObj) {
-  console.log(`Adding due task for user: ${userName}`);
-
-  const profilesData = await readProfilesData();
-
-  for (const profile of profilesData) {
-    if (profile.userName === `${userName}`) {
-      if (!profile.dueTasks) profile.dueTasks = [];
-      profile.dueTasks.push(dueTaskObj);
-      let typeOfProfile = profile.type;
-      profile.dueTasks = utils.removeDuplicates(profile.dueTasks);
-      const getDataPath = typeOfProfile === "agent" ? agentsDataPath : scrapersDataPath;
-      const dataPath = getDataPath(userName);
-
-      const userData = JSON.parse(await fs.readFile(dataPath));
-      userData.dueTasks.push(dueTaskObj);
-      userData.dueTasks = utils.removeDuplicates(userData.dueTasks);
-
-      await writeUserProfileData.call(this, userData);
-    }
-  }
-  await writeProfilesData(profilesData);
-  console.log(`Added task for user: ${userName}`);
-};
-
-const removeDueTask = async function (userName, dueTaskObj) {
-  const profilesData = await readProfilesData();
-
-  for (const profile of profilesData) {
-    if (profile.userName === userName) {
-      if (profile.dueTasks) {
-        // Remove the task by filtering
-        profile.dueTasks = profile.dueTasks.filter((task) => JSON.stringify(task) !== JSON.stringify(dueTaskObj));
-
-        let typeOfProfile = profile.type;
-        const getDataPath = typeOfProfile === "agent" ? agentsDataPath : scrapersDataPath;
-        const dataPath = getDataPath(userName);
-
-        // Update user-specific data file
-        const userData = JSON.parse(await fs.readFile(dataPath));
-
-        if (userData.dueTasks) {
-          userData.dueTasks = userData.dueTasks.filter((task) => JSON.stringify(task) !== JSON.stringify(dueTaskObj));
-
-          await writeUserProfileData.call(this, userData);
-        }
-      }
-    }
-  }
-
-  await writeProfilesData(profilesData);
-  console.log(`Removed task for user: ${userName}`);
-};
 
 const addNewProfile = async function () {
   const newProfile = {};
@@ -161,11 +55,11 @@ const addNewProfile = async function () {
 
   for (const profile of this.state.profilesData) {
     // 1. This only writes data in json file does not update the currently running process's memory.
-    await addDueTask.call(this, profile.userName, {
+    await db.addDueTask.call(this, profile.userName, {
       follow: true,
       userName: `${newProfile.userName}`,
     });
-    await addDueTask.call(this, newProfile.userName, {
+    await db.addDueTask.call(this, newProfile.userName, {
       follow: true,
       userName: `${profile.userName}`,
     });
@@ -176,8 +70,8 @@ const addNewProfile = async function () {
   }
   this.state.profilesData.push(newProfile);
 
-  await writeProfilesData(this.state.profilesData);
-  await writeUserProfileData(newProfile);
+  await db.writeProfilesData(this.state.profilesData);
+  await db.writeUserProfileData(newProfile);
 
   this.state.currentProfile = newProfile;
   this.state.profileTarget = newProfile.profileTarget;
