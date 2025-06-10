@@ -7,6 +7,10 @@
     },
     {
       "follow": true,
+      "userName": "jitendra_swami_007"
+    },
+    {
+      "follow": true,
       "userName": "jitendra_swami_008"
     }
   ],
@@ -94,11 +98,7 @@
     },
     "edges": []
   },
-  "followers": [
-    "laltu.rajwar.1460",
-    "nawazsharif226_salon",
-    "rizwan.idrishi.378"
-  ],
+  "followers": ["laltu.rajwar.1460", "nawazsharif226_salon", "rizwan.idrishi.378"],
   "followings": [
     "roshnigupta0075",
     "_.sneha047._",

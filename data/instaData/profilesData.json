@@ -1,11 +1,5 @@
 [
   {
-    "profileTarget": 21,
-    "userName": "best.frnds.jsm",
-    "password": "hhjsm001",
-    "type": "scrper"
-  },
-  {
     "profileTarget": "2",
     "userName": "manisha.sen.25",
     "password": "hhjsm001",
@@ -14,10 +8,6 @@
       {
         "userName": "itsnancyyy03",
         "date": "2025-06-03T00:25:42.128Z"
-      },
-      {
-        "userName": "riya9669singh",
-        "date": "2025-06-03T00:58:25.414Z"
       },
       {
         "userName": "riya9669singh",
@@ -35,6 +25,26 @@
     "dueTasks": [
       {
         "updateUserData": true
+      },
+      {
+        "follow": true,
+        "userName": "best.frnds.jsm"
+      },
+      {
+        "follow": true,
+        "userName": "best.frnds.jsm"
+      }
+    ]
+  },
+  {
+    "profileTarget": "21",
+    "userName": "best.frnds.jsm",
+    "password": "hhjsm001",
+    "type": "scraper",
+    "dueTasks": [
+      {
+        "follow": true,
+        "userName": "manisha.sen.25"
       }
     ]
   }

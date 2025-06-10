@@ -12,6 +12,10 @@
     {
       "follow": true,
       "userName": "jitendra_swami_008"
+    },
+    {
+      "follow": true,
+      "userName": "best.frnds.jsm"
     }
   ],
   "postsCount": 1,
@@ -87,7 +91,7 @@
   "show_account_transparency_details": true,
   "transparency_label": null,
   "transparency_product": null,
-  "username": "manisha.sen.25",
+  "userName": "manisha.sen.25",
   "connected_fb_page": null,
   "pronouns": [],
   "edge_owner_to_timeline_media": {
@@ -130,5 +134,6 @@
   "automatedUnfollow": [],
   "like": [],
   "comment": [],
+  "type": "agent",
   "lastUpdate": "2025-06-03T17:15:38.859Z"
 }
