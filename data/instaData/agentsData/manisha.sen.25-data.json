@@ -15,7 +15,7 @@
     }
   ],
   "postsCount": 1,
-  "followersCount": 3,
+  "followersCount": 4,
   "followingsCount": 22,
   "mutualFollowersCount": 0,
   "ai_agent_type": null,
@@ -33,7 +33,7 @@
   "external_url": null,
   "external_url_linkshimmed": null,
   "edge_followed_by": {
-    "count": 3
+    "count": 4
   },
   "fbid": "17841474954198317",
   "followed_by_viewer": false,
@@ -60,7 +60,7 @@
   "is_supervised_by_viewer": false,
   "is_supervised_user": false,
   "is_embeds_disabled": false,
-  "is_joined_recently": true,
+  "is_joined_recently": false,
   "guardian_id": null,
   "business_address_json": null,
   "business_contact_method": "UNKNOWN",
@@ -79,8 +79,8 @@
     "edges": []
   },
   "pinned_channels_list_count": 0,
-  "profile_pic_url": "https://instagram.fjdh2-1.fna.fbcdn.net/v/t51.2885-19/500771664_17843063745498474_2386522269947300610_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.fjdh2-1.fna.fbcdn.net&_nc_cat=106&_nc_oc=Q6cZ2QH9z4MxG8ze-UoyF2aWeUDMPk-QzJifXDpOzPaUwo1FC8hD4mfIN9IrkGNk4o1KZVKlT27o6LmvSs6hHb0-oo3v&_nc_ohc=hyCKjmJZsJsQ7kNvwFzzI9S&_nc_gid=Ls_u9RYs9tkLgdWGtby9uQ&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfKM6TnAuEQ1tL2XheJSUFgxKJYqDng6CXuYGALC0vv6bw&oe=6844F780&_nc_sid=8b3546",
-  "profile_pic_url_hd": "https://instagram.fjdh2-1.fna.fbcdn.net/v/t51.2885-19/500771664_17843063745498474_2386522269947300610_n.jpg?stp=dst-jpg_s320x320_tt6&_nc_ht=instagram.fjdh2-1.fna.fbcdn.net&_nc_cat=106&_nc_oc=Q6cZ2QH9z4MxG8ze-UoyF2aWeUDMPk-QzJifXDpOzPaUwo1FC8hD4mfIN9IrkGNk4o1KZVKlT27o6LmvSs6hHb0-oo3v&_nc_ohc=hyCKjmJZsJsQ7kNvwFzzI9S&_nc_gid=Ls_u9RYs9tkLgdWGtby9uQ&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfIUjcnR88tE4dKlQZlfC6iMJ08NgI8sjG2QFsNPz-vzMA&oe=6844F780&_nc_sid=8b3546",
+  "profile_pic_url": "https://instagram.famd1-3.fna.fbcdn.net/v/t51.2885-19/500771664_17843063745498474_2386522269947300610_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.famd1-3.fna.fbcdn.net&_nc_cat=106&_nc_oc=Q6cZ2QGI3TwLz4Dx7XzjM_sujFl0jcLAHimcyolGpRg0uQiiRE8uoMf9GJcmPCYUl21GIHU&_nc_ohc=lNo0QDHrDoEQ7kNvwG617uW&_nc_gid=QmRMJkBrh84ebfp-yyilgQ&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfMrH0MFxRAq83bHxbxcRNIFycigy0RFsY5qF7Ab-mK4Mg&oe=684EDAC0&_nc_sid=8b3546",
+  "profile_pic_url_hd": "https://instagram.famd1-3.fna.fbcdn.net/v/t51.2885-19/500771664_17843063745498474_2386522269947300610_n.jpg?stp=dst-jpg_s320x320_tt6&_nc_ht=instagram.famd1-3.fna.fbcdn.net&_nc_cat=106&_nc_oc=Q6cZ2QGI3TwLz4Dx7XzjM_sujFl0jcLAHimcyolGpRg0uQiiRE8uoMf9GJcmPCYUl21GIHU&_nc_ohc=lNo0QDHrDoEQ7kNvwG617uW&_nc_gid=QmRMJkBrh84ebfp-yyilgQ&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfOkT1lNH9Ci0S6oaJbgI-53UhQdDulsiRTw20sCXkLO3g&oe=684EDAC0&_nc_sid=8b3546",
   "requested_by_viewer": false,
   "should_show_category": false,
   "should_show_public_contacts": false,
@@ -98,7 +98,12 @@
     },
     "edges": []
   },
-  "followers": ["laltu.rajwar.1460", "nawazsharif226_salon", "rizwan.idrishi.378"],
+  "followers": [
+    "hemantrajput701827",
+    "laltu.rajwar.1460",
+    "nawazsharif226_salon",
+    "rizwan.idrishi.378"
+  ],
   "followings": [
     "roshnigupta0075",
     "_.sneha047._",
@@ -127,5 +132,9 @@
   "like": [],
   "comment": [],
   "type": "agent",
-  "lastUpdate": "2025-06-03T17:15:38.859Z"
+  "lastUpdate": "2025-06-11T04:45:04.357Z",
+  "username": "manisha.sen.25",
+  "password": "hhjsm001",
+  "automatedlike": [],
+  "automatedcomment": []
 }

@@ -107,6 +107,31 @@ const removeDueTask = async function (userName, dueTaskObj) {
   console.log(`Removed task for user: ${userName}`);
 };
 
+const updateDatabaseOnFollow = async function (userObject) {
+  const tempProfileData = JSON.parse(await fs.readFile(`./data/instaData/${this.state.currentProfile.userName}-data.json`));
+
+  // Neccessary Checks
+  /* The creatation of automatedFollow Array is for new user only */
+  if (!this.state.currentProfile.automatedFollow) this.state.currentProfile.automatedFollow = [];
+  /* Sometimes in development you manullay unfollow a user that was previously automated followed and hence in automatedFollowed array but when script again perform automated follow on that same user it creates a duplicate array element for that same user but with different date so the below is check for that*/
+  const index = this.state.currentProfile.automatedFollow.findIndex((profile) => profile.userName === userObject.userName);
+  if (index !== -1) {
+    this.state.currentProfile.automatedFollow.splice(index, 1);
+  }
+
+  this.state.currentProfile.automatedFollow.push(userObject);
+
+  /* The creatation of dueTasks Array is for new user only */
+  if (!this.state.currentProfile.dueTasks) this.state.currentProfile.dueTasks = [];
+  this.state.currentProfile.dueTasks.push({ updateUserData: true });
+  this.state.currentProfile.dueTasks = this.utils.removeDuplicates(this.state.currentProfile.dueTasks);
+  await writeUserProfileData.call(this, { ...tempProfileData, ...this.state.currentProfile });
+
+  this.state.profilesData.find((profile) => profile.userName === this.state.currentProfile.userName).dueTasks = this.state.currentProfile.dueTasks;
+  await writeProfilesData.call(this, this.state.profilesData);
+  // console.log(`updateDatabaseOnFollow function completed.`);
+};
+
 // === Interface ===
 const catchAsync = require("../utils/catchAsync.js");
 module.exports = {
@@ -116,4 +141,5 @@ module.exports = {
   writeProfilesData: catchAsync(writeProfilesData),
   addDueTask: catchAsync(addDueTask),
   removeDueTask: catchAsync(removeDueTask),
+  updateDatabaseOnFollow: catchAsync(updateDatabaseOnFollow),
 };

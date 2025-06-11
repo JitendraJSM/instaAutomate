@@ -29,7 +29,7 @@ const db = require("./instAutoDB.js");
 // ======= Event Listeners =======
 const startListeners = async function () {
   this.on("follow", async (userObject) => {
-    await updateDatabaseOnFollow.call(this, userObject);
+    await db.updateDatabaseOnFollow.call(this, userObject);
   });
 };
 
@@ -92,7 +92,7 @@ const addNewProfile = async function () {
 const updateUserData = async function (needUpadte) {
   let userData;
 
-  userData = await readUserProfileData(this.state.currentProfile);
+  userData = await db.readUserProfileData(this.state.currentProfile);
   if (!needUpadte) {
     needUpadte = true;
     if (userData.lastUpdate) {
@@ -120,36 +120,11 @@ const updateUserData = async function (needUpadte) {
     this.state.currentProfile.automatedlike = [];
     this.state.currentProfile.automatedcomment = [];
     this.state.currentProfile.lastUpdate = new Date().toISOString();
-    await writeUserProfileData.call(this, this.state.currentProfile);
+    await db.writeUserProfileData.call(this, this.state.currentProfile);
 
     // console.log(`UserData of ${this.state.currentProfile.userName}'s this.state.currentProfile is as: .`);
     // console.log(this.state.currentProfile);
   } else console.log(`UserData of ${this.state.currentProfile.userName} does not need an updated.`);
-};
-
-const updateDatabaseOnFollow = async function (userObject) {
-  const tempProfileData = JSON.parse(await fs.readFile(`./data/instaData/${this.state.currentProfile.userName}-data.json`));
-
-  // Neccessary Checks
-  /* The creatation of automatedFollow Array is for new user only */
-  if (!this.state.currentProfile.automatedFollow) this.state.currentProfile.automatedFollow = [];
-  /* Sometimes in development you manullay unfollow a user that was previously automated followed and hence in automatedFollowed array but when script again perform automated follow on that same user it creates a duplicate array element for that same user but with different date so the below is check for that*/
-  const index = this.state.currentProfile.automatedFollow.findIndex((profile) => profile.userName === userObject.userName);
-  if (index !== -1) {
-    this.state.currentProfile.automatedFollow.splice(index, 1);
-  }
-
-  this.state.currentProfile.automatedFollow.push(userObject);
-
-  /* The creatation of dueTasks Array is for new user only */
-  if (!this.state.currentProfile.dueTasks) this.state.currentProfile.dueTasks = [];
-  this.state.currentProfile.dueTasks.push({ updateUserData: true });
-  this.state.currentProfile.dueTasks = this.utils.removeDuplicates(this.state.currentProfile.dueTasks);
-  await writeUserProfileData.call(this, { ...tempProfileData, ...this.state.currentProfile });
-
-  this.state.profilesData.find((profile) => profile.userName === this.state.currentProfile.userName).dueTasks = this.state.currentProfile.dueTasks;
-  await writeProfilesData.call(this, this.state.profilesData);
-  // console.log(`updateDatabaseOnFollow function completed.`);
 };
 
 // ======= Main Functions =======
@@ -478,9 +453,14 @@ const performDueTasks = async function () {
   this.state.profileTarget = this.state.currentProfile.profileTarget;
   await this.chrome.initializeBrowser.call(this);
   await this.instaAuto.updateUserData.call(this);
+
+  const stateFilePath = path.join(__dirname, "../data/instaData/stateAtCompletion.json");
+  fs.writeFileSync(stateFilePath, JSON.stringify(this.state, null, 2));
+  console.log(`State written to ${stateFilePath}`);
+
   // await follow.call(this, "riya9669singh");
   // await follow.call(this, "sona_sengupta_");
-  await follow.call(this, "roshnigupta0075");
+  // await follow.call(this, "roshnigupta0075");
 };
 
 // ======= Controller Functions =======
@@ -493,7 +473,7 @@ const instaAutomation = async function () {
   await removeDueTask("manisha.sen.25", { follow: true, userName: "jitendra_swami_008" });
   */
 
-  this.state.profilesData = await readProfilesData();
+  this.state.profilesData = await db.readProfilesData();
   await startListeners.call(this);
 
   const userInput = await this.utils.askUser(`Do you want to add new profile? (y/n): `);
@@ -501,8 +481,8 @@ const instaAutomation = async function () {
     const addNewProfileResponse = await addNewProfile.call(this);
     if (!addNewProfileResponse) throw new Error(`Failed to add new profile`);
   }
-  console.log(`----------------- ENDEDDDDDD----------`);
-  process.exit(0);
+
+  // As agent's dueTasks are more important than scraper's dueTasks.
   this.state.profilesToLoop = this.state.profilesData.filter((profile) => profile.type === "agent");
   // console.log(this.state.profilesToLoop);
   if (this.state.profilesToLoop.length === 0) throw new Error(`No profiles to loop`);
@@ -546,8 +526,9 @@ const scrapeContentOfUser = async function () {};
 // module.exports = Instauto;
 // === Interface ===
 const catchAsync = require("../utils/catchAsync.js");
+const fs = require("fs");
+const path = require("path");
 module.exports = {
-  readProfilesData: catchAsync(readProfilesData),
   instaAutomation: catchAsync(instaAutomation),
   updateUserData: catchAsync(updateUserData),
   follow: catchAsync(follow),

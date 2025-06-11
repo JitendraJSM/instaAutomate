@@ -1,0 +1,173 @@
+{
+  "startTime": 1749617055737,
+  "logFilePath": "C:\\Users\\acer\\Downloads\\Jitu\\InstaAutomation\\instaAuto-by-JN\\data\\logs\\11-06-25 10-14-15.txt",
+  "profilesData": [
+    {
+      "profileTarget": "2",
+      "userName": "manisha.sen.25",
+      "password": "hhjsm001",
+      "type": "agent",
+      "automatedFollow": [
+        {
+          "userName": "itsnancyyy03",
+          "date": "2025-06-03T00:25:42.128Z"
+        },
+        {
+          "userName": "riya9669singh",
+          "date": "2025-06-03T01:02:47.051Z"
+        },
+        {
+          "userName": "sona_sengupta_",
+          "date": "2025-06-03T01:41:20.155Z"
+        },
+        {
+          "userName": "roshnigupta0075",
+          "date": "2025-06-03T13:17:23.291Z"
+        }
+      ],
+      "dueTasks": [
+        {
+          "updateUserData": true
+        },
+        {
+          "follow": true,
+          "userName": "best.frnds.jsm"
+        },
+        {
+          "follow": true,
+          "userName": "kajalmahioffical143"
+        }
+      ],
+      "postsCount": 1,
+      "followersCount": 4,
+      "followingsCount": 22,
+      "mutualFollowersCount": 0
+    },
+    {
+      "profileTarget": "21",
+      "userName": "best.frnds.jsm",
+      "password": "hhjsm001",
+      "type": "scraper",
+      "dueTasks": [
+        {
+          "follow": true,
+          "userName": "manisha.sen.25"
+        },
+        {
+          "follow": true,
+          "userName": "kajalmahioffical143"
+        },
+        {
+          "follow": true,
+          "userName": "kajalmahioffical143"
+        }
+      ]
+    },
+    {
+      "profileTarget": "22",
+      "userName": "kajalmahioffical143",
+      "password": "hhjsm001",
+      "type": "agent",
+      "dueTasks": [
+        {
+          "follow": true,
+          "userName": "manisha.sen.25"
+        },
+        {
+          "follow": true,
+          "userName": "best.frnds.jsm"
+        }
+      ]
+    }
+  ],
+  "profilesToLoop": [
+    {
+      "profileTarget": "2",
+      "userName": "manisha.sen.25",
+      "password": "hhjsm001",
+      "type": "agent",
+      "automatedFollow": [
+        {
+          "userName": "itsnancyyy03",
+          "date": "2025-06-03T00:25:42.128Z"
+        },
+        {
+          "userName": "riya9669singh",
+          "date": "2025-06-03T01:02:47.051Z"
+        },
+        {
+          "userName": "sona_sengupta_",
+          "date": "2025-06-03T01:41:20.155Z"
+        },
+        {
+          "userName": "roshnigupta0075",
+          "date": "2025-06-03T13:17:23.291Z"
+        }
+      ],
+      "dueTasks": [
+        {
+          "updateUserData": true
+        },
+        {
+          "follow": true,
+          "userName": "best.frnds.jsm"
+        },
+        {
+          "follow": true,
+          "userName": "kajalmahioffical143"
+        }
+      ],
+      "postsCount": 1,
+      "followersCount": 4,
+      "followingsCount": 22,
+      "mutualFollowersCount": 0
+    },
+    {
+      "profileTarget": "22",
+      "userName": "kajalmahioffical143",
+      "password": "hhjsm001",
+      "type": "agent",
+      "dueTasks": [
+        {
+          "follow": true,
+          "userName": "manisha.sen.25"
+        },
+        {
+          "follow": true,
+          "userName": "best.frnds.jsm"
+        }
+      ]
+    }
+  ],
+  "currentProfileIndex": 1,
+  "currentProfile": {
+    "profileTarget": "22",
+    "userName": "kajalmahioffical143",
+    "password": "hhjsm001",
+    "type": "agent",
+    "dueTasks": [
+      {
+        "follow": true,
+        "userName": "manisha.sen.25"
+      },
+      {
+        "follow": true,
+        "userName": "best.frnds.jsm"
+      }
+    ]
+  },
+  "profileTarget": "22",
+  "browserOptions": {
+    "profileTarget": "22",
+    "initialURL": "https://www.youtube.com",
+    "windowSize": [
+      789,
+      815
+    ],
+    "windowPosition": [
+      660,
+      0
+    ],
+    "environment": "development"
+  }
+}
