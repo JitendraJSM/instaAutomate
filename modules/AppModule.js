@@ -19,6 +19,7 @@ const EventEmitter = require("events");
 const chrome = require("../functionsLibrary/chrome.js");
 const devOrTest = require("../functionsLibrary/devOrTest.js");
 const instaAuto = require("../functionsLibrary/instaAuto.js");
+const db = require("../functionsLibrary/db.js");
 
 class App extends EventEmitter {
   constructor() {
@@ -28,6 +29,7 @@ class App extends EventEmitter {
     this.chrome = chrome;
     this.devOrTest = devOrTest;
     this.instaAuto = instaAuto;
+    this.db = db;
 
     // == Modules ==
     this.monitor = new Monitor();
@@ -54,9 +56,7 @@ class App extends EventEmitter {
       // console.log(`The action called ${this.actionList[this.currentActionIndex].callback.name} failed.`);
 
       if (this.errorHandler == null) {
-        console.log(
-          `Error Handler is not defined. Please define as: app.addGlobalErrorHandler(error)`
-        );
+        console.log(`Error Handler is not defined. Please define as: app.addGlobalErrorHandler(error)`);
         // console.log(error);
       } else this.errorHandler(error);
     } else if (this.currentActionIndex < this.actionList.length) {
@@ -82,10 +82,7 @@ class App extends EventEmitter {
     this.currentActionIndex = 0;
 
     // Execute tasks while we have valid index
-    while (
-      this.currentActionIndex >= 0 &&
-      this.currentActionIndex < this.task.length
-    ) {
+    while (this.currentActionIndex >= 0 && this.currentActionIndex < this.task.length) {
       this.currentAction = this.task[this.currentActionIndex];
       // console.log(
       //   `before executing the action: ${this.currentAction.actionName} the currentActionIndex is: ${this.currentActionIndex}`
@@ -127,9 +124,7 @@ class App extends EventEmitter {
         // Only return result if it should be stored in state
         return shouldStoreState ? result : undefined;
       } catch (error) {
-        await utils.log(
-          `Action '${actionName}' failed with error: ${error.message}`
-        );
+        await utils.log(`Action '${actionName}' failed with error: ${error.message}`);
         throw error;
       }
     };

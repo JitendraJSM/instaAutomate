@@ -50,6 +50,7 @@ const writeUserProfileData = async (userData) => {
 const readProfilesData = async function () {
   return JSON.parse(await fs.readFile("./data/instaData/profilesData.json"));
 };
+readProfilesData.shouldStoreState = "profilesData";
 
 const writeProfilesData = async (profilesData) => await fs.writeFile(profilesDataPath(), JSON.stringify(profilesData, null, 2));
 
@@ -132,6 +133,58 @@ const updateDatabaseOnFollow = async function (userObject) {
   // console.log(`updateDatabaseOnFollow function completed.`);
 };
 
+const addNewProfile = async function () {
+  let userInput = await this.utils.askUser(`Do you want to add new profile? (y/n): `);
+  if (userInput.toLowerCase() === "n") {
+    return false;
+  }
+
+  // Create a new profile object
+  const newProfile = {};
+
+  newProfile.profileTarget = await this.utils.askUser("Enter profile target: ");
+  if (this.state.profilesData.find((profile) => profile.profileTarget == newProfile.profileTarget)) throw new Error(`Profile with target ${newProfile.profileTarget} already exists`);
+
+  newProfile.userName = await this.utils.askUser(`Enter user name:`);
+  if (this.state.profilesData.find((profile) => profile.userName == newProfile.userName)) throw new Error(`Profile with user name: ${newProfile.userName} already exists`);
+
+  newProfile.password = await this.utils.askUser(`Enter password:`);
+
+  userInput = await this.utils.askUser("Enter type of profile: 1 for 'agent', 2 for 'scrper'");
+  if (userInput === "1") newProfile.type = "agent";
+  else if (userInput === "2") newProfile.type = "scraper";
+  else throw new Error(`Invalid input`);
+
+  newProfile.dueTasks = [{ updateUserData: true }];
+
+  for (const profile of this.state.profilesData) {
+    // 1. This only writes data in json file does not update the currently running process's memory.
+    await addDueTask.call(this, profile.userName, {
+      follow: true,
+      userName: `${newProfile.userName}`,
+    });
+    await addDueTask.call(this, newProfile.userName, {
+      follow: true,
+      userName: `${profile.userName}`,
+    });
+
+    // 2. This updates the currently running process's memory.
+    profile.dueTasks.push({ follow: true, userName: `${newProfile.userName}` });
+    newProfile.dueTasks.push({ follow: true, userName: `${profile.userName}` });
+  }
+  this.state.profilesData.push(newProfile);
+
+  await writeProfilesData(this.state.profilesData);
+  await writeUserProfileData(newProfile);
+
+  this.state.currentProfile = newProfile;
+  this.state.profileTarget = newProfile.profileTarget;
+
+  console.log(`New profile added successfully.`);
+
+  return true;
+};
+
 // === Interface ===
 const catchAsync = require("../utils/catchAsync.js");
 module.exports = {
@@ -142,4 +195,5 @@ module.exports = {
   addDueTask: catchAsync(addDueTask),
   removeDueTask: catchAsync(removeDueTask),
   updateDatabaseOnFollow: catchAsync(updateDatabaseOnFollow),
+  addNewProfile: catchAsync(addNewProfile),
 };

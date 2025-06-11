@@ -24,70 +24,17 @@ const utils = require("../utils/utils.js");
 */
 // ======= Imports =======
 
-const db = require("./instAutoDB.js");
+const db = require("./db.js");
 
 // ======= Event Listeners =======
 const startListeners = async function () {
   this.on("follow", async (userObject) => {
-    await db.updateDatabaseOnFollow.call(this, userObject);
+    await this.db.updateDatabaseOnFollow.call(this, userObject);
   });
+  console.log(`Listeners started.`);
 };
 
 // ======= DB Functions =======
-
-const addNewProfile = async function () {
-  const newProfile = {};
-
-  newProfile.profileTarget = await this.utils.askUser("Enter profile target: ");
-  if (this.state.profilesData.find((profile) => profile.profileTarget == newProfile.profileTarget)) throw new Error(`Profile with target ${newProfile.profileTarget} already exists`);
-
-  newProfile.userName = await this.utils.askUser(`Enter user name:`);
-  if (this.state.profilesData.find((profile) => profile.userName == newProfile.userName)) throw new Error(`Profile with user name: ${newProfile.userName} already exists`);
-
-  newProfile.password = await this.utils.askUser(`Enter password:`);
-
-  const userInput = await this.utils.askUser("Enter type of profile: 1 for 'agent', 2 for 'scrper'");
-  if (userInput === "1") newProfile.type = "agent";
-  else if (userInput === "2") newProfile.type = "scraper";
-  else throw new Error(`Invalid input`);
-
-  newProfile.dueTasks = [];
-
-  for (const profile of this.state.profilesData) {
-    // 1. This only writes data in json file does not update the currently running process's memory.
-    await db.addDueTask.call(this, profile.userName, {
-      follow: true,
-      userName: `${newProfile.userName}`,
-    });
-    await db.addDueTask.call(this, newProfile.userName, {
-      follow: true,
-      userName: `${profile.userName}`,
-    });
-
-    // 2. This updates the currently running process's memory.
-    profile.dueTasks.push({ follow: true, userName: `${newProfile.userName}` });
-    newProfile.dueTasks.push({ follow: true, userName: `${profile.userName}` });
-  }
-  this.state.profilesData.push(newProfile);
-
-  await db.writeProfilesData(this.state.profilesData);
-  await db.writeUserProfileData(newProfile);
-
-  this.state.currentProfile = newProfile;
-  this.state.profileTarget = newProfile.profileTarget;
-
-  // try {
-  await this.chrome.initializeBrowser.call(this);
-  await updateUserData.call(this, true);
-  // } catch (error) {
-  //   console.error(`Error initializing browser or updating user data: ${error.message}`);
-  //   await addDueTask.call(this, newProfile.userName, { updateUserData: true });
-  //   console.log(`Due task for updating user data added successfully.`);
-  // }
-  console.log(`New profile added successfully.`);
-
-  return true;
-};
 
 const updateUserData = async function (needUpadte) {
   let userData;
@@ -473,6 +420,13 @@ const performDueTasks = async function () {
 };
 
 // ======= Controller Functions =======
+
+const filterProfilesToAutomate = async function () {
+  // As agent's dueTasks are more important than scraper's dueTasks.
+  this.state.profilesToLoop = this.state.profilesData.filter((profile) => profile.type === "agent");
+  // console.log(this.state.profilesToLoop);
+  if (this.state.profilesToLoop.length === 0) throw new Error(`No profiles to loop`);
+};
 const instaAutomation = async function () {
   /*
   await addDueTask("manisha.sen.25", { updateUserData: true });
@@ -482,14 +436,14 @@ const instaAutomation = async function () {
   await removeDueTask("manisha.sen.25", { follow: true, userName: "jitendra_swami_008" });
   */
 
-  this.state.profilesData = await db.readProfilesData();
-  await startListeners.call(this);
+  // this.state.profilesData = await db.readProfilesData(); // Done in initialTask.json
+  // await startListeners.call(this); // Done in initialTask.json
 
-  const userInput = await this.utils.askUser(`Do you want to add new profile? (y/n): `);
+  /* const userInput = await this.utils.askUser(`Do you want to add new profile? (y/n): `);
   if (userInput.toLowerCase() === "y") {
     const addNewProfileResponse = await addNewProfile.call(this);
     if (!addNewProfileResponse) throw new Error(`Failed to add new profile`);
-  }
+  }*/ // Shifted to db.js and Done in initialTask.json
 
   // As agent's dueTasks are more important than scraper's dueTasks.
   this.state.profilesToLoop = this.state.profilesData.filter((profile) => profile.type === "agent");

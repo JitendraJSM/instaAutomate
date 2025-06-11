@@ -1,6 +1,19 @@
 [
   {
+    "parentModuleName": "db",
+    "actionName": "readProfilesData"
+  },
+  {
     "parentModuleName": "instaAuto",
-    "actionName": "instaAutomation"
+    "actionName": "startListeners"
+  },
+  {
+    "parentModuleName": "db",
+    "actionName": "addNewProfile"
+  },
+  {
+    "parentModuleName": "devOrTest",
+    "actionName": "consoleLog",
+    "argumentsString": "this.state"
   }
 ]

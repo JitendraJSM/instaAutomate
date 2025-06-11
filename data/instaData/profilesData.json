@@ -33,6 +33,10 @@
       {
         "follow": true,
         "userName": "kajalmahioffical143"
+      },
+      {
+        "follow": true,
+        "userName": "kajalmahioffical143"
       }
     ]
   },
@@ -53,6 +57,14 @@
       {
         "follow": true,
         "userName": "kajalmahioffical143"
+      },
+      {
+        "follow": true,
+        "userName": "kajalmahioffical143"
+      },
+      {
+        "follow": true,
+        "userName": "kajalmahioffical143"
       }
     ]
   },
@@ -62,6 +74,9 @@
     "password": "hhjsm001",
     "type": "agent",
     "dueTasks": [
+      {
+        "updateUserData": true
+      },
       {
         "follow": true,
         "userName": "manisha.sen.25"
