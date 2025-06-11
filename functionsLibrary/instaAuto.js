@@ -451,8 +451,17 @@ const performDueTasks = async function () {
   // return;
   // agentPreDueTasks are as below
   this.state.profileTarget = this.state.currentProfile.profileTarget;
+  // 1. Initialize the browser
   await this.chrome.initializeBrowser.call(this);
-  await this.instaAuto.updateUserData.call(this);
+  // 2. Get dueTasks Array of currentProfile
+  const dueTasks = this.state.currentProfile.dueTasks;
+  console.log(`-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-xx-x-x-x-xx-x-x-`);
+  console.log(this.state.currentProfile.dueTasks);
+  console.log(`-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-xx-x-x-x-xx-x-x-`);
+  console.log(`-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-==-=-=-`);
+  console.log(this);
+  console.log(`-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-==-=-=-`);
+  await this.utils.devWaitCheckContinue();
 
   const stateFilePath = path.join(__dirname, "../data/instaData/stateAtCompletion.json");
   fs.writeFileSync(stateFilePath, JSON.stringify(this.state, null, 2));

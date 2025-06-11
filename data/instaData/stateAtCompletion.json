@@ -1,6 +1,6 @@
 {
-  "startTime": 1749617055737,
-  "logFilePath": "C:\\Users\\acer\\Downloads\\Jitu\\InstaAutomation\\instaAuto-by-JN\\data\\logs\\11-06-25 10-14-15.txt",
+  "startTime": 1749619653300,
+  "logFilePath": "C:\\Users\\acer\\Downloads\\Jitu\\InstaAutomation\\instaAuto-by-JN\\data\\logs\\11-06-25 10-57-33.txt",
   "profilesData": [
     {
       "profileTarget": "2",
@@ -37,11 +37,7 @@
           "follow": true,
           "userName": "kajalmahioffical143"
         }
-      ],
-      "postsCount": 1,
-      "followersCount": 4,
-      "followingsCount": 22,
-      "mutualFollowersCount": 0
+      ]
     },
     {
       "profileTarget": "21",
@@ -116,11 +112,7 @@
           "follow": true,
           "userName": "kajalmahioffical143"
         }
-      ],
-      "postsCount": 1,
-      "followersCount": 4,
-      "followingsCount": 22,
-      "mutualFollowersCount": 0
+      ]
     },
     {
       "profileTarget": "22",
@@ -161,8 +153,8 @@
     "profileTarget": "22",
     "initialURL": "https://www.youtube.com",
     "windowSize": [
-      789,
-      815
+      815,
+      789
     ],
     "windowPosition": [
       660,

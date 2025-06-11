@@ -134,6 +134,15 @@ async function askUser(question) {
 }
 exports.askUser = askUser;
 
+async function devWaitCheckContinue() {
+  const answer = await askUser("Press Enter to continue or type 'e' to stop the script: ");
+  if (answer.toLowerCase() === "exit") {
+    console.log("Exiting the script as per user request.");
+    process.exit(0);
+  }
+}
+exports.devWaitCheckContinue = devWaitCheckContinue;
+
 async function log(message) {
   const pathToLogFile = `./Data/Logs/${getDateTime().split(",")[0]}_log.txt`;
   fs.appendFileSync(pathToLogFile, message + "\n");
