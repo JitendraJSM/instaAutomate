@@ -78,7 +78,7 @@ const catchAsync = (fn) => {
         const modErrorMSG = `Error in ${fn.name}: ${error.message}. \n${error?.stack?.split("\n")[1]?.trim()}`;
 
         console.error(`\x1b[31m${modErrorMSG}\x1b[0m`);
-        this.appLogger.logError(modErrorMSG);
+        this.logger.logError(modErrorMSG);
         const msgForUser =
           "Please resolve the error and press \n---'r' to retry.\n---'ra' if you want to read the task again and then retry the current Action.\n---'cr 5' if you want to read the task again and start the task from index no. 5.\n---'s' if you want to skip.\nPress Enter.....";
         const userInput = (await askUser(`${msgForUser}`)).toLowerCase();

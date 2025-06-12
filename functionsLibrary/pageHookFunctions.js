@@ -128,6 +128,7 @@ const typeHuman = async function (selector, stringToType) {
 
   // Clear the input field
   await inputField.evaluate((el) => (el.value = ""));
+  console.log(`----- stringToType: ${stringToType} ---causing the error --`);
 
   for (let char of stringToType) {
     // Simulate typing delay

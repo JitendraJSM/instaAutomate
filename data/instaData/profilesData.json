@@ -26,7 +26,7 @@
       {
         "parentModuleName": "instaAuto",
         "actionName": "follow",
-        "argumentString": "kajalmahioffical143"
+        "argumentsString": "kajalmahioffical143"
       }
     ]
   },
@@ -39,7 +39,7 @@
       {
         "parentModuleName": "instaAuto",
         "actionName": "follow",
-        "argumentString": "kajalmahioffical143"
+        "argumentsString": "kajalmahioffical143"
       }
     ]
   },
@@ -52,17 +52,17 @@
       {
         "parentModuleName": "instaAuto",
         "actionName": "updateUserData",
-        "argumentString": true
+        "argumentsString": true
       },
       {
         "parentModuleName": "instaAuto",
         "actionName": "follow",
-        "argumentString": "manisha.sen.25"
+        "argumentsString": "manisha.sen.25"
       },
       {
         "parentModuleName": "instaAuto",
         "actionName": "follow",
-        "argumentString": "best.frnds.jsm"
+        "argumentsString": "best.frnds.jsm"
       }
     ]
   }

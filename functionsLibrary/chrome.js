@@ -34,7 +34,7 @@ const initializeBrowser = async function () {
 };
 
 // 2. Delete this.browser and Reconnect to browser
-const ReconnectBrowser = async function () {
+const reconnectBrowser = async function () {
   let { getBrowser } = require("../utils/getBrowser.js");
 
   try {
@@ -51,7 +51,21 @@ const ReconnectBrowser = async function () {
   }
 };
 
-// 3. To console log all pages URLs
+// 3. Close the browser
+const closeBrowser = async function () {
+  const userInput = await this.utlis.askUser("Are you sure you want to close the browser? (y/n): ");
+  if (userInput.toLowerCase() !== "n") {
+    console.log("Browser close operation cancelled.");
+    return;
+  }
+  // If the browser was not disconnected, we try to reconnect
+  if (!this.browser) await reconnectBrowser.call(this);
+  await this.browser.close();
+  this.browser = null;
+  console.log("Browser closed successfully.");
+};
+
+// 4. To console log all pages URLs
 const printAllPagesURLs = async function () {
   let pages = await this.browser.pages();
 
@@ -64,6 +78,7 @@ const printAllPagesURLs = async function () {
 const catchAsync = require("../utils/catchAsync.js");
 module.exports = {
   initializeBrowser: catchAsync(initializeBrowser),
+  reconnectBrowser: catchAsync(reconnectBrowser),
+  closeBrowser: catchAsync(closeBrowser),
   printAllPagesURLs: catchAsync(printAllPagesURLs),
-  ReconnectBrowser: catchAsync(ReconnectBrowser),
 };

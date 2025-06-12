@@ -6,12 +6,12 @@
   "dueTasks": [
     {
       "actionName": "follow",
-      "argumentString": "kajalmahioffical143"
+      "argumentsString": "kajalmahioffical143"
     },
     {
       "parentModuleName": "instaAuto",
       "actionName": "follow",
-      "argumentString": "kajalmahioffical143"
+      "argumentsString": "kajalmahioffical143"
     }
   ],
   "ai_agent_type": null,
@@ -94,13 +94,7 @@
     },
     "edges": []
   },
-  "followers": [
-    "itis__molex",
-    "lami__ne__",
-    "therocky_verma",
-    "nanu_cute_00",
-    "jitendra_goswami132"
-  ],
+  "followers": ["itis__molex", "lami__ne__", "therocky_verma", "nanu_cute_00", "jitendra_goswami132"],
   "followings": [
     "kittu___rawat____143",
     "sunita_poswal_",

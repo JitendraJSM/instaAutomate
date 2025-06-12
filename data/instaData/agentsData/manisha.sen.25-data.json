@@ -5,7 +5,7 @@
     {
       "parentModuleName": "instaAuto",
       "actionName": "follow",
-      "argumentString": "kajalmahioffical143"
+      "argumentsString": "kajalmahioffical143"
     }
   ],
   "postsCount": 1,
@@ -92,12 +92,7 @@
     },
     "edges": []
   },
-  "followers": [
-    "hemantrajput701827",
-    "laltu.rajwar.1460",
-    "nawazsharif226_salon",
-    "rizwan.idrishi.378"
-  ],
+  "followers": ["hemantrajput701827", "laltu.rajwar.1460", "nawazsharif226_salon", "rizwan.idrishi.378"],
   "followings": [
     "roshnigupta0075",
     "_.sneha047._",

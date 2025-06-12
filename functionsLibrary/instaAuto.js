@@ -69,10 +69,17 @@ const updateUserData = async function (needUpadte) {
     this.state.currentProfile.lastUpdate = new Date().toISOString();
     await db.writeUserProfileData.call(this, this.state.currentProfile);
 
+    await db.removeDueTask.call(this, this.state.currentProfile.userName, {
+      parentModuleName: "instaAuto",
+      actionName: "updateUserData",
+      argumentsString: true,
+    });
+
     // console.log(`UserData of ${this.state.currentProfile.userName}'s this.state.currentProfile is as: .`);
     // console.log(this.state.currentProfile);
   } else console.log(`UserData of ${this.state.currentProfile.userName} does not need an updated.`);
 };
+updateUserData.doNotParseargumentsString = true; // This is used to skip parsing of argumentsString as it is not needed here.
 
 // ======= Main Functions =======
 const goInstaHome = async function () {
@@ -83,7 +90,8 @@ const goInstaHome = async function () {
     console.log(`Home button clicked.`);
   } catch (error) {
     console.log(`Home Button of Instagram is not availble so going to navigate home page for : ${this.state.currentProfile.userName}`);
-    if (this.page.url() !== `https://www.instagram.com/${this.state.currentProfile.userName}`) await this.page.navigateTo(`https://www.instagram.com/${this.state.currentProfile.userName}/`);
+    if (this.page.url() !== `https://www.instagram.com/${this.state.currentProfile.userName}`)
+      await this.page.navigateTo(`https://www.instagram.com/${this.state.currentProfile.userName}/`);
   }
 
   await this.utils.randomDelay(1.25, 0.25);
@@ -123,7 +131,9 @@ const scrapeUserData = async function (userName, needFollowers = true, needFollo
           const request = response.request();
           return (
             request.method() === "GET" &&
-            new RegExp(`https:\\/\\/i\\.instagram\\.com\\/api\\/v1\\/users\\/web_profile_info\\/\\?username=${encodeURIComponent(userName.toLowerCase())}`).test(request.url())
+            new RegExp(
+              `https:\\/\\/i\\.instagram\\.com\\/api\\/v1\\/users\\/web_profile_info\\/\\?username=${encodeURIComponent(userName.toLowerCase())}`
+            ).test(request.url())
           );
         },
         { timeout: 30000 }
@@ -133,7 +143,6 @@ const scrapeUserData = async function (userName, needFollowers = true, needFollo
     ]);
 
     const json = JSON.parse(await foundResponse.text());
-    console.log("the scraped data is as: ");
     scrapedData = json.data.user;
   } finally {
     clearTimeout(t);
@@ -154,6 +163,7 @@ const scrapeUserData = async function (userName, needFollowers = true, needFollo
     scrapedData.followers = followers;
     scrapedData.followings = followings;
   }
+  console.log(`Successfully scraped data for user: ${userName}`);
 
   return scrapedData;
 };
@@ -235,7 +245,7 @@ const getListOfFollowersOrFollowings = async function (targetUserId, needFollowe
       getFollowers: true,
     });
     // console.log(`Followers are as:`);
-    console.log(followers);
+    // console.log(followers);
   }
   await goInstaHome.call(this);
   if (needFollowings) {
@@ -244,7 +254,7 @@ const getListOfFollowersOrFollowings = async function (targetUserId, needFollowe
       getFollowers: false,
     });
     // console.log(`followings are as:`);
-    console.log(followings);
+    // console.log(followings);
   }
   await goInstaHome.call(this);
   return { followers, followings };
@@ -294,7 +304,7 @@ const follow = async function (userName, likeOptions) {
   const userObject = { userName, date: new Date().toISOString() };
   this.emit("follow", userObject);
 };
-follow.doNotParseArgumentString = true;
+follow.doNotParseargumentsString = true;
 
 const like = async function (likeOptions) {
   const { userName, minNumberOfPostsToLike = 1, maxNumberOfPostsToLike = 5 } = likeOptions;
@@ -389,8 +399,9 @@ const performDueTasks = async function () {
       actionName: "closeBrowser",
     },
   ];
-  const dueTasks = this.state.currentProfile.dueTasks;
-  this.task.splice(this.currentActionIndex + 1, 0, ...agentPreDueTasks, ...dueTasks, ...agentPostDueTasks);
+  // Deep copy of dueTasks, handling multilevel nested arrays/objects
+  const copyOfDueTasks = JSON.parse(JSON.stringify(this.state.currentProfile.dueTasks, null, 2));
+  this.task.splice(this.currentActionIndex + 1, 0, ...agentPreDueTasks, ...copyOfDueTasks, ...agentPostDueTasks);
 };
 
 /*const performDueTasks = async function () {
@@ -411,7 +422,7 @@ const performDueTasks = async function () {
   //     parentModuleName: "instaAuto",
   //     actionName: "follow",
   //     argumentsString: `ritika_paswan._`,
-  //     doNotParseArgumentString: true, // must be true if arugumentString contains dot or /
+  //     doNotParseargumentsString: true, // must be true if arugumentString contains dot or /
   //   },
   // ];
   // this.task = [...this.task, ...agentPreDueTasks, lastTask];
@@ -443,28 +454,8 @@ const performDueTasks = async function () {
 // ======= Controller Functions =======
 
 const instaAutomation = async function () {
-  /*
-  await addDueTask("manisha.sen.25", { updateUserData: true });
-  await addDueTasks("manisha.sen.25", { follow: true, userName: "jitendra_swami_007" });
-  await addDueTasks("manisha.sen.25", { follow: true, userName: "jitendra_swami_008" });
-  await removeDueTask("manisha.sen.25", { follow: true, userName: "jitendra_swami_007" });
-  await removeDueTask("manisha.sen.25", { follow: true, userName: "jitendra_swami_008" });
-  */
-
-  // this.state.profilesData = await db.readProfilesData(); // Done in initialTask.json
-  // await startListeners.call(this); // Done in initialTask.json
-
-  /* const userInput = await this.utils.askUser(`Do you want to add new profile? (y/n): `);
-  if (userInput.toLowerCase() === "y") {
-    const addNewProfileResponse = await addNewProfile.call(this);
-    if (!addNewProfileResponse) throw new Error(`Failed to add new profile`);
-  }*/ // Shifted to db.js and Done in initialTask.json
-
-  /*  // As agent's dueTasks are more important than scraper's dueTasks.
-  this.state.profilesToLoop = this.state.profilesData.filter((profile) => profile.type === "agent");
-  // console.log(this.state.profilesToLoop);
-  if (this.state.profilesToLoop.length === 0) throw new Error(`No profiles to loop`);*/ // Shifted to db.js and Done in initialTask.json
-
+  /* Given below loop fills all the dueTasks to this.currentActions Array but in reverse order still it doesn't matter if in future it 
+  is needed then first sort this.state.profilesToLoop as number of dueTasks. */
   this.state.currentProfileIndex = 0;
   while (this.state.currentProfileIndex < this.state.profilesToLoop.length) {
     this.state.currentProfile = this.state.profilesToLoop[this.state.currentProfileIndex];
@@ -472,41 +463,34 @@ const instaAutomation = async function () {
     console.log(`currentProfile to loop over is as: `);
     console.log(this.state.currentProfile);
     console.log(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`);
-    // console.log(`Before this.tasks`);
-    // console.log(this.task);
+    console.log(`Before this.tasks`);
+    console.log(this.task);
 
     await performDueTasks.call(this);
-    // console.log(`After this.tasks`);
-    // console.log(this.task);
+    console.log(`After this.tasks`);
+    console.log(this.task);
 
-    // const currentProfile = profilesToLoop[currenttProfileIndex];
-    // this.state.currentProfile = currentProfile;
-    // await this.instaAuto.updateUserData.call(this);
-    // Close browser
-    // await this.browser.close();
-
-    // Change IP address
-    // let ipChanged = false;
-    // while (!ipChanged) {
-    //   const currentIP = await this.utils.getCurrentIP();
-    //   await this.utils.triggerAirplaneModeToggle();
-    //   await sleep(180000); // Wait 3 minutes
-    //   const newIP = await this.utils.getCurrentIP();
-    //   ipChanged = currentIP !== newIP;
-    // }
+    /* Change IP address
+     let ipChanged = false;
+     while (!ipChanged) {
+       const currentIP = await this.utils.getCurrentIP();
+       await this.utils.triggerAirplaneModeToggle();
+       await sleep(180000); // Wait 3 minutes
+       const newIP = await this.utils.getCurrentIP();
+       ipChanged = currentIP !== newIP;
+     }  */
 
     this.state.currentProfileIndex++;
   }
+  await this.utils.devWaitCheckContinue();
+
   // console.log(`---- All Tasks Added ----`);
 };
 
 const scrapeContentOfUser = async function () {};
 
-// module.exports = Instauto;
 // === Interface ===
 const catchAsync = require("../utils/catchAsync.js");
-const fs = require("fs");
-const path = require("path");
 module.exports = {
   instaAutomation: catchAsync(instaAutomation),
   updateUserData: catchAsync(updateUserData),

@@ -15,6 +15,7 @@ const readUserProfileData = async (userProfile) => {
   // Determine the path of user profile
   const getDataPath = userProfile.type === "agent" ? agentsDataPath : scrapersDataPath;
   const userDataPath = getDataPath(userProfile.userName);
+
   // Check if file exists
   const doesfileExist = await fs.pathExists(userDataPath);
   if (!doesfileExist) {
@@ -97,31 +98,46 @@ const removeDueTask = async function (userName, dueTaskObj) {
   for (const profile of profilesData) {
     if (profile.userName === userName) {
       if (profile.dueTasks) {
-        // Remove the task by filtering
-        profile.dueTasks = profile.dueTasks.filter((task) => JSON.stringify(task) !== JSON.stringify(dueTaskObj));
+        // 1. find the index of dueTaskObj in profile.dueTasks
+        const index = profile.dueTasks.findIndex((task) => JSON.stringify(task) === JSON.stringify(dueTaskObj));
+        // 2. If index is -1 then break the loop and throw error that dueTaskObj for userName is not found, else remove it
+        if (index === -1) {
+          console.error(`This particular due task ${JSON.stringify(dueTaskObj)} for user: ${userName} not found in profilesData.`);
+          break;
+        }
+        profile.dueTasks.splice(index, 1);
 
+        // 3. Write the updated profile data to the file
         let typeOfProfile = profile.type;
         const getDataPath = typeOfProfile === "agent" ? agentsDataPath : scrapersDataPath;
         const dataPath = getDataPath(userName);
 
-        // Update user-specific data file
+        // 4. Update user-specific data file
         const userData = JSON.parse(await fs.readFile(dataPath));
-
-        if (userData.dueTasks) {
-          userData.dueTasks = userData.dueTasks.filter((task) => JSON.stringify(task) !== JSON.stringify(dueTaskObj));
-
-          await writeUserProfileData.call(this, userData);
+        if (!userData.dueTasks) {
+          console.error(`Due tasks for user: ${userName} doesn't exists in file ${dataPath}.`);
+          break;
         }
+
+        userData.dueTaskIndex = userData.dueTasks.findIndex((task) => JSON.stringify(task) === JSON.stringify(dueTaskObj));
+        if (dueTaskIndex === -1) {
+          console.error(`This particular due task ${JSON.stringify(dueTaskObj)} for user: ${userName} doesn't exists in file ${dataPath}.`);
+          break;
+        }
+        userData.dueTasks.splice(dueTaskIndex, 1);
+        // 5. Write the updated userData to the file
+        await writeUserProfileData.call(this, userData);
+        // 6. Write the updated profilesData to the file
+        await writeProfilesData(profilesData);
       }
     }
   }
 
-  await writeProfilesData(profilesData);
   console.log(`Removed task for user: ${userName}`);
 };
 
 const updateDatabaseOnFollow = async function (userObject) {
-  const tempProfileData = JSON.parse(await fs.readFile(`./data/instaData/${this.state.currentProfile.userName}-data.json`));
+  const tempProfileData = await readUserProfileData(this.state.currentProfile);
 
   // Neccessary Checks
   /* The creatation of automatedFollow Array is for new user only */
@@ -136,13 +152,12 @@ const updateDatabaseOnFollow = async function (userObject) {
 
   /* The creatation of dueTasks Array is for new user only */
   if (!this.state.currentProfile.dueTasks) this.state.currentProfile.dueTasks = [];
-  this.state.currentProfile.dueTasks.push({ parentModuleName: "instaAuto", actionName: "updateUserData", argumentString: true });
-  this.state.currentProfile.dueTasks = this.utils.removeDuplicates(this.state.currentProfile.dueTasks);
-  await writeUserProfileData.call(this, { ...tempProfileData, ...this.state.currentProfile });
 
-  this.state.profilesData.find((profile) => profile.userName === this.state.currentProfile.userName).dueTasks = this.state.currentProfile.dueTasks;
-  await writeProfilesData.call(this, this.state.profilesData);
-  // console.log(`updateDatabaseOnFollow function completed.`);
+  await addDueTask.call(this, this.state.currentProfile.userName, { parentModuleName: "instaAuto", actionName: "updateUserData", argumentsString: true });
+  this.state.currentProfile.dueTasks = this.utils.removeDuplicates(this.state.currentProfile.dueTasks);
+  const currentfollowDueTask = this.state.currentProfile.dueTasks.find((task) => task.argumentsString === userObject.userName && task.actionName === "follow");
+  await removeDueTask.call(this, this.state.currentProfile.userName, currentfollowDueTask);
+  console.log(`updateDatabaseOnFollow function completed.`);
 };
 
 const addNewProfile = async function () {
@@ -155,10 +170,12 @@ const addNewProfile = async function () {
   const newProfile = {};
 
   newProfile.profileTarget = await this.utils.askUser("Enter profile target: ");
-  if (this.state.profilesData.find((profile) => profile.profileTarget == newProfile.profileTarget)) throw new Error(`Profile with target ${newProfile.profileTarget} already exists`);
+  if (this.state.profilesData.find((profile) => profile.profileTarget == newProfile.profileTarget))
+    throw new Error(`Profile with target ${newProfile.profileTarget} already exists`);
 
   newProfile.userName = await this.utils.askUser(`Enter user name:`);
-  if (this.state.profilesData.find((profile) => profile.userName == newProfile.userName)) throw new Error(`Profile with user name: ${newProfile.userName} already exists`);
+  if (this.state.profilesData.find((profile) => profile.userName == newProfile.userName))
+    throw new Error(`Profile with user name: ${newProfile.userName} already exists`);
 
   newProfile.password = await this.utils.askUser(`Enter password:`);
 
@@ -167,18 +184,18 @@ const addNewProfile = async function () {
   else if (userInput === "2") newProfile.type = "scraper";
   else throw new Error(`Invalid input`);
 
-  newProfile.dueTasks = [{ parentModuleName: "instaAuto", actionName: "updateUserData", argumentString: true }];
+  newProfile.dueTasks = [{ parentModuleName: "instaAuto", actionName: "updateUserData", argumentsString: true }];
 
   for (const profile of this.state.profilesData) {
     // 1. This only writes data in json file does not update the currently running process's memory.
-    await addDueTask.call(this, profile.userName, { parentModuleName: "instaAuto", actionName: "follow", argumentString: `${newProfile.userName}` });
-    await addDueTask.call(this, newProfile.userName, { parentModuleName: "instaAuto", actionName: "follow", argumentString: `${profile.userName}` });
+    await addDueTask.call(this, profile.userName, { parentModuleName: "instaAuto", actionName: "follow", argumentsString: `${newProfile.userName}` });
+    await addDueTask.call(this, newProfile.userName, { parentModuleName: "instaAuto", actionName: "follow", argumentsString: `${profile.userName}` });
 
     // 2. This updates the currently running process's memory.
     // profile.dueTasks.push({ follow: true, userName: `${newProfile.userName}` });
     // newProfile.dueTasks.push({ follow: true, userName: `${profile.userName}` });
-    profile.dueTasks.push({ parentModuleName: "instaAuto", actionName: "follow", argumentString: `${newProfile.userName}` });
-    newProfile.dueTasks.push({ parentModuleName: "instaAuto", actionName: "follow", argumentString: `${profile.userName}` });
+    profile.dueTasks.push({ parentModuleName: "instaAuto", actionName: "follow", argumentsString: `${newProfile.userName}` });
+    newProfile.dueTasks.push({ parentModuleName: "instaAuto", actionName: "follow", argumentsString: `${profile.userName}` });
   }
   this.state.profilesData.push(newProfile);
 
@@ -202,6 +219,7 @@ const filterProfilesToAutomate = async function () {
 
 // === Interface ===
 const catchAsync = require("../utils/catchAsync.js");
+const { remove } = require("lodash");
 module.exports = {
   readUserProfileData: catchAsync(readUserProfileData),
   writeUserProfileData: catchAsync(writeUserProfileData),

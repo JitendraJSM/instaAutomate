@@ -1,5 +1,5 @@
 require("dotenv").config();
-const fs = require("fs");
+const fs = require("fs-extra");
 const os = require("os");
 const readline = require("readline");
 
@@ -135,6 +135,7 @@ async function askUser(question) {
 exports.askUser = askUser;
 
 async function devWaitCheckContinue() {
+  await fs.writeFile("./data/thisAtThisPoint.json", JSON.stringify(this, null, 2));
   const answer = await askUser("Press Enter to continue or type 'e' to stop the script: ");
   if (answer.toLowerCase() === "exit") {
     console.log("Exiting the script as per user request.");

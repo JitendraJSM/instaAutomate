@@ -54,7 +54,9 @@ async function verifyPreCondition(preCondition) {
       preConditionResult = await preCondition.call(this);
     }
     if (!preConditionResult) {
-      console.log(`Precondition failed. if You want to skip the preCondition check with this failure, please write "skip". \n else press anything to continue.`);
+      console.log(
+        `Precondition failed. if You want to skip the preCondition check with this failure, please write "skip". \n else press anything to continue.`
+      );
       const userInput = await this.utils.askUser("Waiting for your response...");
       if (userInput.toLowerCase() === "skip") {
         preConditionResult = true;
@@ -104,6 +106,15 @@ async function executeAction(actionDetails) {
   if (typeof action !== "function") {
     throw new Error(`Action ${actionName} not found in module ${parentModuleName}`);
   }
+
+  //  If details are not defined in actionDetails, then check on action itself.
+  preCondition ||= action.preCondition;
+  parentModuleName ||= action.parentModuleName;
+  actionName ||= action.actionName;
+  argumentsString ||= action.argumentsString;
+  shouldStoreState ||= action.shouldStoreState;
+  doNotParseArgumentString ||= action.doNotParseArgumentString;
+
   this.currentAction.index = this.currentActionIndex;
   try {
     await this.utils.randomDelay(3, 1);
@@ -135,6 +146,7 @@ async function executeAction(actionDetails) {
       // this.appLogger.logMSG(`${shouldStoreState}:${result}\n`);
     }
     this.appLogger.logAction();
+    await this.utils.devWaitCheckContinue.call(this);
 
     return result;
   } catch (error) {

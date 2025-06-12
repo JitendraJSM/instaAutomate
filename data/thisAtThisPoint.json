@@ -1,0 +1,259 @@
+{
+  "_events": {},
+  "_eventsCount": 0,
+  "utils": {},
+  "chrome": {},
+  "devOrTest": {},
+  "instaAuto": {},
+  "db": {},
+  "monitor": {
+    "pollingTasks": {}
+  },
+  "appLogger": {},
+  "actionList": [],
+  "currentActionIndex": 0,
+  "errorHandler": null,
+  "state": {
+    "startTime": 1749726476695,
+    "logFilePath": "C:\\Users\\acer\\Downloads\\Jitu\\InstaAutomation\\instaAuto-by-JN\\data\\logs\\12-06-25 16-37-56.txt",
+    "profilesData": [
+      {
+        "profileTarget": "2",
+        "userName": "manisha.sen.25",
+        "password": "hhjsm001",
+        "type": "agent",
+        "automatedFollow": [
+          {
+            "userName": "itsnancyyy03",
+            "date": "2025-06-03T00:25:42.128Z"
+          },
+          {
+            "userName": "riya9669singh",
+            "date": "2025-06-03T01:02:47.051Z"
+          },
+          {
+            "userName": "sona_sengupta_",
+            "date": "2025-06-03T01:41:20.155Z"
+          },
+          {
+            "userName": "roshnigupta0075",
+            "date": "2025-06-03T13:17:23.291Z"
+          }
+        ],
+        "dueTasks": [
+          {
+            "parentModuleName": "instaAuto",
+            "actionName": "follow",
+            "argumentsString": "kajalmahioffical143"
+          }
+        ]
+      },
+      {
+        "profileTarget": "21",
+        "userName": "best.frnds.jsm",
+        "password": "hhjsm001",
+        "type": "scraper",
+        "dueTasks": [
+          {
+            "parentModuleName": "instaAuto",
+            "actionName": "follow",
+            "argumentsString": "kajalmahioffical143"
+          }
+        ]
+      },
+      {
+        "profileTarget": "22",
+        "userName": "kajalmahioffical143",
+        "password": "hhjsm001",
+        "type": "agent",
+        "dueTasks": [
+          {
+            "parentModuleName": "instaAuto",
+            "actionName": "updateUserData",
+            "argumentsString": true
+          },
+          {
+            "parentModuleName": "instaAuto",
+            "actionName": "follow",
+            "argumentsString": "manisha.sen.25"
+          },
+          {
+            "parentModuleName": "instaAuto",
+            "actionName": "follow",
+            "argumentsString": "best.frnds.jsm"
+          }
+        ]
+      }
+    ]
+  },
+  "task": [
+    {
+      "parentModuleName": "db",
+      "actionName": "readProfilesData",
+      "index": 0,
+      "profilesData": [
+        {
+          "profileTarget": "2",
+          "userName": "manisha.sen.25",
+          "password": "hhjsm001",
+          "type": "agent",
+          "automatedFollow": [
+            {
+              "userName": "itsnancyyy03",
+              "date": "2025-06-03T00:25:42.128Z"
+            },
+            {
+              "userName": "riya9669singh",
+              "date": "2025-06-03T01:02:47.051Z"
+            },
+            {
+              "userName": "sona_sengupta_",
+              "date": "2025-06-03T01:41:20.155Z"
+            },
+            {
+              "userName": "roshnigupta0075",
+              "date": "2025-06-03T13:17:23.291Z"
+            }
+          ],
+          "dueTasks": [
+            {
+              "parentModuleName": "instaAuto",
+              "actionName": "follow",
+              "argumentsString": "kajalmahioffical143"
+            }
+          ]
+        },
+        {
+          "profileTarget": "21",
+          "userName": "best.frnds.jsm",
+          "password": "hhjsm001",
+          "type": "scraper",
+          "dueTasks": [
+            {
+              "parentModuleName": "instaAuto",
+              "actionName": "follow",
+              "argumentsString": "kajalmahioffical143"
+            }
+          ]
+        },
+        {
+          "profileTarget": "22",
+          "userName": "kajalmahioffical143",
+          "password": "hhjsm001",
+          "type": "agent",
+          "dueTasks": [
+            {
+              "parentModuleName": "instaAuto",
+              "actionName": "updateUserData",
+              "argumentsString": true
+            },
+            {
+              "parentModuleName": "instaAuto",
+              "actionName": "follow",
+              "argumentsString": "manisha.sen.25"
+            },
+            {
+              "parentModuleName": "instaAuto",
+              "actionName": "follow",
+              "argumentsString": "best.frnds.jsm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "parentModuleName": "instaAuto",
+      "actionName": "startListeners"
+    },
+    {
+      "parentModuleName": "db",
+      "actionName": "addNewProfile"
+    },
+    {
+      "parentModuleName": "db",
+      "actionName": "filterProfilesToAutomate"
+    },
+    {
+      "parentModuleName": "instaAuto",
+      "actionName": "instaAutomation"
+    },
+    {
+      "parentModuleName": "devOrTest",
+      "actionName": "endDevFunction"
+    }
+  ],
+  "currentAction": {
+    "parentModuleName": "db",
+    "actionName": "readProfilesData",
+    "index": 0,
+    "profilesData": [
+      {
+        "profileTarget": "2",
+        "userName": "manisha.sen.25",
+        "password": "hhjsm001",
+        "type": "agent",
+        "automatedFollow": [
+          {
+            "userName": "itsnancyyy03",
+            "date": "2025-06-03T00:25:42.128Z"
+          },
+          {
+            "userName": "riya9669singh",
+            "date": "2025-06-03T01:02:47.051Z"
+          },
+          {
+            "userName": "sona_sengupta_",
+            "date": "2025-06-03T01:41:20.155Z"
+          },
+          {
+            "userName": "roshnigupta0075",
+            "date": "2025-06-03T13:17:23.291Z"
+          }
+        ],
+        "dueTasks": [
+          {
+            "parentModuleName": "instaAuto",
+            "actionName": "follow",
+            "argumentsString": "kajalmahioffical143"
+          }
+        ]
+      },
+      {
+        "profileTarget": "21",
+        "userName": "best.frnds.jsm",
+        "password": "hhjsm001",
+        "type": "scraper",
+        "dueTasks": [
+          {
+            "parentModuleName": "instaAuto",
+            "actionName": "follow",
+            "argumentsString": "kajalmahioffical143"
+          }
+        ]
+      },
+      {
+        "profileTarget": "22",
+        "userName": "kajalmahioffical143",
+        "password": "hhjsm001",
+        "type": "agent",
+        "dueTasks": [
+          {
+            "parentModuleName": "instaAuto",
+            "actionName": "updateUserData",
+            "argumentsString": true
+          },
+          {
+            "parentModuleName": "instaAuto",
+            "actionName": "follow",
+            "argumentsString": "manisha.sen.25"
+          },
+          {
+            "parentModuleName": "instaAuto",
+            "actionName": "follow",
+            "argumentsString": "best.frnds.jsm"
+          }
+        ]
+      }
+    ]
+  }
+}
