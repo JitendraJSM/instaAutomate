@@ -119,7 +119,7 @@ const removeDueTask = async function (userName, dueTaskObj) {
           break;
         }
 
-        userData.dueTaskIndex = userData.dueTasks.findIndex((task) => JSON.stringify(task) === JSON.stringify(dueTaskObj));
+        const dueTaskIndex = userData.dueTasks.findIndex((task) => JSON.stringify(task) === JSON.stringify(dueTaskObj));
         if (dueTaskIndex === -1) {
           console.error(`This particular due task ${JSON.stringify(dueTaskObj)} for user: ${userName} doesn't exists in file ${dataPath}.`);
           break;
@@ -146,9 +146,11 @@ const updateDatabaseOnFollow = async function (userObject) {
   const index = this.state.currentProfile.automatedFollow.findIndex((profile) => profile.userName === userObject.userName);
   if (index !== -1) {
     this.state.currentProfile.automatedFollow.splice(index, 1);
+    console.log(`User ${userObject.userName} already exists in automatedFollow array, removing the old entry.`);
   }
 
   this.state.currentProfile.automatedFollow.push(userObject);
+  await writeUserProfileData(this.state.currentProfile);
 
   /* The creatation of dueTasks Array is for new user only */
   if (!this.state.currentProfile.dueTasks) this.state.currentProfile.dueTasks = [];
@@ -170,12 +172,10 @@ const addNewProfile = async function () {
   const newProfile = {};
 
   newProfile.profileTarget = await this.utils.askUser("Enter profile target: ");
-  if (this.state.profilesData.find((profile) => profile.profileTarget == newProfile.profileTarget))
-    throw new Error(`Profile with target ${newProfile.profileTarget} already exists`);
+  if (this.state.profilesData.find((profile) => profile.profileTarget == newProfile.profileTarget)) throw new Error(`Profile with target ${newProfile.profileTarget} already exists`);
 
   newProfile.userName = await this.utils.askUser(`Enter user name:`);
-  if (this.state.profilesData.find((profile) => profile.userName == newProfile.userName))
-    throw new Error(`Profile with user name: ${newProfile.userName} already exists`);
+  if (this.state.profilesData.find((profile) => profile.userName == newProfile.userName)) throw new Error(`Profile with user name: ${newProfile.userName} already exists`);
 
   newProfile.password = await this.utils.askUser(`Enter password:`);
 

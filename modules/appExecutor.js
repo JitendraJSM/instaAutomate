@@ -54,9 +54,7 @@ async function verifyPreCondition(preCondition) {
       preConditionResult = await preCondition.call(this);
     }
     if (!preConditionResult) {
-      console.log(
-        `Precondition failed. if You want to skip the preCondition check with this failure, please write "skip". \n else press anything to continue.`
-      );
+      console.log(`Precondition failed. if You want to skip the preCondition check with this failure, please write "skip". \n else press anything to continue.`);
       const userInput = await this.utils.askUser("Waiting for your response...");
       if (userInput.toLowerCase() === "skip") {
         preConditionResult = true;
@@ -83,8 +81,8 @@ async function executeAction(actionDetails) {
     actionName,
     argumentsString,
     shouldStoreState,
-    doNotParseArgumentString,
-    // doNotParseArgumentString = false, // Default to false
+    doNotParseArgumentsString,
+    // doNotParseArgumentsString = false, // Default to false
   } = actionDetails;
 
   if (!this.currentAction.actionName) {
@@ -113,14 +111,14 @@ async function executeAction(actionDetails) {
   actionName ||= action.actionName;
   argumentsString ||= action.argumentsString;
   shouldStoreState ||= action.shouldStoreState;
-  doNotParseArgumentString ||= action.doNotParseArgumentString;
+  doNotParseArgumentsString ||= action.doNotParseArgumentsString;
 
   this.currentAction.index = this.currentActionIndex;
   try {
     await this.utils.randomDelay(3, 1);
 
     // Only parse as JSON if it's an object-like string
-    let parsedArguments = !!doNotParseArgumentString ? [argumentsString] : parseArguments.call(this, argumentsString);
+    let parsedArguments = !!doNotParseArgumentsString ? [argumentsString] : parseArguments.call(this, argumentsString);
 
     // console.log(`parsed args: ${parsedArgs}`);
     // console.log(`Array.isArray parsed args: ${Array.isArray(parsedArgs)}`);

@@ -4,24 +4,6 @@
     "userName": "manisha.sen.25",
     "password": "hhjsm001",
     "type": "agent",
-    "automatedFollow": [
-      {
-        "userName": "itsnancyyy03",
-        "date": "2025-06-03T00:25:42.128Z"
-      },
-      {
-        "userName": "riya9669singh",
-        "date": "2025-06-03T01:02:47.051Z"
-      },
-      {
-        "userName": "sona_sengupta_",
-        "date": "2025-06-03T01:41:20.155Z"
-      },
-      {
-        "userName": "roshnigupta0075",
-        "date": "2025-06-03T13:17:23.291Z"
-      }
-    ],
     "dueTasks": [
       {
         "parentModuleName": "instaAuto",
@@ -51,18 +33,13 @@
     "dueTasks": [
       {
         "parentModuleName": "instaAuto",
-        "actionName": "updateUserData",
-        "argumentsString": true
-      },
-      {
-        "parentModuleName": "instaAuto",
-        "actionName": "follow",
-        "argumentsString": "manisha.sen.25"
-      },
-      {
-        "parentModuleName": "instaAuto",
         "actionName": "follow",
         "argumentsString": "best.frnds.jsm"
+      },
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "updateUserData",
+        "argumentsString": true
       }
     ]
   }

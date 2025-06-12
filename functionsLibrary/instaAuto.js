@@ -79,7 +79,7 @@ const updateUserData = async function (needUpadte) {
     // console.log(this.state.currentProfile);
   } else console.log(`UserData of ${this.state.currentProfile.userName} does not need an updated.`);
 };
-updateUserData.doNotParseargumentsString = true; // This is used to skip parsing of argumentsString as it is not needed here.
+updateUserData.doNotParseArgumentsString = true; // This is used to skip parsing of argumentsString as it is not needed here.
 
 // ======= Main Functions =======
 const goInstaHome = async function () {
@@ -90,8 +90,7 @@ const goInstaHome = async function () {
     console.log(`Home button clicked.`);
   } catch (error) {
     console.log(`Home Button of Instagram is not availble so going to navigate home page for : ${this.state.currentProfile.userName}`);
-    if (this.page.url() !== `https://www.instagram.com/${this.state.currentProfile.userName}`)
-      await this.page.navigateTo(`https://www.instagram.com/${this.state.currentProfile.userName}/`);
+    if (this.page.url() !== `https://www.instagram.com/${this.state.currentProfile.userName}`) await this.page.navigateTo(`https://www.instagram.com/${this.state.currentProfile.userName}/`);
   }
 
   await this.utils.randomDelay(1.25, 0.25);
@@ -131,9 +130,7 @@ const scrapeUserData = async function (userName, needFollowers = true, needFollo
           const request = response.request();
           return (
             request.method() === "GET" &&
-            new RegExp(
-              `https:\\/\\/i\\.instagram\\.com\\/api\\/v1\\/users\\/web_profile_info\\/\\?username=${encodeURIComponent(userName.toLowerCase())}`
-            ).test(request.url())
+            new RegExp(`https:\\/\\/i\\.instagram\\.com\\/api\\/v1\\/users\\/web_profile_info\\/\\?username=${encodeURIComponent(userName.toLowerCase())}`).test(request.url())
           );
         },
         { timeout: 30000 }
@@ -304,7 +301,7 @@ const follow = async function (userName, likeOptions) {
   const userObject = { userName, date: new Date().toISOString() };
   this.emit("follow", userObject);
 };
-follow.doNotParseargumentsString = true;
+follow.doNotParseArgumentsString = true;
 
 const like = async function (likeOptions) {
   const { userName, minNumberOfPostsToLike = 1, maxNumberOfPostsToLike = 5 } = likeOptions;
@@ -422,7 +419,7 @@ const performDueTasks = async function () {
   //     parentModuleName: "instaAuto",
   //     actionName: "follow",
   //     argumentsString: `ritika_paswan._`,
-  //     doNotParseargumentsString: true, // must be true if arugumentString contains dot or /
+  //     doNotParseArgumentsString: true, // must be true if arugumentString contains dot or /
   //   },
   // ];
   // this.task = [...this.task, ...agentPreDueTasks, lastTask];

@@ -6,18 +6,13 @@
   "dueTasks": [
     {
       "parentModuleName": "instaAuto",
-      "actionName": "updateUserData",
-      "argumentsString": true
-    },
-    {
-      "parentModuleName": "instaAuto",
-      "actionName": "follow",
-      "argumentsString": "manisha.sen.25"
-    },
-    {
-      "parentModuleName": "instaAuto",
       "actionName": "follow",
       "argumentsString": "best.frnds.jsm"
+    },
+    {
+      "parentModuleName": "instaAuto",
+      "actionName": "updateUserData",
+      "argumentsString": true
     }
   ],
   "ai_agent_type": null,
@@ -81,8 +76,8 @@
     "edges": []
   },
   "pinned_channels_list_count": 0,
-  "profile_pic_url": "https://instagram.famd1-1.fna.fbcdn.net/v/t51.2885-19/418991194_1546497079451774_3774613391376622570_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.famd1-1.fna.fbcdn.net&_nc_cat=102&_nc_oc=Q6cZ2QHLxuzOdTwTUZj3AQWg63hbh-2NWZ4fmt9iLNH4FWUvGZlYsBdVpZiitSAAyZlgiis&_nc_ohc=78lc73ypAqEQ7kNvwEFKp3a&_nc_gid=eW4SIJLmNfYdoHGGRqsVbA&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfNQrVysI1beydfhe8fXv2bW8wXU-FzIXXlzirVkQPqkbQ&oe=685076F0&_nc_sid=8b3546",
-  "profile_pic_url_hd": "https://instagram.famd1-1.fna.fbcdn.net/v/t51.2885-19/418991194_1546497079451774_3774613391376622570_n.jpg?stp=dst-jpg_s320x320_tt6&_nc_ht=instagram.famd1-1.fna.fbcdn.net&_nc_cat=102&_nc_oc=Q6cZ2QHLxuzOdTwTUZj3AQWg63hbh-2NWZ4fmt9iLNH4FWUvGZlYsBdVpZiitSAAyZlgiis&_nc_ohc=78lc73ypAqEQ7kNvwEFKp3a&_nc_gid=eW4SIJLmNfYdoHGGRqsVbA&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfOMLhJRvE1AhzanhICJpyq3VE-mVJkWDaiPN97WQYRxqw&oe=685076F0&_nc_sid=8b3546",
+  "profile_pic_url": "https://instagram.fjdh2-1.fna.fbcdn.net/v/t51.2885-19/418991194_1546497079451774_3774613391376622570_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.fjdh2-1.fna.fbcdn.net&_nc_cat=102&_nc_oc=Q6cZ2QFEk9JJP8BzGQp11Z3dzBrQw_QrHgEKzRo-JE2ArvvzKCiaT0Sa8SxIf2l6zyLmiRB_7pi0TCBhKMmqyI0RwhrH&_nc_ohc=78lc73ypAqEQ7kNvwHHKb_W&_nc_gid=YagngZ5qu7aLol9qpr9yfg&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfNfmuM5gWA9JmFwLIy5jqpmyMc2ji7H_WbqAT7we80HRg&oe=6850AF30&_nc_sid=8b3546",
+  "profile_pic_url_hd": "https://instagram.fjdh2-1.fna.fbcdn.net/v/t51.2885-19/418991194_1546497079451774_3774613391376622570_n.jpg?stp=dst-jpg_s320x320_tt6&_nc_ht=instagram.fjdh2-1.fna.fbcdn.net&_nc_cat=102&_nc_oc=Q6cZ2QFEk9JJP8BzGQp11Z3dzBrQw_QrHgEKzRo-JE2ArvvzKCiaT0Sa8SxIf2l6zyLmiRB_7pi0TCBhKMmqyI0RwhrH&_nc_ohc=78lc73ypAqEQ7kNvwHHKb_W&_nc_gid=YagngZ5qu7aLol9qpr9yfg&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfM9bE7Ryb-6rfkV_o-2SgPzchjpL8ilFuwPZgBlhXC8MA&oe=6850AF30&_nc_sid=8b3546",
   "requested_by_viewer": false,
   "should_show_category": false,
   "should_show_public_contacts": false,
@@ -250,9 +245,14 @@
   "followersCount": 50,
   "followingsCount": 92,
   "mutualFollowersCount": 0,
-  "automatedFollow": [],
+  "automatedFollow": [
+    {
+      "userName": "manisha.sen.25",
+      "date": "2025-06-12T13:24:35.362Z"
+    }
+  ],
   "automatedUnfollow": [],
   "automatedlike": [],
   "automatedcomment": [],
-  "lastUpdate": "2025-06-12T10:56:49.723Z"
+  "lastUpdate": "2025-06-12T13:13:12.624Z"
 }
