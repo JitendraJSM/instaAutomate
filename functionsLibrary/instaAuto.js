@@ -294,6 +294,7 @@ const follow = async function (userName, likeOptions) {
   const userObject = { userName, date: new Date().toISOString() };
   this.emit("follow", userObject);
 };
+follow.doNotParseArgumentString = true;
 
 const like = async function (likeOptions) {
   const { userName, minNumberOfPostsToLike = 1, maxNumberOfPostsToLike = 5 } = likeOptions;
@@ -373,6 +374,26 @@ const like = async function (likeOptions) {
 };
 
 const performDueTasks = async function () {
+  const agentPreDueTasks = [
+    {
+      expression: `this.state.profileTarget = ${this.state.currentProfile.profileTarget}*1`,
+    },
+    {
+      parentModuleName: "chrome",
+      actionName: "initializeBrowser",
+    },
+  ];
+  const agentPostDueTasks = [
+    {
+      parentModuleName: "chrome",
+      actionName: "closeBrowser",
+    },
+  ];
+  const dueTasks = this.state.currentProfile.dueTasks;
+  this.task.splice(this.currentActionIndex + 1, 0, ...agentPreDueTasks, ...dueTasks, ...agentPostDueTasks);
+};
+
+/*const performDueTasks = async function () {
   // const lastTask = this.task.pop();
   // const agentPreDueTasks = [
   //   {
@@ -417,16 +438,10 @@ const performDueTasks = async function () {
   // await follow.call(this, "riya9669singh");
   // await follow.call(this, "sona_sengupta_");
   // await follow.call(this, "roshnigupta0075");
-};
+};*/
 
 // ======= Controller Functions =======
 
-const filterProfilesToAutomate = async function () {
-  // As agent's dueTasks are more important than scraper's dueTasks.
-  this.state.profilesToLoop = this.state.profilesData.filter((profile) => profile.type === "agent");
-  // console.log(this.state.profilesToLoop);
-  if (this.state.profilesToLoop.length === 0) throw new Error(`No profiles to loop`);
-};
 const instaAutomation = async function () {
   /*
   await addDueTask("manisha.sen.25", { updateUserData: true });
@@ -445,10 +460,10 @@ const instaAutomation = async function () {
     if (!addNewProfileResponse) throw new Error(`Failed to add new profile`);
   }*/ // Shifted to db.js and Done in initialTask.json
 
-  // As agent's dueTasks are more important than scraper's dueTasks.
+  /*  // As agent's dueTasks are more important than scraper's dueTasks.
   this.state.profilesToLoop = this.state.profilesData.filter((profile) => profile.type === "agent");
   // console.log(this.state.profilesToLoop);
-  if (this.state.profilesToLoop.length === 0) throw new Error(`No profiles to loop`);
+  if (this.state.profilesToLoop.length === 0) throw new Error(`No profiles to loop`);*/ // Shifted to db.js and Done in initialTask.json
 
   this.state.currentProfileIndex = 0;
   while (this.state.currentProfileIndex < this.state.profilesToLoop.length) {
@@ -456,6 +471,7 @@ const instaAutomation = async function () {
 
     console.log(`currentProfile to loop over is as: `);
     console.log(this.state.currentProfile);
+    console.log(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`);
     // console.log(`Before this.tasks`);
     // console.log(this.task);
 

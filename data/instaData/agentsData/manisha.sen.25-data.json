@@ -3,15 +3,9 @@
   "automatedFollow": [],
   "dueTasks": [
     {
-      "updateUserData": true
-    },
-    {
-      "follow": true,
-      "userName": "best.frnds.jsm"
-    },
-    {
-      "follow": true,
-      "userName": "kajalmahioffical143"
+      "parentModuleName": "instaAuto",
+      "actionName": "follow",
+      "argumentString": "kajalmahioffical143"
     }
   ],
   "postsCount": 1,

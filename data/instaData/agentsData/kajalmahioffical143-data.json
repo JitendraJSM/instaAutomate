@@ -5,15 +5,19 @@
   "type": "agent",
   "dueTasks": [
     {
-      "updateUserData": true
+      "parentModuleName": "instaAuto",
+      "actionName": "updateUserData",
+      "argumentString": true
     },
     {
-      "follow": true,
-      "userName": "manisha.sen.25"
+      "parentModuleName": "instaAuto",
+      "actionName": "follow",
+      "argumentString": "manisha.sen.25"
     },
     {
-      "follow": true,
-      "userName": "best.frnds.jsm"
+      "parentModuleName": "instaAuto",
+      "actionName": "follow",
+      "argumentString": "best.frnds.jsm"
     }
   ]
 }

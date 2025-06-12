@@ -5,12 +5,13 @@
   "type": "scraper",
   "dueTasks": [
     {
-      "follow": true,
-      "userName": "manisha.sen.25"
+      "actionName": "follow",
+      "argumentString": "kajalmahioffical143"
     },
     {
-      "follow": true,
-      "userName": "kajalmahioffical143"
+      "parentModuleName": "instaAuto",
+      "actionName": "follow",
+      "argumentString": "kajalmahioffical143"
     }
   ],
   "ai_agent_type": null,

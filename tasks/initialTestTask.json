@@ -12,8 +12,11 @@
     "actionName": "addNewProfile"
   },
   {
-    "parentModuleName": "devOrTest",
-    "actionName": "consoleLog",
-    "argumentsString": "this.state"
+    "parentModuleName": "db",
+    "actionName": "filterProfilesToAutomate"
+  },
+  {
+    "parentModuleName": "instaAuto",
+    "actionName": "instaAutomation"
   }
 ]
