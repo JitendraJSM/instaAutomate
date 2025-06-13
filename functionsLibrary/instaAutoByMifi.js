@@ -80,8 +80,6 @@ const Instauto = async (db, browser, options) => {
   assert(maxFollowsPerHour * botWorkShiftHours >= maxFollowsPerDay, "Max follows per hour too low compared to max follows per day");
 
   const { addPrevFollowedUser, getPrevFollowedUser, addPrevUnfollowedUser, getLikedPhotosLastTimeUnit, getPrevUnfollowedUsers, getPrevFollowedUsers, addLikedPhoto } = db;
-  console.log(`inside instaAuto finished.`);
-  process.exit();
 
   const getNumLikesThisTimeUnit = (time) => getLikedPhotosLastTimeUnit(time).length;
 
