@@ -4,6 +4,7 @@
     "userName": "manisha.sen.25",
     "password": "hhjsm001",
     "type": "agent",
+    "userDataPath": "data/instaData/agentsData/manisha.sen.25-data.json",
     "dueTasks": [
       {
         "parentModuleName": "instaAuto",
@@ -17,6 +18,7 @@
     "userName": "best.frnds.jsm",
     "password": "hhjsm001",
     "type": "scraper",
+    "userDataPath": "data/instaData/scrapersData/best.frnds.jsm-data.json",
     "dueTasks": [
       {
         "parentModuleName": "instaAuto",
@@ -30,6 +32,7 @@
     "userName": "kajalmahioffical143",
     "password": "hhjsm001",
     "type": "agent",
+    "userDataPath": "data/instaData/agentsData/kajalmahioffical143-data.json",
     "dueTasks": [
       {
         "parentModuleName": "instaAuto",

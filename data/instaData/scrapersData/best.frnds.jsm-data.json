@@ -3,6 +3,7 @@
   "userName": "best.frnds.jsm",
   "password": "hhjsm001",
   "type": "scraper",
+  "userDataPath": "data/instaData/scrapersData/best.frnds.jsm-data.json",
   "dueTasks": [
     {
       "actionName": "follow",

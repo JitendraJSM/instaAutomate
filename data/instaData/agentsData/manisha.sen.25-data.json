@@ -1,6 +1,7 @@
 {
   "profileTarget": "2",
   "automatedFollow": [],
+  "userDataPath": "data/instaData/agentsData/manisha.sen.25-data.json",
   "dueTasks": [
     {
       "parentModuleName": "instaAuto",

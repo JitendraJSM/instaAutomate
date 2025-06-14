@@ -3,6 +3,7 @@
   "userName": "kajalmahioffical143",
   "password": "hhjsm001",
   "type": "agent",
+  "userDataPath": "data/instaData/agentsData/kajalmahioffical143-data.json",
   "dueTasks": [
     {
       "parentModuleName": "instaAuto",
