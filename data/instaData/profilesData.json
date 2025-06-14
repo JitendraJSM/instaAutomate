@@ -38,11 +38,6 @@
         "parentModuleName": "instaAuto",
         "actionName": "follow",
         "argumentsString": "best.frnds.jsm"
-      },
-      {
-        "parentModuleName": "instaAuto",
-        "actionName": "updateUserData",
-        "argumentsString": true
       }
     ]
   }

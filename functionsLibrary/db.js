@@ -107,7 +107,9 @@ const writeUserProfileData = async (userData) => {
 // Refactored until this line 14-06-2025
 
 const addDueTask = async function (userName, dueTaskObj) {
-  console.log(`Adding due task for user: ${userName}`);
+  console.log(
+    `Adding due task for user: ${userName}, ${JSON.stringify(dueTaskObj)}`
+  );
 
   const profilesData = await readProfilesData();
 
@@ -119,18 +121,16 @@ const addDueTask = async function (userName, dueTaskObj) {
         await readUserProfileData.call(this, userName)
       );
       userData.dueTasks.push(dueTaskObj);
-      // Refactored until this line 14-06-2025
 
       await writeUserProfileData.call(this, userData);
-    } else
-      throw new Error(
-        `User profile with userName: ${userName} not found in profilesData.`
-      );
+    }
   }
+  console.log(`12.3. ${userName}`);
   await writeProfilesData(profilesData);
   console.log(`Added task for user: ${userName}`);
 };
 
+// Refactored until this line 14-06-2025
 const removeDueTask = async function (userName, dueTaskObj) {
   const profilesData = await readProfilesData();
 

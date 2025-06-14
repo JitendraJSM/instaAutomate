@@ -15,14 +15,26 @@
 // }
 // main();
 
-const { words } = require("lodash");
-
 // ======== utils.removeDuplicates of writeProfilesData() Testing ========
+// const db = require("./functionsLibrary/db.js");
+// async function main() {
+//   const profilesData = await db.readProfilesData();
+//   const result = await db.writeProfilesData(profilesData);
+//   console.log(`result.`);
+// }
+
+// main();
+
+// ===== addDueTask() Testing ====
 const db = require("./functionsLibrary/db.js");
 async function main() {
-  const profilesData = await db.readProfilesData();
-  const result = await db.writeProfilesData(profilesData);
+  const result = await db.addDueTask("kajalmahioffical143", {
+    parentModuleName: "instaAuto",
+    actionName: "updateUserData",
+    argumentsString: true,
+  });
   console.log(`result.`);
+  console.log(result);
 }
 
 main();
