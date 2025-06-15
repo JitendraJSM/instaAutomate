@@ -9,11 +9,6 @@
       "parentModuleName": "instaAuto",
       "actionName": "follow",
       "argumentsString": "best.frnds.jsm"
-    },
-    {
-      "parentModuleName": "instaAuto",
-      "actionName": "updateUserData",
-      "argumentsString": true
     }
   ],
   "ai_agent_type": null,
