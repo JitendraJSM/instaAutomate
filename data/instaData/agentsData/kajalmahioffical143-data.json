@@ -7,8 +7,8 @@
   "dueTasks": [
     {
       "parentModuleName": "instaAuto",
-      "actionName": "follow",
-      "argumentsString": "best.frnds.jsm"
+      "actionName": "updateUserData",
+      "argumentsString": true
     }
   ],
   "ai_agent_type": null,
@@ -26,12 +26,12 @@
   "external_url": null,
   "external_url_linkshimmed": null,
   "edge_followed_by": {
-    "count": 50
+    "count": 51
   },
   "fbid": "17841464065441230",
   "followed_by_viewer": false,
   "edge_follow": {
-    "count": 92
+    "count": 93
   },
   "follows_viewer": false,
   "full_name": "Kajal Mahi",
@@ -72,8 +72,8 @@
     "edges": []
   },
   "pinned_channels_list_count": 0,
-  "profile_pic_url": "https://instagram.fjdh2-1.fna.fbcdn.net/v/t51.2885-19/418991194_1546497079451774_3774613391376622570_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.fjdh2-1.fna.fbcdn.net&_nc_cat=102&_nc_oc=Q6cZ2QFEk9JJP8BzGQp11Z3dzBrQw_QrHgEKzRo-JE2ArvvzKCiaT0Sa8SxIf2l6zyLmiRB_7pi0TCBhKMmqyI0RwhrH&_nc_ohc=78lc73ypAqEQ7kNvwHHKb_W&_nc_gid=YagngZ5qu7aLol9qpr9yfg&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfNfmuM5gWA9JmFwLIy5jqpmyMc2ji7H_WbqAT7we80HRg&oe=6850AF30&_nc_sid=8b3546",
-  "profile_pic_url_hd": "https://instagram.fjdh2-1.fna.fbcdn.net/v/t51.2885-19/418991194_1546497079451774_3774613391376622570_n.jpg?stp=dst-jpg_s320x320_tt6&_nc_ht=instagram.fjdh2-1.fna.fbcdn.net&_nc_cat=102&_nc_oc=Q6cZ2QFEk9JJP8BzGQp11Z3dzBrQw_QrHgEKzRo-JE2ArvvzKCiaT0Sa8SxIf2l6zyLmiRB_7pi0TCBhKMmqyI0RwhrH&_nc_ohc=78lc73ypAqEQ7kNvwHHKb_W&_nc_gid=YagngZ5qu7aLol9qpr9yfg&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfM9bE7Ryb-6rfkV_o-2SgPzchjpL8ilFuwPZgBlhXC8MA&oe=6850AF30&_nc_sid=8b3546",
+  "profile_pic_url": "https://instagram.fjdh1-2.fna.fbcdn.net/v/t51.2885-19/418991194_1546497079451774_3774613391376622570_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.fjdh1-2.fna.fbcdn.net&_nc_cat=102&_nc_oc=Q6cZ2QH9XVFOefL-LNRi3tX2d2hfymF63sTG1GliEQ1nUY2tbZMfYNkgsnUWrTA5ea5MN_KbyX5WipxBC2v8xoxVyqbX&_nc_ohc=NeS5Urs9I3cQ7kNvwHnRbH0&_nc_gid=FIjRqdL5VO0P-4UgMSiG-w&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfPqiQwpJ05lB1uQ6Z5BfN-RryoQtnh74ihMV8q3SCbaGA&oe=68546B70&_nc_sid=8b3546",
+  "profile_pic_url_hd": "https://instagram.fjdh1-2.fna.fbcdn.net/v/t51.2885-19/418991194_1546497079451774_3774613391376622570_n.jpg?stp=dst-jpg_s320x320_tt6&_nc_ht=instagram.fjdh1-2.fna.fbcdn.net&_nc_cat=102&_nc_oc=Q6cZ2QH9XVFOefL-LNRi3tX2d2hfymF63sTG1GliEQ1nUY2tbZMfYNkgsnUWrTA5ea5MN_KbyX5WipxBC2v8xoxVyqbX&_nc_ohc=NeS5Urs9I3cQ7kNvwHnRbH0&_nc_gid=FIjRqdL5VO0P-4UgMSiG-w&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfPaZ6Li0ITZogvXb2TX9JlOdNdrINIFyNmzMceygO00Qw&oe=68546B70&_nc_sid=8b3546",
   "requested_by_viewer": false,
   "should_show_category": false,
   "should_show_public_contacts": false,
@@ -92,6 +92,7 @@
     "edges": []
   },
   "followers": [
+    "itz_nemichand_manju_150",
     "gopesnishad",
     "ragahav127",
     "gendlalomkarkar",
@@ -101,7 +102,7 @@
     "mohmaresuresh",
     "najar.singh.754",
     "madhuram.seervi.75470",
-    "royal___up__50__azamgarh",
+    "abhishek_vlogs_king_005",
     "rk3669singh",
     "dipankar7770",
     "jitendranarahia1993",
@@ -144,6 +145,7 @@
     "omeglejiya"
   ],
   "followings": [
+    "manisha.sen.25",
     "mubinchanali",
     "vik_ram8872",
     "_suman119",
@@ -186,10 +188,10 @@
     "rajak3792023",
     "rakesh_bhai_123457",
     "lokeshkalyanelokesh",
-    "royal___up__50__azamgarh",
+    "abhishek_vlogs_king_005",
     "gendlalomkarkar",
     "rani.7161kumari",
-    "r_j_ckd",
+    "itz_nemichand_manju_150",
     "rahct_a",
     "____aryan__bhai_____752",
     "young_by22222",
@@ -220,12 +222,12 @@
     "chetankrs798",
     "saksham_dakhare",
     "vikasnishad445",
-    "just._.cherry_18",
+    "the._.lavarish_420",
     "vashu_edits_",
     "the.lucknow.frames",
     "chandan.paswan.4004",
     "anita_choudhary_jaat_00",
-    "aashik_sindkhopade",
+    "the._.lavarish__356",
     "lucknowwale2",
     "sreeleela14",
     "rohitsharma45",
@@ -238,17 +240,17 @@
     "chota_pushparaj07"
   ],
   "postsCount": 2,
-  "followersCount": 50,
-  "followingsCount": 92,
+  "followersCount": 51,
+  "followingsCount": 93,
   "mutualFollowersCount": 0,
   "automatedFollow": [
     {
       "userName": "manisha.sen.25",
-      "date": "2025-06-12T13:24:35.362Z"
+      "date": "2025-06-15T13:41:57.957Z"
     }
   ],
   "automatedUnfollow": [],
   "automatedlike": [],
   "automatedcomment": [],
-  "lastUpdate": "2025-06-12T13:13:12.624Z"
+  "lastUpdate": "2025-06-15T10:59:00.402Z"
 }

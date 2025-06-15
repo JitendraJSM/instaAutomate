@@ -53,8 +53,11 @@ const reconnectBrowser = async function () {
 
 // 3. Close the browser
 const closeBrowser = async function () {
-  const userInput = await this.utlis.askUser("Are you sure you want to close the browser? (y/n): ");
-  if (userInput.toLowerCase() !== "n") {
+  console.log(`Before closing the browser.`);
+  console.log(this.browser);
+
+  const userInput = await this.utils.askUser("Are you sure you want to close the browser? (y/n): ");
+  if (userInput.toLowerCase() === "n") {
     console.log("Browser close operation cancelled.");
     return;
   }
@@ -63,6 +66,7 @@ const closeBrowser = async function () {
   await this.browser.close();
   this.browser = null;
   console.log("Browser closed successfully.");
+  console.log(this.browser);
 };
 
 // 4. To console log all pages URLs

@@ -131,16 +131,16 @@ async function executeAction(actionDetails) {
 
     // Execute the action based on whether it's async or not
     // const result = action.constructor.name === "AsyncFunction" ? await action.call(this, ...parsedArguments) : action.call(this, ...parsedArguments);
-    this.currentAction.preURL = await this.page?.url();
+    if (this.browser) this.currentAction.preURL = await this.page?.url();
     const result = action.constructor.name === "AsyncFunction" ? await action.call(this, ...parsedArguments) : action.call(this, ...parsedArguments);
-    await this.page?.waitForPageLoad();
-    this.currentAction.postURL = await this.page?.url();
+    if (this.browser) await this.page?.waitForPageLoad();
+    if (this.browser) this.currentAction.postURL = await this.page?.url();
 
     // Store result in state if specified
     shouldStoreState ||= action.shouldStoreState;
     if (shouldStoreState && result !== undefined) {
       this.state[shouldStoreState] = result;
-      this.currentAction[shouldStoreState] = result;
+      // this.currentAction[shouldStoreState] = result;
       // this.appLogger.logMSG(`${shouldStoreState}:${result}\n`);
     }
     this.appLogger.logAction();

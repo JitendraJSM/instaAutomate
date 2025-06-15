@@ -1,5 +1,19 @@
 [
   {
+    "profileTarget": "22",
+    "userName": "kajalmahioffical143",
+    "password": "hhjsm001",
+    "type": "agent",
+    "userDataPath": "data/instaData/agentsData/kajalmahioffical143-data.json",
+    "dueTasks": [
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "updateUserData",
+        "argumentsString": true
+      }
+    ]
+  },
+  {
     "profileTarget": "2",
     "userName": "manisha.sen.25",
     "password": "hhjsm001",
@@ -8,8 +22,8 @@
     "dueTasks": [
       {
         "parentModuleName": "instaAuto",
-        "actionName": "follow",
-        "argumentsString": "kajalmahioffical143"
+        "actionName": "updateUserData",
+        "argumentsString": true
       }
     ]
   },
@@ -24,20 +38,6 @@
         "parentModuleName": "instaAuto",
         "actionName": "follow",
         "argumentsString": "kajalmahioffical143"
-      }
-    ]
-  },
-  {
-    "profileTarget": "22",
-    "userName": "kajalmahioffical143",
-    "password": "hhjsm001",
-    "type": "agent",
-    "userDataPath": "data/instaData/agentsData/kajalmahioffical143-data.json",
-    "dueTasks": [
-      {
-        "parentModuleName": "instaAuto",
-        "actionName": "follow",
-        "argumentsString": "best.frnds.jsm"
       }
     ]
   }

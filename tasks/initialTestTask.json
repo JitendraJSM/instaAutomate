@@ -4,10 +4,6 @@
     "actionName": "readProfilesData"
   },
   {
-    "parentModuleName": "instaAuto",
-    "actionName": "startListeners"
-  },
-  {
     "parentModuleName": "db",
     "actionName": "addNewProfile"
   },

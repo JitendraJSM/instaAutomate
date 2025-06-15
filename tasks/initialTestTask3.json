@@ -1,0 +1,33 @@
+[
+  {
+    "expression": "this.state.profileTarget = 21*1"
+  },
+  {
+    "parentModuleName": "chrome",
+    "actionName": "initializeBrowser"
+  },
+  {
+    "parentModuleName": "devOrTest",
+    "actionName": "consoleLog",
+    "argumentsString": "Before Closing Chrome",
+    "doNotParseArgumentsString": true
+  },
+  {
+    "parentModuleName": "devOrTest",
+    "actionName": "printNwriteThis"
+  },
+  {
+    "parentModuleName": "chrome",
+    "actionName": "closeBrowser"
+  },
+  {
+    "parentModuleName": "devOrTest",
+    "actionName": "consoleLog",
+    "argumentsString": "ok ji everything is ok....",
+    "doNotParseArgumentsString": true
+  },
+  {
+    "parentModuleName": "devOrTest",
+    "actionName": "endDevFunction"
+  }
+]

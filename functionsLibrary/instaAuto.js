@@ -1,3 +1,4 @@
+const fs = require("fs-extra");
 const utils = require("../utils/utils.js");
 // ====== Flow ======
 /* 
@@ -27,19 +28,19 @@ const utils = require("../utils/utils.js");
 const db = require("./db.js");
 
 // ======= Event Listeners =======
-const startListeners = async function () {
-  this.on("follow", async (userObject) => {
-    await this.db.updateDatabaseOnFollow.call(this, userObject);
-  });
-  console.log(`Listeners started.`);
-};
+// const startListeners = async function () {
+//   this.on("follow", async (userObject) => {
+//     await this.db.updateDatabaseOnFollow.call(this, userObject);
+//   });
+//   console.log(`Listeners started.`);
+// };
 
 // ======= DB Functions =======
 
 const updateUserData = async function (needUpadte) {
   let userData;
 
-  userData = await db.readUserProfileData(this.state.currentProfile);
+  userData = await db.readUserProfileData.call(this, this.state.currentProfile.userName);
   if (!needUpadte) {
     needUpadte = true;
     if (userData.lastUpdate) {
@@ -299,7 +300,10 @@ const follow = async function (userName, likeOptions) {
   await this.monitor.robustPolling(waitForFollowingDone.bind(this), { rejectOnEnd: false, waitForFunctionCompletion: true }, followBTN);
 
   const userObject = { userName, date: new Date().toISOString() };
-  this.emit("follow", userObject);
+  // this.emit("follow", userObject);
+  const dbUpdatedForAutomatedFollow = await db.updateDatabaseOnFollow.call(this, userObject);
+  console.log(`Does Data Base Updated Successfully : ${dbUpdatedForAutomatedFollow}.`);
+  return true;
 };
 follow.doNotParseArgumentsString = true;
 
@@ -380,10 +384,24 @@ const like = async function (likeOptions) {
   console.log(`Random Post likes is Completed.`);
 };
 
+const updateCurrentProfile = async function (userName) {
+  this.state.currentProfile = this.state.profilesToLoop.find((profile) => profile.userName === userName);
+  this.state.profileTarget = this.state.currentProfile.profileTarget * 1;
+  return true;
+};
+updateCurrentProfile.doNotParseArgumentsString = true;
+
 const performDueTasks = async function () {
   const agentPreDueTasks = [
     {
-      expression: `this.state.profileTarget = ${this.state.currentProfile.profileTarget}*1`,
+      parentModuleName: "instaAuto",
+      actionName: "updateCurrentProfile",
+      argumentsString: `${this.state.currentProfile.userName}`,
+    },
+    {
+      parentModuleName: "devOrTest",
+      actionName: "consoleLog",
+      argumentsString: "this.state.currentProfile",
     },
     {
       parentModuleName: "chrome",
@@ -399,6 +417,7 @@ const performDueTasks = async function () {
   // Deep copy of dueTasks, handling multilevel nested arrays/objects
   const copyOfDueTasks = JSON.parse(JSON.stringify(this.state.currentProfile.dueTasks, null, 2));
   this.task.splice(this.currentActionIndex + 1, 0, ...agentPreDueTasks, ...copyOfDueTasks, ...agentPostDueTasks);
+  return true;
 };
 
 /*const performDueTasks = async function () {
@@ -457,11 +476,11 @@ const instaAutomation = async function () {
   while (this.state.currentProfileIndex < this.state.profilesToLoop.length) {
     this.state.currentProfile = this.state.profilesToLoop[this.state.currentProfileIndex];
 
-    console.log(`currentProfile to loop over is as: `);
-    console.log(this.state.currentProfile);
+    // console.log(`currentProfile to loop over is as: `);
+    // console.log(this.state.currentProfile);
     console.log(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`);
-    console.log(`Before this.tasks`);
-    console.log(this.task);
+    // console.log(`Before this.tasks`);
+    // console.log(this.task);
 
     await performDueTasks.call(this);
     console.log(`After this.tasks`);
@@ -489,11 +508,12 @@ const scrapeContentOfUser = async function () {};
 // === Interface ===
 const catchAsync = require("../utils/catchAsync.js");
 module.exports = {
+  updateCurrentProfile: catchAsync(updateCurrentProfile),
   instaAutomation: catchAsync(instaAutomation),
   updateUserData: catchAsync(updateUserData),
   follow: catchAsync(follow),
   like: catchAsync(like),
-  startListeners: catchAsync(startListeners),
+  // startListeners: catchAsync(startListeners),
   scrapeUserData: catchAsync(scrapeUserData),
   getListOfFollowersOrFollowings: catchAsync(getListOfFollowersOrFollowings),
 };

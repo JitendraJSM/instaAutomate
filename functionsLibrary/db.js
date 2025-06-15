@@ -138,16 +138,19 @@ const removeDueTask = async function (userName, dueTaskObj) {
 const updateDatabaseOnFollow = async function (userObject) {
   console.log(`Adding ${JSON.stringify(userObject)} to ${this.state.currentProfile.userName}.automatedFollow: [].`);
 
+  const currentUserData = await readUserProfileData.call(this, this.state.currentProfile.userName);
+
   // Neccessary Checks
   /* Sometimes in development you manually unfollow a user that was previously automated followed and hence in automatedFollowed array but when script again perform automated follow on that same user it creates a duplicate array element for that same user but with different date so the below is check for that*/
-  const index = this.state.currentProfile.automatedFollow.findIndex((profile) => profile.userName === userObject.userName);
+  const index = currentUserData.automatedFollow.findIndex((profile) => profile.userName === userObject.userName);
   if (index !== -1) {
     console.log(`User ${userObject.userName} already exists in automatedFollow array, removing the old entry.`);
     this.state.currentProfile.automatedFollow.splice(index, 1);
   }
 
-  this.state.currentProfile.automatedFollow.push(userObject);
-  await writeUserProfileData.call(this, this.state.currentProfile);
+  currentUserData.automatedFollow.push(userObject);
+
+  await writeUserProfileData.call(this, currentUserData);
 
   await addDueTask.call(this, this.state.currentProfile.userName, {
     parentModuleName: "instaAuto",
@@ -159,6 +162,7 @@ const updateDatabaseOnFollow = async function (userObject) {
   this.state.currentProfile.dueTasks = this.utils.removeDuplicates(this.state.currentProfile.dueTasks);
 
   const currentfollowDueTask = this.state.currentProfile.dueTasks.find((task) => task.argumentsString === userObject.userName && task.actionName === "follow");
+  if (!currentfollowDueTask) throw new Error(`currentfollowDueTask {"argumentsString"===${userObject.userName}, "actionName" === "follow"} not found in ${JSON.stringify(this.state.currentProfile)}`);
   await removeDueTask.call(this, this.state.currentProfile.userName, currentfollowDueTask);
 
   console.log(`Adding ${JSON.stringify(userObject)} to ${this.state.currentProfile.userName}.automatedFollow: [].`);

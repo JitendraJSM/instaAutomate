@@ -19,10 +19,6 @@ async function main() {
   // console.log(`=================================`);
   // console.log(app);
   // console.log(`=================================`);
-
-  console.log(`let's start running instaAutoFunc`);
-  await instaAutoFunc(app);
-  console.log(`InstaAutoFunc just finished running.`);
   // console.log(`app.state is as below : `);
   // console.log(app.state);
 
