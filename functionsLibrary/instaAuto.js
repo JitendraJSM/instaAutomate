@@ -35,8 +35,6 @@ const db = require("./db.js");
 //   console.log(`Listeners started.`);
 // };
 
-// ======= DB Functions =======
-
 const updateUserData = async function (needUpadte) {
   let userData;
 
@@ -63,10 +61,6 @@ const updateUserData = async function (needUpadte) {
       ...scrapedUserData,
       ...this.state.currentProfile,
     }; // Fixed variable name from scrapeUserData to scrapedUserData
-    this.state.currentProfile.automatedFollow = [];
-    this.state.currentProfile.automatedUnfollow = [];
-    this.state.currentProfile.automatedlike = [];
-    this.state.currentProfile.automatedcomment = [];
     this.state.currentProfile.lastUpdate = new Date().toISOString();
     await db.writeUserProfileData.call(this, this.state.currentProfile);
 

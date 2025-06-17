@@ -5,13 +5,7 @@
     "password": "hhjsm001",
     "type": "agent",
     "userDataPath": "data/instaData/agentsData/kajalmahioffical143-data.json",
-    "dueTasks": [
-      {
-        "parentModuleName": "instaAuto",
-        "actionName": "updateUserData",
-        "argumentsString": true
-      }
-    ]
+    "dueTasks": []
   },
   {
     "profileTarget": "2",
@@ -19,13 +13,7 @@
     "password": "hhjsm001",
     "type": "agent",
     "userDataPath": "data/instaData/agentsData/manisha.sen.25-data.json",
-    "dueTasks": [
-      {
-        "parentModuleName": "instaAuto",
-        "actionName": "updateUserData",
-        "argumentsString": true
-      }
-    ]
+    "dueTasks": []
   },
   {
     "profileTarget": "21",

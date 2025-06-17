@@ -144,7 +144,8 @@ async function executeAction(actionDetails) {
       // this.appLogger.logMSG(`${shouldStoreState}:${result}\n`);
     }
     this.appLogger.logAction();
-    await this.utils.devWaitCheckContinue.call(this);
+    // await this.utils.devWaitCheckContinue.call(this);
+    await this.utils.randomDelay(4, 1);
 
     return result;
   } catch (error) {

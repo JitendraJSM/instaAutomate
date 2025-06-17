@@ -7,16 +7,10 @@
     }
   ],
   "userDataPath": "data/instaData/agentsData/manisha.sen.25-data.json",
-  "dueTasks": [
-    {
-      "parentModuleName": "instaAuto",
-      "actionName": "updateUserData",
-      "argumentsString": true
-    }
-  ],
+  "dueTasks": [],
   "postsCount": 1,
-  "followersCount": 4,
-  "followingsCount": 22,
+  "followersCount": 8,
+  "followingsCount": 23,
   "mutualFollowersCount": 0,
   "ai_agent_type": null,
   "biography": "",
@@ -33,12 +27,12 @@
   "external_url": null,
   "external_url_linkshimmed": null,
   "edge_followed_by": {
-    "count": 4
+    "count": 8
   },
   "fbid": "17841474954198317",
   "followed_by_viewer": false,
   "edge_follow": {
-    "count": 22
+    "count": 23
   },
   "follows_viewer": false,
   "full_name": "Manisha Sen",
@@ -46,7 +40,7 @@
   "has_ar_effects": false,
   "has_clips": false,
   "has_guides": false,
-  "has_chaining": false,
+  "has_chaining": true,
   "has_channel": false,
   "has_blocked_viewer": false,
   "highlight_reel_count": 0,
@@ -79,8 +73,8 @@
     "edges": []
   },
   "pinned_channels_list_count": 0,
-  "profile_pic_url": "https://instagram.famd1-3.fna.fbcdn.net/v/t51.2885-19/500771664_17843063745498474_2386522269947300610_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.famd1-3.fna.fbcdn.net&_nc_cat=106&_nc_oc=Q6cZ2QGI3TwLz4Dx7XzjM_sujFl0jcLAHimcyolGpRg0uQiiRE8uoMf9GJcmPCYUl21GIHU&_nc_ohc=lNo0QDHrDoEQ7kNvwG617uW&_nc_gid=QmRMJkBrh84ebfp-yyilgQ&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfMrH0MFxRAq83bHxbxcRNIFycigy0RFsY5qF7Ab-mK4Mg&oe=684EDAC0&_nc_sid=8b3546",
-  "profile_pic_url_hd": "https://instagram.famd1-3.fna.fbcdn.net/v/t51.2885-19/500771664_17843063745498474_2386522269947300610_n.jpg?stp=dst-jpg_s320x320_tt6&_nc_ht=instagram.famd1-3.fna.fbcdn.net&_nc_cat=106&_nc_oc=Q6cZ2QGI3TwLz4Dx7XzjM_sujFl0jcLAHimcyolGpRg0uQiiRE8uoMf9GJcmPCYUl21GIHU&_nc_ohc=lNo0QDHrDoEQ7kNvwG617uW&_nc_gid=QmRMJkBrh84ebfp-yyilgQ&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfOkT1lNH9Ci0S6oaJbgI-53UhQdDulsiRTw20sCXkLO3g&oe=684EDAC0&_nc_sid=8b3546",
+  "profile_pic_url": "https://instagram.fjdh1-1.fna.fbcdn.net/v/t51.2885-19/500771664_17843063745498474_2386522269947300610_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.fjdh1-1.fna.fbcdn.net&_nc_cat=106&_nc_oc=Q6cZ2QFhHvrwD88yM3gfGWBbSXDQ3DsLO9DX9DcB9h_x-0ygaX4q27JyUXG3yaj9V-q78ErATPhOz5u1fBVarqZgyOg3&_nc_ohc=_9oCiBdAaWAQ7kNvwETjmfm&_nc_gid=CwM6pprOIOHdxQ0V9DJiEg&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfOZE7l4KIHc1I7rjNa3wXzaIXvl7SYSMoYAh5DRHXu6Mw&oe=68561B00&_nc_sid=8b3546",
+  "profile_pic_url_hd": "https://instagram.fjdh1-1.fna.fbcdn.net/v/t51.2885-19/500771664_17843063745498474_2386522269947300610_n.jpg?stp=dst-jpg_s320x320_tt6&_nc_ht=instagram.fjdh1-1.fna.fbcdn.net&_nc_cat=106&_nc_oc=Q6cZ2QFhHvrwD88yM3gfGWBbSXDQ3DsLO9DX9DcB9h_x-0ygaX4q27JyUXG3yaj9V-q78ErATPhOz5u1fBVarqZgyOg3&_nc_ohc=_9oCiBdAaWAQ7kNvwETjmfm&_nc_gid=CwM6pprOIOHdxQ0V9DJiEg&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfNNUVCt2jQz_7hndurcwiyGCfx8HYxwtvXuG5qvqpgiZw&oe=68561B00&_nc_sid=8b3546",
   "requested_by_viewer": false,
   "should_show_category": false,
   "should_show_public_contacts": false,
@@ -99,12 +93,17 @@
     "edges": []
   },
   "followers": [
+    "kajalmahioffical143",
+    "anujroll1971",
+    "bharat_nath_beragi",
+    "rmu_sai_121",
     "hemantrajput701827",
     "laltu.rajwar.1460",
     "nawazsharif226_salon",
     "rizwan.idrishi.378"
   ],
   "followings": [
+    "kajalmahioffical143",
     "roshnigupta0075",
     "_.sneha047._",
     "sona_sengupta_",
@@ -132,7 +131,7 @@
   "like": [],
   "comment": [],
   "type": "agent",
-  "lastUpdate": "2025-06-11T04:45:04.357Z",
+  "lastUpdate": "2025-06-16T17:34:58.801Z",
   "username": "manisha.sen.25",
   "password": "hhjsm001",
   "automatedlike": [],

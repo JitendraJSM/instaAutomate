@@ -96,9 +96,14 @@ exports.robustPolling = robustPolling;
  * @param {number} minSec The minimum delay in seconds. default is 0.25 seconds.
  */
 const randomDelay = async (maxSec = 0.45, minSec = 0.25) => {
-  await delay((Math.floor(Math.random() * (maxSec - minSec) * 10) + minSec * 10) * 100);
+  const delayTime = (Math.floor(Math.random() * (maxSec - minSec) * 10) + minSec * 10) * 100;
+  console.log(`Random Delay for ${delayTime}ms.`);
+  await delay(delayTime);
 };
 exports.randomDelay = randomDelay;
+// const randomDelay = async (maxSec = 0.45, minSec = 0.25) => {
+//   await delay((Math.floor(Math.random() * (maxSec - minSec) * 10) + minSec * 10) * 100);
+// };
 
 const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 exports.getRandomNumber = getRandomNumber;
