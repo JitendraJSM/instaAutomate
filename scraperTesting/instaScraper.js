@@ -90,11 +90,11 @@ const extractPostsFromResponse = async function (responseJSON) {
   responseJSON.data.xdt_api__v1__feed__user_timeline_graphql_connection.edges.forEach((postNode) => {
     if (this.state.scrapedMetaDataOfPosts.some((post) => post.code === postNode.code)) return;
     try {
-      this.state.scrapedMetaDataOfPosts.push({
+      const node = {
         code: postNode.node.code,
         pk: postNode.node.pk,
         caption: postNode.node.caption,
-        video_versions: postNode.node.video_versions[0].url,
+        caption: postNode.node.taken_at, // this is date and time of post upload/1000
         user: postNode.node.user.username,
         user: postNode.node.user,
         coauthor_producers: postNode.node.coauthor_producers,
@@ -105,7 +105,17 @@ const extractPostsFromResponse = async function (responseJSON) {
         media_type: postNode.node.media_type,
         clips_metadata: postNode.node.clips_metadata,
         comments: postNode.node.comments,
-      });
+      };
+      // if (postNode.node?.video_versions[0]?.url) node.video_versions = postNode.node.video_versions[0].url;
+      // else if (postNode.node?.image_versions2?.candidates[0]?.url) node.video_versions = postNode.node.video_versions[0].url; /// these if conditions are not perfect but...
+      // if (postNode.node?.is_dash_eligible) node.video_versions = postNode.node.video_versions[0].url;
+      // else if (!postNode.node?.is_dash_eligible) node.video_versions = postNode.node.video_versions[0].url; /// these if conditions are not perfect but...
+      if (postNode.node.product_type === "clips") node.video_versions = postNode.node.video_versions[0].url;
+      else if (!postNode.node.product_type === "feed") {
+        node.video_versions = postNode.node.video_versions[0].url; /// these if conditions are not perfect but..
+        node.accessibility_caption = postNode.node.accessibility_caption; /// these if conditions are not perfect but..
+      }
+      this.state.scrapedMetaDataOfPosts.push(node);
     } catch (error) {
       console.log(`Cannot extract data from postNade: ${postNode}`);
       console.log(`88888888888`);

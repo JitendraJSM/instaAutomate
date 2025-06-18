@@ -14,7 +14,7 @@
     "preCondition": "chrome://new-tab-page/",
     "parentModuleName": "page",
     "actionName": "navigateTo",
-    "argumentsString": "https://www.instagram.com/nanu_cute_00/",
+    "argumentsString": "https://www.instagram.com/its_cute_girl__85/",
     "doNotParseArgumentsString": true
   }
 ]
