@@ -76,41 +76,50 @@ async function interceptRequests(page, options, filterFn, handlerFn) {
  *                              Receives request and response (if completed) as arguments.
  * @returns {Function} - A configured interceptor function that takes a page and options
  */
-function createRequestInterceptor(filterFn, handlerFn) {
-  return async (page, options = { interceptCompletedOnly: false }) => {
-    await interceptRequests(page, options, filterFn, handlerFn);
-  };
-}
+// function createRequestInterceptor(filterFn, handlerFn) {
+//   return async function (page, options = { interceptCompletedOnly: false }) {
+//     await interceptRequests(page, options, filterFn, handlerFn);
+//   };
+// }
 
 const fs = require("fs-extra");
 
 const extractPostsFromResponse = async function (responseJSON) {
-  const postsArray = [];
+  // const postsArray = [];
+
   responseJSON.data.xdt_api__v1__feed__user_timeline_graphql_connection.edges.forEach((postNode) => {
-    if (postsArray.find((post) => post.pk === postNode.pk)) return;
-    postsArray.push({
-      code: postNode.node.code,
-      pk: postNode.node.pk,
-      caption: postNode.node.caption,
-      video_versions: postNode.node.video_versions.find((obj) => obj.width == 720 && obj.height == 1280).url,
-      user: postNode.node.user.username,
-      user: postNode.node.user,
-      coauthor_producers: postNode.node.coauthor_producers,
-      title: postNode.node.title,
-      comment_count: postNode.node.comment_count,
-      like_count: postNode.node.like_count,
-      product_type: postNode.node.product_type,
-      media_type: postNode.node.media_type,
-      clips_metadata: postNode.node.clips_metadata,
-      comments: postNode.node.comments,
-    });
+    if (this.state.scrapedMetaDataOfPosts.some((post) => post.code === postNode.code)) return;
+    try {
+      this.state.scrapedMetaDataOfPosts.push({
+        code: postNode.node.code,
+        pk: postNode.node.pk,
+        caption: postNode.node.caption,
+        video_versions: postNode.node.video_versions[0].url,
+        user: postNode.node.user.username,
+        user: postNode.node.user,
+        coauthor_producers: postNode.node.coauthor_producers,
+        title: postNode.node.title,
+        comment_count: postNode.node.comment_count,
+        like_count: postNode.node.like_count,
+        product_type: postNode.node.product_type,
+        media_type: postNode.node.media_type,
+        clips_metadata: postNode.node.clips_metadata,
+        comments: postNode.node.comments,
+      });
+    } catch (error) {
+      console.log(`Cannot extract data from postNade: ${postNode}`);
+      console.log(`88888888888`);
+      console.log(postNode);
+      console.log(`88888888888`);
+    }
   });
-  return postsArray;
+  return true;
 };
 
 const postsScraper = async function () {
-  let i = 0;
-  this.state.scrapedPosts = [];
+  // Read Already existed data
+  const userDataPath = "./scraperTesting/extractedPosts.json"; // this file must be array
+  this.state.scrapedMetaDataOfPosts = JSON.parse(await fs.readFile(userDataPath));
   // Filter function - process requests
   const filterFn = async (request, response) => {
     {
@@ -129,18 +138,20 @@ const postsScraper = async function () {
       const resJSON = await response.json();
       console.log(`==============================================`);
       await fs.appendFile("./scraperTesting/responseAsItIs.json", JSON.stringify(resJSON, null, 2) + ",\n");
-      i++;
-      console.log(`OK check Appended. ${i}---`);
-      const postsArray = await extractPostsFromResponse(resJSON);
-      await fs.appendFile("./scraperTesting/extractedPosts.json", JSON.stringify(postsArray, null, 2) + ",\n");
+
+      console.log(`OK check Appended. ---`);
+      console.log(`Currently length of scrapedMetaDataOfPosts is : ${this.state.scrapedMetaDataOfPosts.length}`);
+
+      await extractPostsFromResponse.call(this, resJSON);
+      await fs.writeFile("./scraperTesting/extractedPosts.json", JSON.stringify(this.state.scrapedMetaDataOfPosts, null, 2));
       console.log(`==============================================`);
     }
   };
 
-  const interceptCompletedRequests = createRequestInterceptor.call(this, filterFn.bind(this), handlerFn.bind(this));
+  // const interceptCompletedRequests = createRequestInterceptor.call(this, filterFn.bind(this), handlerFn.bind(this));
 
   // Apply the interceptor to completed requests
-  await interceptCompletedRequests(this.page, { interceptCompletedOnly: true });
+  await interceptRequests(this.page, { interceptCompletedOnly: true }, filterFn.bind(this), handlerFn.bind(this));
 
   console.log("postsScraper function completed.");
 };
@@ -148,5 +159,5 @@ const catchAsync = require("../utils/catchAsync.js");
 module.exports = {
   postsScraper: catchAsync(postsScraper),
   interceptRequests,
-  createRequestInterceptor,
+  // createRequestInterceptor,
 };
