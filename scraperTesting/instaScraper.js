@@ -82,31 +82,66 @@ function createRequestInterceptor(filterFn, handlerFn) {
   };
 }
 
+const fs = require("fs-extra");
+
+const extractPostsFromResponse = async function (responseJSON) {
+  const postsArray = [];
+  responseJSON.data.xdt_api__v1__feed__user_timeline_graphql_connection.edges.forEach((postNode) => {
+    if (postsArray.find((post) => post.pk === postNode.pk)) return;
+    postsArray.push({
+      code: postNode.node.code,
+      pk: postNode.node.pk,
+      caption: postNode.node.caption,
+      video_versions: postNode.node.video_versions.find((obj) => obj.width == 720 && obj.height == 1280).url,
+      user: postNode.node.user.username,
+      user: postNode.node.user,
+      coauthor_producers: postNode.node.coauthor_producers,
+      title: postNode.node.title,
+      comment_count: postNode.node.comment_count,
+      like_count: postNode.node.like_count,
+      product_type: postNode.node.product_type,
+      media_type: postNode.node.media_type,
+      clips_metadata: postNode.node.clips_metadata,
+      comments: postNode.node.comments,
+    });
+  });
+  return postsArray;
+};
+
 const postsScraper = async function () {
-  const interceptCompletedRequests = createRequestInterceptor(
-    // Filter function - only process image requests
-    async (request, response) => {
-      {
-        console.log(JSON.stringify(request));
-        const headers = request.headers();
-        let postData = request.postData();
+  let i = 0;
+  this.state.scrapedPosts = [];
+  // Filter function - process requests
+  const filterFn = async (request, response) => {
+    {
+      if (request.url() === "https://www.instagram.com/graphql/query") {
+        const headers = request.headers()["x-fb-friendly-name"];
         console.log("Request Headers:", headers);
-        if (postData) {
-          console.log("Request Body:", postData);
-        } else {
-          console.log("Request Body: <none>");
-        }
         return true;
-        // return request.resourceType() === "image" && response.status() === 200;
       }
-    },
-    // Handler function - log successful image requests
-    (request, response) => {
-      console.log(`Successful url with res: ${request.url()}`);
+      // return request.resourceType() === "image" && response.status() === 200;
     }
-  );
+  };
+
+  // Handler function - successful requests
+  const handlerFn = async (request, response) => {
+    if (request.headers()["x-fb-friendly-name"] === "PolarisProfilePostsQuery" || request.headers()["x-fb-friendly-name"] === "PolarisProfilePostsTabContentQuery_connection") {
+      const resJSON = await response.json();
+      console.log(`==============================================`);
+      await fs.appendFile("./scraperTesting/responseAsItIs.json", JSON.stringify(resJSON, null, 2) + ",\n");
+      i++;
+      console.log(`OK check Appended. ${i}---`);
+      const postsArray = await extractPostsFromResponse(resJSON);
+      await fs.appendFile("./scraperTesting/extractedPosts.json", JSON.stringify(postsArray, null, 2) + ",\n");
+      console.log(`==============================================`);
+    }
+  };
+
+  const interceptCompletedRequests = createRequestInterceptor.call(this, filterFn.bind(this), handlerFn.bind(this));
+
   // Apply the interceptor to completed requests
   await interceptCompletedRequests(this.page, { interceptCompletedOnly: true });
+
   console.log("postsScraper function completed.");
 };
 const catchAsync = require("../utils/catchAsync.js");
