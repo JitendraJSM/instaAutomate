@@ -1,18 +1,20 @@
 [
   {
-    "parentModuleName": "db",
-    "actionName": "readProfilesData"
+    "expression": "this.state.profileTarget = 21*1"
   },
   {
-    "parentModuleName": "db",
-    "actionName": "addNewProfile"
+    "parentModuleName": "chrome",
+    "actionName": "initializeBrowser"
   },
   {
-    "parentModuleName": "db",
-    "actionName": "filterProfilesToAutomate"
+    "parentModuleName": "instaScraper",
+    "actionName": "postsScraper"
   },
   {
-    "parentModuleName": "instaAuto",
-    "actionName": "instaAutomation"
+    "preCondition": "chrome://new-tab-page/",
+    "parentModuleName": "page",
+    "actionName": "navigateTo",
+    "argumentsString": "https://www.example.com",
+    "doNotParseArgumentsString": true
   }
 ]

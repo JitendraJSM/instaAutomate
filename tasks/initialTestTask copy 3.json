@@ -1,0 +1,18 @@
+[
+  {
+    "parentModuleName": "db",
+    "actionName": "readProfilesData"
+  },
+  {
+    "parentModuleName": "db",
+    "actionName": "addNewProfile"
+  },
+  {
+    "parentModuleName": "db",
+    "actionName": "filterProfilesToAutomate"
+  },
+  {
+    "parentModuleName": "instaAuto",
+    "actionName": "instaAutomation"
+  }
+]
