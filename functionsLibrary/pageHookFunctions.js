@@ -302,6 +302,75 @@ const listAllElementsTextAndSelector = async function () {
   }
 };
 
+// ==== Request Intercepter ====
+/**
+ * Intercepts network requests in a Puppeteer page
+ *
+ * @param {Object} page - Puppeteer page instance
+ * @param {Object} options - Configuration options
+ * @param {boolean} options.interceptCompletedOnly - If true, intercepts only completed requests. If false, intercepts requests before they are sent.
+ * @param {Function} filterFn - Function that determines if a request should be processed.
+ *                             Receives request and response (if completed) as arguments.
+ *                             Should return true if the request should be processed.
+ * @param {Function} handlerFn - Function that processes the request if filterFn returns true.
+ *                              Receives request and response (if completed) as arguments.
+ * @returns {Promise<void>}
+ */
+const interceptRequests = async function (options, filterFn, handlerFn) {
+  if (!this.page) {
+    throw new Error("Page instance is required");
+  }
+
+  if (typeof filterFn !== "function") {
+    throw new Error("Filter function is required");
+  }
+
+  if (typeof handlerFn !== "function") {
+    throw new Error("Handler function is required");
+  }
+
+  const interceptCompletedOnly = options?.interceptCompletedOnly ?? false;
+
+  if (interceptCompletedOnly) {
+    // Intercept completed requests
+    this.page.on("response", async (response) => {
+      try {
+        const request = response.request();
+
+        // Check if this request should be processed
+        if (await filterFn(request, response)) {
+          await handlerFn(request, response);
+        }
+      } catch (error) {
+        console.error("Error in response interceptor:", error);
+      }
+    });
+  } else {
+    // Intercept requests before they are sent
+    await this.page.setRequestInterception(true);
+
+    this.page.on("request", async (request) => {
+      try {
+        // Check if this request should be processed
+        if (await filterFn(request, null)) {
+          await handlerFn(request, null);
+        }
+
+        // Continue the request (important!)
+        if (!request.isInterceptionHandled()) {
+          await request.continue();
+        }
+      } catch (error) {
+        console.error("Error in request interceptor:", error);
+        // Make sure the request continues even if there's an error
+        if (!request.isInterceptionHandled()) {
+          await request.continue();
+        }
+      }
+    });
+  }
+};
+
 // === Implementation ===
 const hookMethodsOnPage = async function (page) {
   page.waitForPageLoad = catchAsync(waitForPageLoad.bind(this));
@@ -319,6 +388,7 @@ const hookMethodsOnPage = async function (page) {
   page.listAllElements = catchAsync(listAllElements.bind(this));
   page.listAllElementsText = catchAsync(listAllElementsText.bind(this));
   page.listAllElementsTextAndSelector = catchAsync(listAllElementsTextAndSelector.bind(this));
+  page.interceptRequests = catchAsync(interceptRequests.bind(this));
   // ==== 👇🏻 Event Handler 👇🏻 ====
   page.on("framenavigated", async (frame) => {
     if (frame === this.page.mainFrame()) {
