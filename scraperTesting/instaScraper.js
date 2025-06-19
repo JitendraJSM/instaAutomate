@@ -87,49 +87,56 @@ const fs = require("fs-extra");
 const extractPostsFromResponse = async function (responseJSON) {
   // const postsArray = [];
 
-  responseJSON.data.xdt_api__v1__feed__user_timeline_graphql_connection.edges.forEach((postNode) => {
-    if (this.state.scrapedMetaDataOfPosts.some((post) => post.code === postNode.code)) return;
-    try {
-      const node = {
-        code: postNode.node.code,
-        pk: postNode.node.pk,
-        caption: postNode.node.caption,
-        caption: postNode.node.taken_at, // this is date and time of post upload/1000
-        user: postNode.node.user.username,
-        user: postNode.node.user,
-        coauthor_producers: postNode.node.coauthor_producers,
-        title: postNode.node.title,
-        comment_count: postNode.node.comment_count,
-        like_count: postNode.node.like_count,
-        product_type: postNode.node.product_type,
-        media_type: postNode.node.media_type,
-        clips_metadata: postNode.node.clips_metadata,
-        comments: postNode.node.comments,
-      };
-      // if (postNode.node?.video_versions[0]?.url) node.video_versions = postNode.node.video_versions[0].url;
-      // else if (postNode.node?.image_versions2?.candidates[0]?.url) node.video_versions = postNode.node.video_versions[0].url; /// these if conditions are not perfect but...
-      // if (postNode.node?.is_dash_eligible) node.video_versions = postNode.node.video_versions[0].url;
-      // else if (!postNode.node?.is_dash_eligible) node.video_versions = postNode.node.video_versions[0].url; /// these if conditions are not perfect but...
-      if (postNode.node.product_type === "clips") node.video_versions = postNode.node.video_versions[0].url;
-      else if (!postNode.node.product_type === "feed") {
-        node.video_versions = postNode.node.video_versions[0].url; /// these if conditions are not perfect but..
-        node.accessibility_caption = postNode.node.accessibility_caption; /// these if conditions are not perfect but..
+  responseJSON.data.xdt_api__v1__feed__user_timeline_graphql_connection.edges.forEach(
+    (postNode) => {
+      if (
+        this.state.scrapedMetaDataOfPosts.some(
+          (post) => post.code === postNode.code
+        )
+      )
+        return;
+      try {
+        const node = {
+          code: postNode.node.code,
+          pk: postNode.node.pk,
+          caption: postNode.node.caption,
+          caption: postNode.node.taken_at, // this is date and time of post upload/1000
+          userName: postNode.node.user.username,
+          user: postNode.node.user,
+          coauthor_producers: postNode.node.coauthor_producers,
+          title: postNode.node.title,
+          comment_count: postNode.node.comment_count,
+          like_count: postNode.node.like_count,
+          product_type: postNode.node.product_type,
+          media_type: postNode.node.media_type,
+          clips_metadata: postNode.node.clips_metadata,
+          comments: postNode.node.comments,
+        };
+        if (postNode.node.product_type === "clips")
+          node.video_versions = postNode.node.video_versions[0].url;
+        else if (postNode.node.product_type === "feed") {
+          node.image_versions2.candidates =
+            postNode.node.image_versions2.candidates[0].url; /// these if conditions are not perfect but..
+          node.accessibility_caption = postNode.node.accessibility_caption; /// these if conditions are not perfect but..
+        }
+        this.state.scrapedMetaDataOfPosts.push(node);
+      } catch (error) {
+        console.log(`Cannot extract data from postNade: ${postNode}`);
+        console.log(`88888888888`);
+        console.log(postNode);
+        console.log(`88888888888`);
       }
-      this.state.scrapedMetaDataOfPosts.push(node);
-    } catch (error) {
-      console.log(`Cannot extract data from postNade: ${postNode}`);
-      console.log(`88888888888`);
-      console.log(postNode);
-      console.log(`88888888888`);
     }
-  });
+  );
   return true;
 };
 
 const postsScraper = async function () {
   // Read Already existed data
   const userDataPath = "./scraperTesting/extractedPosts.json"; // this file must be array
-  this.state.scrapedMetaDataOfPosts = JSON.parse(await fs.readFile(userDataPath));
+  this.state.scrapedMetaDataOfPosts = JSON.parse(
+    await fs.readFile(userDataPath)
+  );
   // Filter function - process requests
   const filterFn = async (request, response) => {
     {
@@ -144,16 +151,28 @@ const postsScraper = async function () {
 
   // Handler function - successful requests
   const handlerFn = async (request, response) => {
-    if (request.headers()["x-fb-friendly-name"] === "PolarisProfilePostsQuery" || request.headers()["x-fb-friendly-name"] === "PolarisProfilePostsTabContentQuery_connection") {
+    if (
+      request.headers()["x-fb-friendly-name"] === "PolarisProfilePostsQuery" ||
+      request.headers()["x-fb-friendly-name"] ===
+        "PolarisProfilePostsTabContentQuery_connection"
+    ) {
       const resJSON = await response.json();
       console.log(`==============================================`);
-      await fs.appendFile("./scraperTesting/responseAsItIs.json", JSON.stringify(resJSON, null, 2) + ",\n");
+      await fs.appendFile(
+        "./scraperTesting/responseAsItIs.json",
+        JSON.stringify(resJSON, null, 2) + ",\n"
+      );
 
       console.log(`OK check Appended. ---`);
-      console.log(`Currently length of scrapedMetaDataOfPosts is : ${this.state.scrapedMetaDataOfPosts.length}`);
+      console.log(
+        `Currently length of scrapedMetaDataOfPosts is : ${this.state.scrapedMetaDataOfPosts.length}`
+      );
 
       await extractPostsFromResponse.call(this, resJSON);
-      await fs.writeFile("./scraperTesting/extractedPosts.json", JSON.stringify(this.state.scrapedMetaDataOfPosts, null, 2));
+      await fs.writeFile(
+        "./scraperTesting/extractedPosts.json",
+        JSON.stringify(this.state.scrapedMetaDataOfPosts, null, 2)
+      );
       console.log(`==============================================`);
     }
   };
@@ -161,7 +180,12 @@ const postsScraper = async function () {
   // const interceptCompletedRequests = createRequestInterceptor.call(this, filterFn.bind(this), handlerFn.bind(this));
 
   // Apply the interceptor to completed requests
-  await interceptRequests(this.page, { interceptCompletedOnly: true }, filterFn.bind(this), handlerFn.bind(this));
+  await interceptRequests(
+    this.page,
+    { interceptCompletedOnly: true },
+    filterFn.bind(this),
+    handlerFn.bind(this)
+  );
 
   console.log("postsScraper function completed.");
 };
