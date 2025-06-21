@@ -1,0 +1,127 @@
+const fs = require("fs-extra");
+
+// Read Already Exited Resources Data
+const readAlReadyExitedResourcesData = async function (userName) {
+  const allResourcesData = await fs.readJSON("./data/resources/allResourcesData.json");
+  if (!userName) {
+    console.log(`No userName provided, so reading all resources data.`);
+    return allResourcesData;
+  }
+
+  let resourceDataPath = allResourcesData.find((resource) => resource.userName === userName)?.resourceDataPath;
+
+  if (!resourceDataPath) {
+    console.log(`Either there is no user details in allResources for : ${userName}, or the ${userName} has no "resourceDataPath" defined in allResourcesData.json`);
+    // TODO: 20 June Worked until this
+    // Check metaData file Exists of username or not in `./data/resources/${userName}-data.json`
+    resourceDataPath = `./data/resources/${userName}/${userName}-data.json`;
+    if (!fs.existsSync(resourceDataPath)) {
+      console.log(`User folder does not exist: ${resourceDataPath} so creating it.`);
+      //  Create the metaData json file
+      await fs.ensureDir(`./data/resources/${userName}`);
+      console.log(`111`);
+
+      await fs.writeJSON(resourceDataPath, { userName: userName, resourceDataPath }, { spaces: 2 });
+      console.log(`Created metaData file for user: ${userName}`);
+    }
+  }
+  console.log(`Reading data from: ${resourceDataPath}. all Done....`);
+
+  return await fs.readJSON(resourceDataPath);
+};
+(async () => {
+  try {
+    const res = await readAlReadyExitedResourcesData("its_cute_girl__85");
+    console.log(`res is as below:`);
+    console.log(res);
+  } catch (err) {
+    console.error("Error in IIFE:", err);
+  }
+})();
+const extractPostsFromResponse = async function (responseJSON) {
+  // const postsArray = [];
+
+  responseJSON.data.xdt_api__v1__feed__user_timeline_graphql_connection.edges.forEach((postNode) => {
+    if (this.state.scrapedMetaDataOfPosts.some((post) => post.code === postNode.node.code)) return;
+    try {
+      const node = {
+        code: postNode.node.code,
+        pk: postNode.node.pk,
+        caption: postNode.node.caption,
+        caption: postNode.node.taken_at, // this is date and time of post upload/1000
+        userName: postNode.node.owner.username,
+        coauthor_producers: postNode.node.coauthor_producers,
+        title: postNode.node.title,
+        comment_count: postNode.node.comment_count,
+        like_count: postNode.node.like_count,
+        product_type: postNode.node.product_type,
+        media_type: postNode.node.media_type,
+        clips_metadata: postNode.node.clips_metadata,
+        comments: postNode.node.comments,
+        location: postNode.node?.location,
+      };
+      if (postNode.node.product_type === "clips") node.video_versions = postNode.node.video_versions[0].url;
+      else if (postNode.node.product_type === "feed") {
+        node.image_versions2 = postNode.node.image_versions2.candidates[0].url;
+        node.accessibility_caption = postNode.node.accessibility_caption;
+      } else if (postNode.node.product_type === "carousel_container") {
+        node.carousel_media_count = postNode.node.carousel_media_count;
+        node.carousel_media = [];
+        node.carousel_media_count = postNode.node.carousel_media.forEach((obj, i) => node.carousel_media.push({ url: obj.image_versions2.candidates[0].url, imgIndex: i }));
+      }
+      this.state.scrapedMetaDataOfPosts.push(node);
+    } catch (error) {
+      console.log(error);
+
+      console.log(`Cannot extract data from postNade: ${postNode}`);
+      console.log(`-=-=-=-=-=-=-=-`);
+      console.log(postNode.node.code);
+      console.log(`-=-=-=-=-=-=-=-`);
+    }
+  });
+  return true;
+};
+
+const postsScraper = async function () {
+  // Read Already existed data
+  const userDataPath = "./scraperTesting/extractedPosts.json"; // this file must be array
+  this.state.scrapedMetaDataOfPosts = JSON.parse(await fs.readFile(userDataPath));
+  // Filter function - process requests
+  const filterFn = async (request, response) => {
+    {
+      if (request.url() === "https://www.instagram.com/graphql/query") {
+        const headers = request.headers()["x-fb-friendly-name"];
+        console.log("Request Headers:", headers);
+        return true;
+      }
+      // return request.resourceType() === "image" && response.status() === 200;
+    }
+  };
+
+  // Handler function - successful requests
+  const handlerFn = async (request, response) => {
+    if (request.headers()["x-fb-friendly-name"] === "PolarisProfilePostsQuery" || request.headers()["x-fb-friendly-name"] === "PolarisProfilePostsTabContentQuery_connection") {
+      const resJSON = await response.json();
+      console.log(`==============================================`);
+      await fs.appendFile("./scraperTesting/responseAsItIs.json", JSON.stringify(resJSON, null, 2) + ",\n");
+
+      console.log(`OK check Appended. ---`);
+      console.log(`Currently length of scrapedMetaDataOfPosts is : ${this.state.scrapedMetaDataOfPosts.length}`);
+
+      await extractPostsFromResponse.call(this, resJSON);
+      await fs.writeFile("./scraperTesting/extractedPosts.json", JSON.stringify(this.state.scrapedMetaDataOfPosts, null, 2));
+      console.log(`==============================================`);
+    }
+  };
+
+  // const interceptCompletedRequests = createRequestInterceptor.call(this, filterFn.bind(this), handlerFn.bind(this));
+
+  // Apply the interceptor to completed requests
+  await this.page.interceptRequests({ interceptCompletedOnly: true }, filterFn.bind(this), handlerFn.bind(this));
+
+  console.log("postsScraper function completed.");
+};
+const catchAsync = require("../utils/catchAsync.js");
+module.exports = {
+  postsScraper: catchAsync(postsScraper),
+};
