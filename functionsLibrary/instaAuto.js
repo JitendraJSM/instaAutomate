@@ -452,7 +452,7 @@ const performDueTasks = async function () {
   console.log(`-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-==-=-=-`);
   await this.utils.devWaitCheckContinue();
 
-  const stateFilePath = path.join(__dirname, "../data/instaData/stateAtCompletion.json");
+  const stateFilePath = path.join(__dirname, "../data/instaProfilesData/stateAtCompletion.json");
   fs.writeFileSync(stateFilePath, JSON.stringify(this.state, null, 2));
   console.log(`State written to ${stateFilePath}`);
 
@@ -540,6 +540,6 @@ module.exports = {
 //    - toAutomatePosts : [{pathToContent,description,hashtags}]
 // 1.2 Where to store the data?
 //    - Local Storage
-//    - In path ./data/instaData/{userName-data}.json
+//    - In path ./data/instaProfilesData/{userName-data}.json
 // 1.3 Which module to use?
 //    - JSONDB

@@ -8,7 +8,7 @@ const dayMs = 24 * 60 * 60 * 1000;
 const hourMs = 60 * 60 * 1000;
 
 // ==== Profiles Data Functions ====
-const readProfilesData = async () => JSON.parse(await fs.readFile("./data/instaData/profilesData.json"));
+const readProfilesData = async () => JSON.parse(await fs.readFile("./data/instaProfilesData/profilesData.json"));
 readProfilesData.shouldStoreState = "profilesData";
 
 const writeProfilesData = async (profilesData) => {
@@ -22,7 +22,7 @@ const writeProfilesData = async (profilesData) => {
     }
   });
 
-  await fs.writeFile("./data/instaData/profilesData.json", JSON.stringify(profilesData, null, 2));
+  await fs.writeFile("./data/instaProfilesData/profilesData.json", JSON.stringify(profilesData, null, 2));
   return true;
 };
 

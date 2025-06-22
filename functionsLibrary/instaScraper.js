@@ -1,43 +1,120 @@
 const fs = require("fs-extra");
 
-// Read Already Exited Resources Data
-const readAlReadyExitedResourcesData = async function (userName) {
-  const allResourcesData = await fs.readJSON("./data/resources/allResourcesData.json");
-  if (!userName) {
-    console.log(`No userName provided, so reading all resources data.`);
-    return allResourcesData;
-  }
+// ==== All Resources Data Functions ====
+const readAllResourcesData = async () => JSON.parse(await fs.readFile("./data/instaResourcesData/allResourcesData.json"));
+readAllResourcesData.shouldStoreState = "allResourcesData";
 
-  let resourceDataPath = allResourcesData.find((resource) => resource.userName === userName)?.resourceDataPath;
+const writeAllResourcesData = async function (allResourcesData) {
+  if (!allResourcesData || !Array.isArray(allResourcesData)) throw new Error(`Invalid allResourcesData object provided. It must be an array.`);
+
+  // Ensure all profiles have userName, userDataPath properties and do not have duplicate objects in dueTasks
+  allResourcesData.forEach((resourceProfile) => {
+    if (!resourceProfile.userName || !resourceProfile.resourceDataPath) throw new Error(`Invalid resourcesProfile object provided. It must contain userName and resourceDataPath properties.`);
+  });
+
+  await fs.writeFile("./data/instaResourcesData/allResourcesData.json", JSON.stringify(allResourcesData, null, 2));
+  this.state.allResourcesData = allResourcesData; // Update the state with the new data
+  console.log(`Updated allResourcesData.json with ${allResourcesData.length} resources.`);
+  return true;
+};
+writeAllResourcesData.doNotParseArgumentString = true;
+
+const updateAllResourcesDataForLastUpdate = async function (userName) {
+  if (!this.state.allResourcesData) this.state.allResourcesData = await readAllResourcesData.call(this);
+  if (!userName) throw new Error("UserName is required to update allResourcesData for last update.");
+  const index = this.state.allResourcesData.findIndex((resource) => resource.userName === userName);
+  if (index === -1) throw new Error(`Resource data for user: ${userName} not found in allResourcesData.`);
+  this.state.allResourcesData[index].lastUpdate = new Date().toISOString();
+  await writeAllResourcesData.call(this, this.state.allResourcesData);
+  return true;
+};
+updateAllResourcesDataForLastUpdate.doNotParseArgumentString = true;
+
+// ==== Specific Resource Data Functions ====
+const getResourceDataPath = async function (userName) {
+  if (!this.state.allResourcesData) this.state.allResourcesData = await readAllResourcesData();
+
+  if (!userName) throw new Error("UserName is required to get resources data path.");
+
+  let resourceDataPath = this.state.allResourcesData.find((resource) => resource.userName === userName)?.resourceDataPath;
 
   if (!resourceDataPath) {
-    console.log(`Either there is no user details in allResources for : ${userName}, or the ${userName} has no "resourceDataPath" defined in allResourcesData.json`);
-    // TODO: 20 June Worked until this
-    // Check metaData file Exists of username or not in `./data/resources/${userName}-data.json`
-    resourceDataPath = `./data/resources/${userName}/${userName}-data.json`;
-    if (!fs.existsSync(resourceDataPath)) {
-      console.log(`User folder does not exist: ${resourceDataPath} so creating it.`);
-      //  Create the metaData json file
-      await fs.ensureDir(`./data/resources/${userName}`);
-      console.log(`111`);
+    console.log(
+      `No resourceDataPath found for user: ${userName}, Either there is no user details in allResources for : ${userName}, or the ${userName} has no "resourceDataPath" defined in allResourcesData.json`
+    );
 
-      await fs.writeJSON(resourceDataPath, { userName: userName, resourceDataPath }, { spaces: 2 });
-      console.log(`Created metaData file for user: ${userName}`);
-    }
+    resourceDataPath = `./data/instaResourcesData/${userName}/${userName}-data.json`;
+    console.log("\x1b[33m%s\x1b[0m", `Creating a new resourceDataPath for user: ${userName} at ${resourceDataPath}`);
   }
-  console.log(`Reading data from: ${resourceDataPath}. all Done....`);
+  return resourceDataPath;
+};
+getResourceDataPath.doNotParseArgumentString = true;
+
+const createNewResourceDir = async function (userName) {
+  if (!userName) throw new Error("UserName is required to create a new resource directory.");
+
+  if (!this.state.allResourcesData) this.state.allResourcesData = await readAllResourcesData();
+  if (this.state.allResourcesData.some((resource) => resource.userName === userName)) throw new Error(`Resource directory for user: ${userName} already exists.`);
+
+  const userInput = await this.utils.askUser(`Do you want to create a new resource directory for user: ${userName}? (y/n): `);
+  if (userInput.toLowerCase() === "y") {
+    const resourceDataPath = `./data/instaResourcesData/${userName}/${userName}-data.json`;
+    await fs.ensureDir(`./data/instaResourcesData/${userName}`);
+    await fs.writeJSON(resourceDataPath, { userName, resourceDataPath }, { spaces: 2 });
+    this.state.allResourcesData.push({ userName, resourceDataPath });
+    await writeAllResourcesData.call(this, this.state.allResourcesData);
+    console.log(`Created new resource directory for user: ${userName} at ${resourceDataPath}`);
+    return resourceDataPath;
+  }
+  return false; // If user chooses not to create a new directory, return false
+};
+createNewResourceDir.doNotParseArgumentString = true;
+
+const readResourceData = async function (userName) {
+  const resourceDataPath = await getResourceDataPath.call(this, userName);
+
+  if (!fs.existsSync(resourceDataPath)) await createNewResourceDir.call(this, userName);
 
   return await fs.readJSON(resourceDataPath);
 };
-(async () => {
-  try {
-    const res = await readAlReadyExitedResourcesData("its_cute_girl__85");
-    console.log(`res is as below:`);
-    console.log(res);
-  } catch (err) {
-    console.error("Error in IIFE:", err);
-  }
-})();
+readResourceData.shouldStoreState = "currentResourceData";
+readResourceData.doNotParseArgumentString = true;
+
+const updateResourceData = async function (resourceData) {
+  if (!resourceData || typeof resourceData !== "object") throw new Error("Resource data must be a valid object.");
+  if (!resourceData.userName) throw new Error("UserName is required to write resources data.");
+
+  const userName = resourceData.userName;
+  // const resourceDataPath = await getResourceDataPath.call(this, userName);
+  const oldResourceData = await readResourceData.call(this, userName); // This will call createNewResourceDir if not exist.
+  const newResourceData = { ...oldResourceData, ...resourceData, lastUpdate: new Date().toISOString() };
+
+  await fs.writeJSON(newResourceData.resourceDataPath, newResourceData, { spaces: 2 });
+
+  const isAllResourcesDataUpdated = await updateAllResourcesDataForLastUpdate.call(this, userName);
+
+  console.log(`Resource data for ${userName} written successfully to ${newResourceData.resourceDataPath} & allResourcesData updated: ${isAllResourcesDataUpdated}.`);
+  return true;
+};
+updateResourceData.doNotParseArgumentString = true;
+
+const testing = async function () {
+  const resultOfTestingFunction = await updateResourceData.call(this, {
+    userName: "its_cute_girl__85",
+    testProrty: "testValue",
+  });
+  console.log(`Result of testing function: ${resultOfTestingFunction}`);
+};
+
+// (async () => {
+//   try {
+//     const res = await readResourceData("its_cute_girl__85");
+//     console.log(`res is as below:`);
+//     console.log(res);
+//   } catch (err) {
+//     console.error("Error in IIFE:", err);
+//   }
+// })();
 const extractPostsFromResponse = async function (responseJSON) {
   // const postsArray = [];
 
@@ -124,4 +201,6 @@ const postsScraper = async function () {
 const catchAsync = require("../utils/catchAsync.js");
 module.exports = {
   postsScraper: catchAsync(postsScraper),
+  readResourceData: catchAsync(readResourceData),
+  testing: catchAsync(testing),
 };

@@ -1,20 +1,16 @@
 [
   {
-    "expression": "this.state.profileTarget = 21*1"
+    "parentModuleName": "instaScraper",
+    "actionName": "readResourceData",
+    "argumentsString": "its_cute_girl__85"
   },
   {
-    "parentModuleName": "chrome",
-    "actionName": "initializeBrowser"
+    "parentModuleName": "devOrTest",
+    "actionName": "consoleLog",
+    "argumentsString": "this.state.currentResourceData"
   },
   {
     "parentModuleName": "instaScraper",
-    "actionName": "postsScraper"
-  },
-  {
-    "preCondition": "chrome://new-tab-page/",
-    "parentModuleName": "page",
-    "actionName": "navigateTo",
-    "argumentsString": "https://www.instagram.com/pihuydv00/",
-    "doNotParseArgumentsString": true
+    "actionName": "testing"
   }
 ]
