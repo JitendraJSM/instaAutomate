@@ -30,3 +30,7 @@
   `node.media_type`
   `node.clips_metadata`
   `node.comments`
+
+- Different types or url of Insta
+  https://www.instagram.com/p/DLKZmEATRYH/
+  https://www.instagram.com/reel/DLKZmEATRYH/

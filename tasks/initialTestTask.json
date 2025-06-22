@@ -8,9 +8,5 @@
     "parentModuleName": "devOrTest",
     "actionName": "consoleLog",
     "argumentsString": "this.state.currentResourceData"
-  },
-  {
-    "parentModuleName": "instaScraper",
-    "actionName": "testing"
   }
 ]

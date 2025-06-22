@@ -6,6 +6,9 @@ const App = require("./modules/AppModule.js");
 const initialTestTask = require("./tasks/initialTestTask.json");
 initialTestTask.taskName = "initialTestTask";
 
+const instaAutomationTask = require("./tasks/instaAutomationTask.json");
+instaAutomationTask.taskName = "instaAutomationTask";
+
 // === Testing Purpose ===
 
 async function main() {
@@ -16,6 +19,7 @@ async function main() {
   // ------------------ Testing purpose ---------------------------
   app.state;
   await app.run(initialTestTask);
+  // await app.run(instaAutomationTask);
   // console.log(`=================================`);
   // console.log(app);
   // console.log(`=================================`);
