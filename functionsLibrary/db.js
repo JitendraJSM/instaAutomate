@@ -34,7 +34,7 @@ const getUserDataPathByUserName = async function (userName) {
   if (!userDataPath) throw new Error(`User profile with userName: ${userName} not found in profilesData.`);
 
   // Check if file exists
-  if (!(await fs.pathExists(userDataPath))) throw new Error(`User data file does not exist for user: ${userProfile.userName}, at path userDataPath: ${userDataPath}`);
+  if (!(await fs.pathExists(userDataPath))) throw new Error(`User data file does not exist for user: ${userName}, at path userDataPath: ${userDataPath}`);
 
   return userDataPath;
 };
@@ -135,6 +135,17 @@ const removeDueTask = async function (userName, dueTaskObj) {
   console.log(`Removed task for user: ${userName}`);
 };
 
+const removeDuplicatesFormAutomatedFollowArray = function (arr) {
+  const map = new Map();
+  for (const item of arr) {
+    const d = new Date(item.date);
+    const entry = map.get(item.userName);
+    if (!entry || d > entry[1]) map.set(item.userName, [item, d]);
+  }
+  arr = Array.from(map.values(), ([item]) => item);
+  return arr;
+};
+
 const updateDatabaseOnFollow = async function (userObject) {
   console.log(`Adding ${JSON.stringify(userObject)} to ${this.state.currentProfile.userName}.automatedFollow: [].`);
 
@@ -142,13 +153,9 @@ const updateDatabaseOnFollow = async function (userObject) {
 
   // Neccessary Checks
   /* Sometimes in development you manually unfollow a user that was previously automated followed and hence in automatedFollowed array but when script again perform automated follow on that same user it creates a duplicate array element for that same user but with different date so the below is check for that*/
-  const index = currentUserData.automatedFollow.findIndex((profile) => profile.userName === userObject.userName);
-  if (index !== -1) {
-    console.log(`User ${userObject.userName} already exists in automatedFollow array, removing the old entry.`);
-    this.state.currentProfile.automatedFollow.splice(index, 1);
-  }
-
   currentUserData.automatedFollow.push(userObject);
+
+  currentUserData.automatedFollow = removeDuplicatesFormAutomatedFollowArray(currentUserData.automatedFollow);
 
   await writeUserProfileData.call(this, currentUserData);
 
@@ -241,8 +248,15 @@ const addNewProfile = async function () {
 
 const filterProfilesToAutomate = async function () {
   // As agent's dueTasks are more important than scraper's dueTasks.
-  this.state.profilesToLoop = this.state.profilesData.filter((profile) => profile.type === "agent");
-  // console.log(this.state.profilesToLoop);
+  console.log(`Before this.state.profilesToLoop`);
+  console.log(this.state.profilesToLoop);
+
+  // this.state.profilesToLoop = this.state.profilesData.filter((profile) => profile.type === "agent");
+  this.state.profilesToLoop = this.state.profilesData.filter((profile) => profile.type === "agent" && profile.dueTasks.length !== 0);
+
+  console.log(`Before this.state.profilesToLoop`);
+  console.log(this.state.profilesToLoop);
+
   if (this.state.profilesToLoop.length === 0) throw new Error(`No profiles to loop`);
   return true;
 };

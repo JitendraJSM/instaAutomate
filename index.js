@@ -17,9 +17,9 @@ async function main() {
   let app = new App();
 
   // ------------------ Testing purpose ---------------------------
-  app.state;
-  await app.run(initialTestTask);
-  // await app.run(instaAutomationTask);
+
+  // await app.run(initialTestTask);
+  await app.run(instaAutomationTask);
   // console.log(`=================================`);
   // console.log(app);
   // console.log(`=================================`);

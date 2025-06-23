@@ -6,7 +6,7 @@
       "date": "2025-06-15T13:39:55.637Z"
     }
   ],
-  "userDataPath": "data/instaData/agentsData/manisha.sen.25-data.json",
+  "userDataPath": "data/instaProfilesData/agentsData/manisha.sen.25-data.json",
   "dueTasks": [],
   "postsCount": 1,
   "followersCount": 8,
@@ -92,16 +92,7 @@
     },
     "edges": []
   },
-  "followers": [
-    "kajalmahioffical143",
-    "anujroll1971",
-    "bharat_nath_beragi",
-    "rmu_sai_121",
-    "hemantrajput701827",
-    "laltu.rajwar.1460",
-    "nawazsharif226_salon",
-    "rizwan.idrishi.378"
-  ],
+  "followers": ["kajalmahioffical143", "anujroll1971", "bharat_nath_beragi", "rmu_sai_121", "hemantrajput701827", "laltu.rajwar.1460", "nawazsharif226_salon", "rizwan.idrishi.378"],
   "followings": [
     "kajalmahioffical143",
     "roshnigupta0075",

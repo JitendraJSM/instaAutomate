@@ -51,8 +51,7 @@ const updateUserData = async function (needUpadte) {
   if (needUpadte) {
     console.log(`UserData of ${this.state.currentProfile.userName} needs to be updated.`);
 
-    // const scrapedUserData = await scrapeUserData.call(this, this.state.currentProfile.userName);
-    const scrapedUserData = await this.instaScraper.scrapeUserData.call(this, this.state.currentProfile.userName);
+    const scrapedUserData = await scrapeUserData.call(this, this.state.currentProfile.userName);
 
     this.state.currentProfile.postsCount = scrapedUserData.edge_owner_to_timeline_media.count;
     this.state.currentProfile.followersCount = scrapedUserData.edge_followed_by.count;
@@ -77,7 +76,7 @@ const updateUserData = async function (needUpadte) {
 };
 updateUserData.doNotParseArgumentsString = true; // This is used to skip parsing of argumentsString as it is not needed here.
 
-// ======= Main Functions =======
+// ======= Main User Interaction Functions =======
 const goInstaHome = async function () {
   try {
     const pageUrl = this.page.url();
@@ -92,167 +91,6 @@ const goInstaHome = async function () {
   await this.utils.randomDelay(1.25, 0.25);
   this.page.waitForPageLoad();
 };
-
-/* Shifted to instaScraper if in future any task releted to this creates problem then try uncommenting this*/
-// const scrapeUserData = async function (userName, needFollowers = true, needFollowings = true) {
-//   // const userName = "diwanshi1619";
-//   // const userName = "best.frnds.jsm";
-//   /* It is not needed to navigate to user before scraping but it is better so not get banned.*/
-//   if (this.page.url() !== `https://www.instagram.com/${userName}`) await this.page.navigateTo(`https://www.instagram.com/${userName}`);
-
-//   let scrapedData;
-//   // --- Logic for scraping data is copied from "getUserDataFromInterceptedRequest" function of instaAuto git repo of mifi.
-//   const t = setTimeout(async () => {
-//     console.log("Unable to intercept request, will send manually");
-//     try {
-//       await this.page.evaluate(async (username2) => {
-//         const response = await window.fetch(`https://i.instagram.com/api/v1/users/web_profile_info/?username=${encodeURIComponent(username2.toLowerCase())}`, {
-//           mode: "cors",
-//           credentials: "include",
-//           headers: { "x-ig-app-id": "936619743392459" },
-//         });
-//         await response.json(); // else it will not finish the request
-//       }, userName);
-//       // todo `https://i.instagram.com/api/v1/users/${userId}/info/`
-//       // https://www.javafixing.com/2022/07/fixed-can-get-instagram-profile-picture.html?m=1
-//     } catch (err) {
-//       console.error("Failed to manually send request", err);
-//     }
-//   }, 5000);
-
-//   try {
-//     const [foundResponse] = await Promise.all([
-//       this.page.waitForResponse(
-//         (response) => {
-//           const request = response.request();
-//           return (
-//             request.method() === "GET" &&
-//             new RegExp(`https:\\/\\/i\\.instagram\\.com\\/api\\/v1\\/users\\/web_profile_info\\/\\?username=${encodeURIComponent(userName.toLowerCase())}`).test(request.url())
-//           );
-//         },
-//         { timeout: 30000 }
-//       ),
-//       // navigateToUserWithCheck(userName),
-//       // page.waitForNavigation({ waitUntil: 'networkidle0' }),
-//     ]);
-
-//     const json = JSON.parse(await foundResponse.text());
-//     scrapedData = json.data.user;
-//   } finally {
-//     clearTimeout(t);
-//   }
-//   console.log("the scraped data is as: ");
-//   console.log(`User name is: ${scrapedData.username}`);
-//   console.log(`User's id is: ${scrapedData.id}`);
-//   console.log(`Number of Posts are: ${scrapedData.edge_owner_to_timeline_media.count}`);
-//   console.log(`followers are: ${scrapedData.edge_followed_by.count}`);
-//   console.log(`followings are: ${scrapedData.edge_follow.count}`);
-//   console.log(`mutual followers are: ${scrapedData.edge_mutual_followed_by.count}`);
-//   console.log(`1st mutual follower: ${scrapedData.edge_mutual_followed_by.edges[0]}`);
-
-//   // Logic to get followers and followings also
-
-//   if (needFollowers || needFollowings) {
-//     const { followers, followings } = await getListOfFollowersOrFollowings.call(this, scrapedData.id, needFollowers, needFollowings);
-//     scrapedData.followers = followers;
-//     scrapedData.followings = followings;
-//   }
-//   console.log(`Successfully scraped data for user: ${userName}`);
-
-//   return scrapedData;
-// };
-
-// const getListOfFollowersOrFollowings = async function (targetUserId, needFollowers, needFollowings) {
-//   console.log(`Starting to get list of followers or followings...`);
-
-//   let page = this.page;
-//   const instagramBaseUrl = "https://www.instagram.com";
-
-//   async function getPageJson() {
-//     return JSON.parse(await (await (await page.$("pre")).getProperty("textContent")).jsonValue());
-//   }
-//   async function* graphqlQueryUsers({ queryHash, getResponseProp, graphqlVariables: graphqlVariablesIn }) {
-//     const graphqlUrl = `${instagramBaseUrl}/graphql/query/?query_hash=${queryHash}`;
-
-//     const graphqlVariables = {
-//       first: 50,
-//       ...graphqlVariablesIn,
-//     };
-
-//     const outUsers = [];
-
-//     let hasNextPage = true;
-//     let i = 0;
-
-//     while (hasNextPage) {
-//       const url = `${graphqlUrl}&variables=${JSON.stringify(graphqlVariables)}`;
-//       // logger.log(url);
-//       await page.navigateTo(url);
-//       // await page.goto(url);
-//       const json = await getPageJson();
-
-//       const subProp = getResponseProp(json);
-//       const pageInfo = subProp.page_info;
-//       const { edges } = subProp;
-
-//       const ret = [];
-//       edges.forEach((e) => ret.push(e.node.username));
-
-//       graphqlVariables.after = pageInfo.end_cursor;
-//       hasNextPage = pageInfo.has_next_page;
-//       i += 1;
-
-//       if (hasNextPage) {
-//         // logger.log(`Has more pages (current ${i})`);
-//         await new Promise((resolve) => setTimeout(resolve, 1500)); // Wait for 1 second before next request
-//       }
-
-//       yield ret;
-//     }
-
-//     return outUsers;
-//   }
-//   function getFollowersOrFollowingGenerator({ userId, getFollowers = false }) {
-//     return graphqlQueryUsers({
-//       getResponseProp: (json) => json.data.user[getFollowers ? "edge_followed_by" : "edge_follow"],
-//       graphqlVariables: { id: userId },
-//       queryHash: getFollowers ? "37479f2b8209594dde7facb0d904896a" : "58712303d941c6855d4e888c5f0cd22f",
-//     });
-//   }
-//   async function getFollowersOrFollowing({ userId, getFollowers = false }) {
-//     let users = [];
-//     for await (const usersBatch of getFollowersOrFollowingGenerator({
-//       userId,
-//       getFollowers,
-//     })) {
-//       users = [...users, ...usersBatch];
-//     }
-
-//     return users;
-//   }
-
-//   // Getting all followers
-//   let followers, followings;
-//   if (needFollowers) {
-//     followers = await getFollowersOrFollowing({
-//       userId: targetUserId,
-//       getFollowers: true,
-//     });
-//     // console.log(`Followers are as:`);
-//     // console.log(followers);
-//   }
-//   await goInstaHome.call(this);
-//   if (needFollowings) {
-//     followings = await getFollowersOrFollowing({
-//       userId: targetUserId,
-//       getFollowers: false,
-//     });
-//     // console.log(`followings are as:`);
-//     // console.log(followings);
-//   }
-//   await goInstaHome.call(this);
-//   return { followers, followings };
-// };
 
 const follow = async function (userName, likeOptions) {
   await goInstaHome.call(this);
@@ -380,18 +218,180 @@ const like = async function (likeOptions) {
   console.log(`Random Post likes is Completed.`);
 };
 
-const updateCurrentProfile = async function (userName) {
-  this.state.currentProfile = this.state.profilesToLoop.find((profile) => profile.userName === userName);
+// ======= Data Scraping Functions =======
+const scrapeUserData = async function (userName, needFollowers = true, needFollowings = true) {
+  // const userName = "diwanshi1619";
+  // const userName = "best.frnds.jsm";
+  /* It is not needed to navigate to user before scraping but it is better so not get banned.*/
+  if (this.page.url() !== `https://www.instagram.com/${userName}`) await this.page.navigateTo(`https://www.instagram.com/${userName}`);
+
+  let scrapedData;
+  // --- Logic for scraping data is copied from "getUserDataFromInterceptedRequest" function of instaAuto git repo of mifi.
+  const t = setTimeout(async () => {
+    console.log("Unable to intercept request, will send manually");
+    try {
+      await this.page.evaluate(async (username2) => {
+        const response = await window.fetch(`https://i.instagram.com/api/v1/users/web_profile_info/?username=${encodeURIComponent(username2.toLowerCase())}`, {
+          mode: "cors",
+          credentials: "include",
+          headers: { "x-ig-app-id": "936619743392459" },
+        });
+        await response.json(); // else it will not finish the request
+      }, userName);
+      // todo `https://i.instagram.com/api/v1/users/${userId}/info/`
+      // https://www.javafixing.com/2022/07/fixed-can-get-instagram-profile-picture.html?m=1
+    } catch (err) {
+      console.error("Failed to manually send request", err);
+    }
+  }, 5000);
+
+  try {
+    const [foundResponse] = await Promise.all([
+      this.page.waitForResponse(
+        (response) => {
+          const request = response.request();
+          return (
+            request.method() === "GET" &&
+            new RegExp(`https:\\/\\/i\\.instagram\\.com\\/api\\/v1\\/users\\/web_profile_info\\/\\?username=${encodeURIComponent(userName.toLowerCase())}`).test(request.url())
+          );
+        },
+        { timeout: 30000 }
+      ),
+      // navigateToUserWithCheck(userName),
+      // page.waitForNavigation({ waitUntil: 'networkidle0' }),
+    ]);
+
+    const json = JSON.parse(await foundResponse.text());
+    scrapedData = json.data.user;
+  } finally {
+    clearTimeout(t);
+  }
+  console.log("the scraped data is as: ");
+  console.log(`User name is: ${scrapedData.username}`);
+  console.log(`User's id is: ${scrapedData.id}`);
+  console.log(`Number of Posts are: ${scrapedData.edge_owner_to_timeline_media.count}`);
+  console.log(`followers are: ${scrapedData.edge_followed_by.count}`);
+  console.log(`followings are: ${scrapedData.edge_follow.count}`);
+  console.log(`mutual followers are: ${scrapedData.edge_mutual_followed_by.count}`);
+  console.log(`1st mutual follower: ${scrapedData.edge_mutual_followed_by.edges[0]}`);
+
+  // Logic to get followers and followings also
+
+  if (needFollowers || needFollowings) {
+    const { followers, followings } = await getListOfFollowersOrFollowings.call(this, scrapedData.id, needFollowers, needFollowings);
+    scrapedData.followers = followers;
+    scrapedData.followings = followings;
+  }
+  console.log(`Successfully scraped data for user: ${userName}`);
+
+  return scrapedData;
+};
+
+const getListOfFollowersOrFollowings = async function (targetUserId, needFollowers, needFollowings) {
+  console.log(`Starting to get list of followers or followings...`);
+
+  let page = this.page;
+  const instagramBaseUrl = "https://www.instagram.com";
+
+  async function getPageJson() {
+    return JSON.parse(await (await (await page.$("pre")).getProperty("textContent")).jsonValue());
+  }
+  async function* graphqlQueryUsers({ queryHash, getResponseProp, graphqlVariables: graphqlVariablesIn }) {
+    const graphqlUrl = `${instagramBaseUrl}/graphql/query/?query_hash=${queryHash}`;
+
+    const graphqlVariables = {
+      first: 50,
+      ...graphqlVariablesIn,
+    };
+
+    const outUsers = [];
+
+    let hasNextPage = true;
+    let i = 0;
+
+    while (hasNextPage) {
+      const url = `${graphqlUrl}&variables=${JSON.stringify(graphqlVariables)}`;
+      // logger.log(url);
+      await page.navigateTo(url);
+      // await page.goto(url);
+      const json = await getPageJson();
+
+      const subProp = getResponseProp(json);
+      const pageInfo = subProp.page_info;
+      const { edges } = subProp;
+
+      const ret = [];
+      edges.forEach((e) => ret.push(e.node.username));
+
+      graphqlVariables.after = pageInfo.end_cursor;
+      hasNextPage = pageInfo.has_next_page;
+      i += 1;
+
+      if (hasNextPage) {
+        // logger.log(`Has more pages (current ${i})`);
+        await new Promise((resolve) => setTimeout(resolve, 1500)); // Wait for 1 second before next request
+      }
+
+      yield ret;
+    }
+
+    return outUsers;
+  }
+  function getFollowersOrFollowingGenerator({ userId, getFollowers = false }) {
+    return graphqlQueryUsers({
+      getResponseProp: (json) => json.data.user[getFollowers ? "edge_followed_by" : "edge_follow"],
+      graphqlVariables: { id: userId },
+      queryHash: getFollowers ? "37479f2b8209594dde7facb0d904896a" : "58712303d941c6855d4e888c5f0cd22f",
+    });
+  }
+  async function getFollowersOrFollowing({ userId, getFollowers = false }) {
+    let users = [];
+    for await (const usersBatch of getFollowersOrFollowingGenerator({
+      userId,
+      getFollowers,
+    })) {
+      users = [...users, ...usersBatch];
+    }
+
+    return users;
+  }
+
+  // Getting all followers
+  let followers, followings;
+  if (needFollowers) {
+    followers = await getFollowersOrFollowing({
+      userId: targetUserId,
+      getFollowers: true,
+    });
+    // console.log(`Followers are as:`);
+    // console.log(followers);
+  }
+  await goInstaHome.call(this);
+  if (needFollowings) {
+    followings = await getFollowersOrFollowing({
+      userId: targetUserId,
+      getFollowers: false,
+    });
+    // console.log(`followings are as:`);
+    // console.log(followings);
+  }
+  await goInstaHome.call(this);
+  return { followers, followings };
+};
+
+// updateCurrentProfileInMemory is actually needed because when duetasks of a profile gets completed and a new profile's dueTasks execution is going to start at that point accokrding to tasks the old chrome profile instance gets closed but in memeory it doesn't actually gets changed. As generally it is used kon start of each profile automation.
+const updateCurrentProfileInMemory = async function (userName) {
+  this.state.currentProfile = await db.readUserProfileData(this.state.profilesToLoop.find((profile) => profile.userName === userName).userName);
   this.state.profileTarget = this.state.currentProfile.profileTarget * 1;
   return true;
 };
-updateCurrentProfile.doNotParseArgumentsString = true;
+updateCurrentProfileInMemory.doNotParseArgumentsString = true;
 
 const performDueTasks = async function () {
   const agentPreDueTasks = [
     {
       parentModuleName: "instaAuto",
-      actionName: "updateCurrentProfile",
+      actionName: "updateCurrentProfileInMemory",
       argumentsString: `${this.state.currentProfile.userName}`,
     },
     {
@@ -504,7 +504,7 @@ const scrapeContentOfUser = async function () {};
 // === Interface ===
 const catchAsync = require("../utils/catchAsync.js");
 module.exports = {
-  updateCurrentProfile: catchAsync(updateCurrentProfile),
+  updateCurrentProfileInMemory: catchAsync(updateCurrentProfileInMemory),
   instaAutomation: catchAsync(instaAutomation),
   updateUserData: catchAsync(updateUserData),
   follow: catchAsync(follow),

@@ -76,6 +76,8 @@ const catchAsync = (fn) => {
         throw error;
       } else {
         const modErrorMSG = `Error in ${fn.name}: ${error.message}. \n${error?.stack?.split("\n")[1]?.trim()}`;
+        console.log(`-1-1-1-1-1-1- in catchAsync.js -1-1-1-1-1-1- the this will be as below:`);
+        console.log(this);
 
         console.error(`\x1b[31m${modErrorMSG}\x1b[0m`);
         /*      This is a big problem the context of this here changes as you closed the browser and call page.waitForPageLoad you will see the error.

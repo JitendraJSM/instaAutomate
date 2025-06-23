@@ -3,7 +3,7 @@
   "userName": "kajalmahioffical143",
   "password": "hhjsm001",
   "type": "agent",
-  "userDataPath": "data/instaData/agentsData/kajalmahioffical143-data.json",
+  "userDataPath": "data/instaProfilesData/agentsData/kajalmahioffical143-data.json",
   "dueTasks": [],
   "ai_agent_type": null,
   "biography": "",
@@ -241,11 +241,11 @@
   "automatedFollow": [
     {
       "userName": "manisha.sen.25",
-      "date": "2025-06-15T13:41:57.957Z"
+      "date": "2025-06-23T03:46:14.707Z"
     }
   ],
   "automatedUnfollow": [],
   "automatedlike": [],
   "automatedcomment": [],
-  "lastUpdate": "2025-06-16T17:36:24.531Z"
+  "lastUpdate": "2025-06-23T11:51:34.381Z"
 }
