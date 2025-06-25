@@ -6,10 +6,6 @@
   "userDataPath": "data/instaProfilesData/scrapersData/best.frnds.jsm-data.json",
   "dueTasks": [
     {
-      "actionName": "follow",
-      "argumentsString": "kajalmahioffical143"
-    },
-    {
       "parentModuleName": "instaAuto",
       "actionName": "follow",
       "argumentsString": "kajalmahioffical143"
@@ -195,5 +191,6 @@
   "automatedUnfollow": [],
   "automatedlike": [],
   "automatedcomment": [],
-  "lastUpdate": "2025-06-10T18:10:45.786Z"
+  "lastUpdate": "2025-06-10T18:10:45.786Z",
+  "lastDataOverwrite": "2025-06-24T19:05:30.779Z"
 }

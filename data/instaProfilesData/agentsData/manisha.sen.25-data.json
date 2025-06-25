@@ -3,11 +3,17 @@
   "automatedFollow": [
     {
       "userName": "kajalmahioffical143",
-      "date": "2025-06-15T13:39:55.637Z"
+      "date": "2025-06-23T13:17:26.410Z"
     }
   ],
   "userDataPath": "data/instaProfilesData/agentsData/manisha.sen.25-data.json",
-  "dueTasks": [],
+  "dueTasks": [
+    {
+      "parentModuleName": "instaAuto",
+      "actionName": "follow",
+      "argumentsString": "kajalmahioffical143"
+    }
+  ],
   "postsCount": 1,
   "followersCount": 8,
   "followingsCount": 23,
@@ -126,5 +132,6 @@
   "username": "manisha.sen.25",
   "password": "hhjsm001",
   "automatedlike": [],
-  "automatedcomment": []
+  "automatedcomment": [],
+  "lastDataOverwrite": "2025-06-24T19:05:30.772Z"
 }

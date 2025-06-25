@@ -44,6 +44,7 @@ class App extends EventEmitter {
 
     // Add shared state object
     this.state = {};
+    this.isApp = true; // Flag to identify this as an App instance
     // console.log(`Your Automation-App (i.e. app) Instanciated.`);
   }
 

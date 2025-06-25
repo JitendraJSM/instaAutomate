@@ -454,7 +454,7 @@ const performDueTasks = async function () {
   console.log(`-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-==-=-=-`);
   await this.utils.devWaitCheckContinue();
 
-  const stateFilePath = path.join(__dirname, "../data/instaProfilesData/stateAtCompletion.json");
+  const stateFilePath = path.join(__dirname, "../data/stateAtCompletion.json");
   fs.writeFileSync(stateFilePath, JSON.stringify(this.state, null, 2));
   console.log(`State written to ${stateFilePath}`);
 

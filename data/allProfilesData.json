@@ -5,7 +5,13 @@
     "password": "hhjsm001",
     "type": "agent",
     "userDataPath": "data/instaProfilesData/agentsData/kajalmahioffical143-data.json",
-    "dueTasks": []
+    "dueTasks": [
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "follow",
+        "argumentsString": "radhika.lilo"
+      }
+    ]
   },
   {
     "profileTarget": "2",
@@ -13,7 +19,13 @@
     "password": "hhjsm001",
     "type": "agent",
     "userDataPath": "data/instaProfilesData/agentsData/manisha.sen.25-data.json",
-    "dueTasks": []
+    "dueTasks": [
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "follow",
+        "argumentsString": "kajalmahioffical143"
+      }
+    ]
   },
   {
     "profileTarget": "21",
@@ -28,5 +40,14 @@
         "argumentsString": "kajalmahioffical143"
       }
     ]
+  },
+  {
+    "userName": "its_cute_girl__85",
+    "userDataPath": "./data/instaResourcesData/its_cute_girl__85/its_cute_girl__85-data.json",
+    "postsCount": 0,
+    "followersCount": 0,
+    "followingsCount": 0,
+    "type": "resource",
+    "lastUpdate": "2025-06-16T17:34:58.801Z"
   }
 ]

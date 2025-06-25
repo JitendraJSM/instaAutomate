@@ -1,7 +1,28 @@
 {
   "userName": "its_cute_girl__85",
-  "resourceDataPath": "./data/instaResourcesData/its_cute_girl__85/its_cute_girl__85-data.json",
-  "posts": [],
+  "userDataPath": "./data/instaResourcesData/its_cute_girl__85/its_cute_girl__85-data.json",
+  "posts": [
+    {
+      "postId": "1",
+      "postUrl": "https://www.instagram.com/p/1/",
+      "postType": "image",
+      "postDate": "2025-06-17T12:00:00Z",
+      "likesCount": 951,
+      "commentsCount": 7,
+      "caption": "Cute"
+    },
+    {
+      "postId": "2",
+      "postUrl": "https://www.instagram.com/p/2/",
+      "postType": "video",
+      "postDate": "2025-06-22T12:00:00Z",
+      "likesCount": 754,
+      "commentsCount": 84,
+      "caption": "Cute video"
+    }
+  ],
   "followers": [],
-  "followings": []
+  "followings": [],
+  "tempProp": "testVal",
+  "lastDataOverwrite": "2025-06-24T03:23:31.015Z"
 }

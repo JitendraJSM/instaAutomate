@@ -7,11 +7,11 @@ const botWorkShiftHours = 16;
 const dayMs = 24 * 60 * 60 * 1000;
 const hourMs = 60 * 60 * 1000;
 
-// ==== Profiles Data Functions ====
-const readProfilesData = async () => JSON.parse(await fs.readFile("./data/instaProfilesData/profilesData.json"));
+// ==== All Profiles Data Functions ====
+const readProfilesData = async () => JSON.parse(await fs.readFile("./data/allProfilesData.json"));
 readProfilesData.shouldStoreState = "profilesData";
 
-const writeProfilesData = async (profilesData) => {
+const writeProfilesData = async function (profilesData) {
   if (!profilesData || !Array.isArray(profilesData)) throw new Error(`Invalid profilesData object provided. It must be an array.`);
 
   // Ensure all profiles have userName, userDataPath properties and do not have duplicate objects in dueTasks
@@ -21,12 +21,12 @@ const writeProfilesData = async (profilesData) => {
       profile.dueTasks = utils.removeDuplicates(profile.dueTasks);
     }
   });
-
-  await fs.writeFile("./data/instaProfilesData/profilesData.json", JSON.stringify(profilesData, null, 2));
+  if (this.isApp) this.state.profilesData = profilesData; // Update the state if this is an App instance
+  await fs.writeFile("./data/allProfilesData.json", JSON.stringify(profilesData, null, 2));
   return true;
 };
 
-// ==== User Data Functions ====
+// ==== Specific Profile Data Functions ====
 const getUserDataPathByUserName = async function (userName) {
   const tempAllProfilesData = this?.state?.profilesData || (await readProfilesData());
 
@@ -51,7 +51,7 @@ const getUserDataPathByUserName = async function (userName) {
  * @example
  * const userData = await readUserProfileData({ userName: "john_doe", type: "agent" });
  */
-const readUserProfileData = async (userName) => {
+const readUserProfileData = async function (userName) {
   if (!userName) throw new Error(`userName must be provided to read user profile data.`);
 
   const userDataPath = await getUserDataPathByUserName.call(this, userName);
@@ -62,11 +62,12 @@ const readUserProfileData = async (userName) => {
   return userData;
 };
 
-const writeUserProfileData = async (userData) => {
+const writeUserProfileData = async function (userData) {
   if (!userData || !userData.userName) throw new Error(`Invalid userData object provided. It must contain userName property.`);
 
   const storedUserData = await readUserProfileData.call(this, userData.userName);
-  userData = { ...storedUserData, ...userData };
+  // NOTE: lastDataOverwrite doesn't means that the profile is updated, it is for caution so that if any time data get's written accidentally then it can be tracked.
+  userData = { ...storedUserData, ...userData, lastDataOverwrite: new Date().toISOString() };
 
   // Remove updateUserData task if exists
   userData.dueTasks && (userData.dueTasks = utils.removeDuplicates(userData.dueTasks));
@@ -77,14 +78,105 @@ const writeUserProfileData = async (userData) => {
   return true;
 };
 
-// ==== Task Related Functions
+// ==== Combined (for Agent / Scraper / Resource) Task Related Data Functions ====
+const addNewProfile = async function () {
+  let userInput = await this.utils.askUser(`Do you want to add new profile? (y/n): `);
+  if (userInput.toLowerCase() === "n") {
+    return false;
+  }
+
+  // Create a new profile object
+  const newProfile = {};
+
+  newProfile.profileTarget = await this.utils.askUser("Enter profile target: ");
+  if (this.state.profilesData.find((profile) => profile.profileTarget == newProfile.profileTarget)) throw new Error(`Profile with target ${newProfile.profileTarget} already exists`);
+
+  newProfile.userName = await this.utils.askUser(`Enter user name:`);
+  if (this.state.profilesData.find((profile) => profile.userName == newProfile.userName)) throw new Error(`Profile with user name: ${newProfile.userName} already exists`);
+
+  newProfile.password = await this.utils.askUser(`Enter password:`);
+
+  userInput = await this.utils.askUser("Enter type of profile: 1 for 'agent', 2 for 'scrper', 3 for 'resource': ");
+  if (userInput === "1") newProfile.type = "agent";
+  else if (userInput === "2") newProfile.type = "scraper";
+  else if (userInput === "3") newProfile.type = "resource";
+  else throw new Error(`Invalid input`);
+
+  if (newProfile.type === "resource") {
+    newProfile.userDataPath = `./data/instaResourcesData/${newProfile.userName}/${newProfile.userName}-data.json`;
+    await fs.outputJson(newProfile.userDataPath, newProfile, { spaces: 2 });
+  }
+
+  if (newProfile.type !== "resource") {
+    newProfile.userDataPath = `./data/instaProfilesData/${newProfile.type}sData/${newProfile.userName}-data.json`;
+
+    newProfile.dueTasks = [
+      {
+        parentModuleName: "instaAuto",
+        actionName: "updateUserData",
+        argumentsString: true,
+      },
+    ];
+    newProfile.automatedFollow = [];
+
+    await fs.outputJson(newProfile.userDataPath, newProfile, { spaces: 2 });
+  }
+
+  this.state.profilesData.push(newProfile);
+  await writeProfilesData.call(this, this.state.profilesData);
+
+  if (newProfile.type !== "resource") {
+    for (const profile of this.state.profilesData) {
+      if (profile.type === "resource") return;
+      // 1. This only writes data in json file does not update the currently running process's memory.
+      await addDueTask.call(this, profile.userName, {
+        parentModuleName: "instaAuto",
+        actionName: "follow",
+        argumentsString: `${newProfile.userName}`,
+      });
+      await addDueTask.call(this, newProfile.userName, {
+        parentModuleName: "instaAuto",
+        actionName: "follow",
+        argumentsString: `${profile.userName}`,
+      });
+
+      // 2. This updates the currently running process's memory.
+      profile?.dueTasks?.push({
+        parentModuleName: "instaAuto",
+        actionName: "follow",
+        argumentsString: `${newProfile.userName}`,
+      });
+      newProfile?.dueTasks?.push({
+        parentModuleName: "instaAuto",
+        actionName: "follow",
+        argumentsString: `${profile.userName}`,
+      });
+    }
+  }
+
+  this.state.profilesData.push(newProfile);
+
+  await writeProfilesData.call(this, this.state.profilesData);
+  await writeUserProfileData.call(this, newProfile);
+
+  if (newProfile.type !== "resource") {
+    this.state.currentProfile = newProfile;
+    this.state.profileTarget = newProfile.profileTarget;
+  }
+
+  console.log(`New profile added successfully.`);
+  return true;
+};
+
+// ==== Agent Task Related Data Functions ====
+// NOTE: addDueTask() adds due task in the data file of that userName it doesn't update the memory.
 const addDueTask = async function (userName, dueTaskObj) {
   console.log(`Adding due task for user: ${userName}, ${JSON.stringify(dueTaskObj)}`);
 
   const profilesData = await readProfilesData();
 
   for (const profile of profilesData) {
-    if (profile.userName === `${userName}`) {
+    if (profile.userName === `${userName}` && profile.type !== "resource") {
       profile.dueTasks.push(dueTaskObj);
 
       const userData = await readUserProfileData.call(this, userName);
@@ -105,7 +197,7 @@ const removeDueTask = async function (userName, dueTaskObj) {
   const profilesData = await readProfilesData();
 
   for (const profile of profilesData) {
-    if (profile.userName === userName) {
+    if (profile.userName === userName && profile.type !== "resource") {
       // 1. find the index of dueTaskObj in profile.dueTasks
       const index = profile.dueTasks.findIndex((task) => JSON.stringify(task) === JSON.stringify(dueTaskObj));
       // 2. If index is -1 then break the loop and throw error that dueTaskObj for userName is not found, else remove it
@@ -166,83 +258,13 @@ const updateDatabaseOnFollow = async function (userObject) {
   });
 
   // To update the running process's memory
-  this.state.currentProfile.dueTasks = this.utils.removeDuplicates(this.state.currentProfile.dueTasks);
+  this.state.currentProfile.dueTasks = utils.removeDuplicates(this.state.currentProfile.dueTasks);
 
   const currentfollowDueTask = this.state.currentProfile.dueTasks.find((task) => task.argumentsString === userObject.userName && task.actionName === "follow");
   if (!currentfollowDueTask) throw new Error(`currentfollowDueTask {"argumentsString"===${userObject.userName}, "actionName" === "follow"} not found in ${JSON.stringify(this.state.currentProfile)}`);
   await removeDueTask.call(this, this.state.currentProfile.userName, currentfollowDueTask);
 
   console.log(`Adding ${JSON.stringify(userObject)} to ${this.state.currentProfile.userName}.automatedFollow: [].`);
-  return true;
-};
-
-// Refactored until this line 15-06-2025
-const addNewProfile = async function () {
-  let userInput = await this.utils.askUser(`Do you want to add new profile? (y/n): `);
-  if (userInput.toLowerCase() === "n") {
-    return false;
-  }
-
-  // Create a new profile object
-  const newProfile = {};
-
-  newProfile.profileTarget = await this.utils.askUser("Enter profile target: ");
-  if (this.state.profilesData.find((profile) => profile.profileTarget == newProfile.profileTarget)) throw new Error(`Profile with target ${newProfile.profileTarget} already exists`);
-
-  newProfile.userName = await this.utils.askUser(`Enter user name:`);
-  if (this.state.profilesData.find((profile) => profile.userName == newProfile.userName)) throw new Error(`Profile with user name: ${newProfile.userName} already exists`);
-
-  newProfile.password = await this.utils.askUser(`Enter password:`);
-
-  userInput = await this.utils.askUser("Enter type of profile: 1 for 'agent', 2 for 'scrper'");
-  if (userInput === "1") newProfile.type = "agent";
-  else if (userInput === "2") newProfile.type = "scraper";
-  else throw new Error(`Invalid input`);
-
-  newProfile.dueTasks = [
-    {
-      parentModuleName: "instaAuto",
-      actionName: "updateUserData",
-      argumentsString: true,
-    },
-  ];
-  newProfile.automatedFollow = [];
-
-  for (const profile of this.state.profilesData) {
-    // 1. This only writes data in json file does not update the currently running process's memory.
-    await addDueTask.call(this, profile.userName, {
-      parentModuleName: "instaAuto",
-      actionName: "follow",
-      argumentsString: `${newProfile.userName}`,
-    });
-    await addDueTask.call(this, newProfile.userName, {
-      parentModuleName: "instaAuto",
-      actionName: "follow",
-      argumentsString: `${profile.userName}`,
-    });
-
-    // 2. This updates the currently running process's memory.
-    profile.dueTasks.push({
-      parentModuleName: "instaAuto",
-      actionName: "follow",
-      argumentsString: `${newProfile.userName}`,
-    });
-    newProfile.dueTasks.push({
-      parentModuleName: "instaAuto",
-      actionName: "follow",
-      argumentsString: `${profile.userName}`,
-    });
-  }
-
-  this.state.profilesData.push(newProfile);
-
-  await writeProfilesData.call(this, this.state.profilesData);
-  await writeUserProfileData.call(this, newProfile);
-
-  this.state.currentProfile = newProfile;
-  this.state.profileTarget = newProfile.profileTarget;
-
-  console.log(`New profile added successfully.`);
   return true;
 };
 
@@ -260,6 +282,54 @@ const filterProfilesToAutomate = async function () {
   if (this.state.profilesToLoop.length === 0) throw new Error(`No profiles to loop`);
   return true;
 };
+
+// ==== Resource Task Related Data Functions ====
+
+// (async () => {
+//   try {
+//     // const profilesData = await readProfilesData();
+//     // console.log(`Profiles data read successfully:`, profilesData.length, `profiles found.`);
+//     // console.log(profilesData);
+//     const userDataPath = await getUserDataPathByUserName("its_cute_girl__85");
+//     console.log(`Resource data path for user 'its_cute_girl__85':`, userDataPath);
+//     // const userData = await readUserProfileData("its_cute_girl__85");
+//     // console.log(`User data for "its_cute_girl__85" is as Below: `);
+//     // console.log(userData);
+//     /*
+//     const userData = {
+//       userName: "its_cute_girl__85",
+//       userDataPath: "./data/instaResourcesData/its_cute_girl__85/its_cute_girl__85-data.json",
+//       posts: [
+//         {
+//           postId: "1",
+//           postUrl: "https://www.instagram.com/p/1/",
+//           postType: "image",
+//           postDate: "2025-06-17T12:00:00Z",
+//           likesCount: 951,
+//           commentsCount: 7,
+//           caption: "Cute",
+//         },
+//         {
+//           postId: "2",
+//           postUrl: "https://www.instagram.com/p/2/",
+//           postType: "video",
+//           postDate: "2025-06-22T12:00:00Z",
+//           likesCount: 754,
+//           commentsCount: 84,
+//           caption: "Cute video",
+//         },
+//       ],
+//       followers: [],
+//       followings: [],
+//       tempProp: "testVal",
+//     };
+// */
+//     const res = await writeUserProfileData.call(this, userData);
+//     console.log(`User data written or not  res is as: ${res}.`);
+//   } catch (err) {
+//     console.error("Error in IIFE:", err);
+//   }
+// })();
 
 // === Interface ===
 const catchAsync = require("../utils/catchAsync.js");
