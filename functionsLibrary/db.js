@@ -16,7 +16,7 @@ const writeProfilesData = async function (profilesData) {
 
   // Ensure all profiles have userName, userDataPath properties and do not have duplicate objects in dueTasks
   profilesData.forEach((profile) => {
-    if (!profile.userName || !profile.userDataPath) throw new Error(`Invalid profile object provided. It must contain userName and userDataPath properties.`);
+    if (!profile.userName || !profile.userDataPath) throw new Error(`Invalid profile object\n${JSON.stringify(profile)} \n provided. It must contain userName and userDataPath properties.`);
     if (profile.dueTasks) {
       profile.dueTasks = utils.removeDuplicates(profile.dueTasks);
     }
@@ -96,75 +96,60 @@ const addNewProfile = async function () {
 
   newProfile.password = await this.utils.askUser(`Enter password:`);
 
-  userInput = await this.utils.askUser("Enter type of profile: 1 for 'agent', 2 for 'scrper', 3 for 'resource': ");
+  userInput = await this.utils.askUser("Enter type of profile: 1 for 'agent', 2 for 'scrper'");
   if (userInput === "1") newProfile.type = "agent";
   else if (userInput === "2") newProfile.type = "scraper";
-  else if (userInput === "3") newProfile.type = "resource";
   else throw new Error(`Invalid input`);
 
-  if (newProfile.type === "resource") {
-    newProfile.userDataPath = `./data/instaResourcesData/${newProfile.userName}/${newProfile.userName}-data.json`;
-    await fs.outputJson(newProfile.userDataPath, newProfile, { spaces: 2 });
-  }
-
-  if (newProfile.type !== "resource") {
-    newProfile.userDataPath = `./data/instaProfilesData/${newProfile.type}sData/${newProfile.userName}-data.json`;
-
-    newProfile.dueTasks = [
-      {
-        parentModuleName: "instaAuto",
-        actionName: "updateUserData",
-        argumentsString: true,
-      },
-    ];
-    newProfile.automatedFollow = [];
-
-    await fs.outputJson(newProfile.userDataPath, newProfile, { spaces: 2 });
-  }
+  newProfile.userDataPath = `./data/instaProfilesData/${newProfile.type}sData/${newProfile.userName}-data.json`;
+  newProfile.dueTasks = [
+    {
+      parentModuleName: "instaAuto",
+      actionName: "updateUserData",
+      argumentsString: true,
+    },
+  ];
+  newProfile.automatedFollow = [];
 
   this.state.profilesData.push(newProfile);
+
   await writeProfilesData.call(this, this.state.profilesData);
+  await fs.outputJson(newProfile.userDataPath, newProfile, { spaces: 2 });
 
-  if (newProfile.type !== "resource") {
-    for (const profile of this.state.profilesData) {
-      if (profile.type === "resource") return;
-      // 1. This only writes data in json file does not update the currently running process's memory.
-      await addDueTask.call(this, profile.userName, {
-        parentModuleName: "instaAuto",
-        actionName: "follow",
-        argumentsString: `${newProfile.userName}`,
-      });
-      await addDueTask.call(this, newProfile.userName, {
-        parentModuleName: "instaAuto",
-        actionName: "follow",
-        argumentsString: `${profile.userName}`,
-      });
+  for (const profile of this.state.profilesData) {
+    // 1. This only writes data in json file does not update the currently running process's memory.
+    await addDueTask.call(this, profile.userName, {
+      parentModuleName: "instaAuto",
+      actionName: "follow",
+      argumentsString: `${newProfile.userName}`,
+    });
+    await addDueTask.call(this, newProfile.userName, {
+      parentModuleName: "instaAuto",
+      actionName: "follow",
+      argumentsString: `${profile.userName}`,
+    });
 
-      // 2. This updates the currently running process's memory.
-      profile?.dueTasks?.push({
-        parentModuleName: "instaAuto",
-        actionName: "follow",
-        argumentsString: `${newProfile.userName}`,
-      });
-      newProfile?.dueTasks?.push({
-        parentModuleName: "instaAuto",
-        actionName: "follow",
-        argumentsString: `${profile.userName}`,
-      });
-    }
+    // 2. This updates the currently running process's memory.
+    profile.dueTasks.push({
+      parentModuleName: "instaAuto",
+      actionName: "follow",
+      argumentsString: `${newProfile.userName}`,
+    });
+    newProfile.dueTasks.push({
+      parentModuleName: "instaAuto",
+      actionName: "follow",
+      argumentsString: `${profile.userName}`,
+    });
   }
-
-  this.state.profilesData.push(newProfile);
 
   await writeProfilesData.call(this, this.state.profilesData);
   await writeUserProfileData.call(this, newProfile);
 
-  if (newProfile.type !== "resource") {
-    this.state.currentProfile = newProfile;
-    this.state.profileTarget = newProfile.profileTarget;
-  }
+  this.state.currentProfile = newProfile;
+  this.state.profileTarget = newProfile.profileTarget;
 
   console.log(`New profile added successfully.`);
+  process.exit();
   return true;
 };
 

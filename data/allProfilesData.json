@@ -9,7 +9,12 @@
       {
         "parentModuleName": "instaAuto",
         "actionName": "follow",
-        "argumentsString": "radhika.lilo"
+        "argumentsString": "lali"
+      },
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "follow",
+        "argumentsString": "rararara"
       }
     ]
   },
@@ -24,6 +29,16 @@
         "parentModuleName": "instaAuto",
         "actionName": "follow",
         "argumentsString": "kajalmahioffical143"
+      },
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "follow",
+        "argumentsString": "lali"
+      },
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "follow",
+        "argumentsString": "rararara"
       }
     ]
   },
@@ -38,16 +53,87 @@
         "parentModuleName": "instaAuto",
         "actionName": "follow",
         "argumentsString": "kajalmahioffical143"
+      },
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "follow",
+        "argumentsString": "lali"
+      },
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "follow",
+        "argumentsString": "rararara"
       }
     ]
   },
   {
-    "userName": "its_cute_girl__85",
-    "userDataPath": "./data/instaResourcesData/its_cute_girl__85/its_cute_girl__85-data.json",
-    "postsCount": 0,
-    "followersCount": 0,
-    "followingsCount": 0,
-    "type": "resource",
-    "lastUpdate": "2025-06-16T17:34:58.801Z"
+    "profileTarget": "7",
+    "userName": "lali",
+    "password": "hgjgjh",
+    "type": "agent",
+    "userDataPath": "./data/instaProfilesData/agentsData/lali-data.json",
+    "dueTasks": [
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "updateUserData",
+        "argumentsString": true
+      },
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "follow",
+        "argumentsString": "kajalmahioffical143"
+      },
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "follow",
+        "argumentsString": "manisha.sen.25"
+      },
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "follow",
+        "argumentsString": "best.frnds.jsm"
+      }
+    ],
+    "automatedFollow": []
+  },
+  {
+    "profileTarget": "9",
+    "userName": "rararara",
+    "password": "jhjhjh",
+    "type": "scraper",
+    "userDataPath": "./data/instaProfilesData/scrapersData/rararara-data.json",
+    "dueTasks": [
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "updateUserData",
+        "argumentsString": true
+      },
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "follow",
+        "argumentsString": "kajalmahioffical143"
+      },
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "follow",
+        "argumentsString": "manisha.sen.25"
+      },
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "follow",
+        "argumentsString": "best.frnds.jsm"
+      },
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "follow",
+        "argumentsString": "lali"
+      },
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "follow",
+        "argumentsString": "rararara"
+      }
+    ],
+    "automatedFollow": []
   }
 ]

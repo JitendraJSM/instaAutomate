@@ -4,13 +4,7 @@
   "password": "hhjsm001",
   "type": "agent",
   "userDataPath": "data/instaProfilesData/agentsData/kajalmahioffical143-data.json",
-  "dueTasks": [
-    {
-      "parentModuleName": "instaAuto",
-      "actionName": "follow",
-      "argumentsString": "radhika.lilo"
-    }
-  ],
+  "dueTasks": [],
   "ai_agent_type": null,
   "biography": "",
   "bio_links": [],
@@ -254,5 +248,5 @@
   "automatedlike": [],
   "automatedcomment": [],
   "lastUpdate": "2025-06-23T11:51:34.381Z",
-  "lastDataOverwrite": "2025-06-25T02:39:40.842Z"
+  "lastDataOverwrite": "2025-06-25T04:06:18.611Z"
 }
