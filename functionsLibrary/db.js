@@ -86,20 +86,25 @@ const addNewProfile = async function () {
   }
 
   // Create a new profile object
-  const newProfile = {};
-
-  newProfile.profileTarget = await this.utils.askUser("Enter profile target: ");
-  if (this.state.profilesData.find((profile) => profile.profileTarget == newProfile.profileTarget)) throw new Error(`Profile with target ${newProfile.profileTarget} already exists`);
+  let newProfile = {};
 
   newProfile.userName = await this.utils.askUser(`Enter user name:`);
   if (this.state.profilesData.find((profile) => profile.userName == newProfile.userName)) throw new Error(`Profile with user name: ${newProfile.userName} already exists`);
 
   newProfile.password = await this.utils.askUser(`Enter password:`);
 
-  userInput = await this.utils.askUser("Enter type of profile: 1 for 'agent', 2 for 'scrper'");
+  userInput = await this.utils.askUser("Enter type of profile: 1 for 'agent', 2 for 'scrper' or 3 for 'resource': ");
   if (userInput === "1") newProfile.type = "agent";
   else if (userInput === "2") newProfile.type = "scraper";
-  else throw new Error(`Invalid input`);
+  else if (userInput === "3") {
+    newProfile.type = "resource";
+    const result = await addNewResourceProfile.call(this, newProfile);
+    if (!result) throw new Error(`Failed to add new resource profile: ${JSON.stringify(newProfile)}`);
+    return;
+  } else throw new Error(`Invalid input`);
+
+  newProfile.profileTarget = await this.utils.askUser("Enter profile target: ");
+  if (this.state.profilesData.find((profile) => profile.profileTarget == newProfile.profileTarget)) throw new Error(`Profile with target ${newProfile.profileTarget} already exists`);
 
   newProfile.userDataPath = `./data/instaProfilesData/${newProfile.type}sData/${newProfile.userName}-data.json`;
   newProfile.dueTasks = [
@@ -113,10 +118,14 @@ const addNewProfile = async function () {
 
   this.state.profilesData.push(newProfile);
 
+  newProfile = this.state.profilesData.at(-1); // Get the last added profile object
+
   await writeProfilesData.call(this, this.state.profilesData);
   await fs.outputJson(newProfile.userDataPath, newProfile, { spaces: 2 });
 
   for (const profile of this.state.profilesData) {
+    if (profile.type === "resource") continue; // Skip resource profiles
+    if (profile.userName === newProfile.userName) continue; // Skip the newly added profile itself
     // 1. This only writes data in json file does not update the currently running process's memory.
     await addDueTask.call(this, profile.userName, {
       parentModuleName: "instaAuto",
@@ -149,7 +158,21 @@ const addNewProfile = async function () {
   this.state.profileTarget = newProfile.profileTarget;
 
   console.log(`New profile added successfully.`);
-  process.exit();
+  return true;
+};
+
+const addNewResourceProfile = async function (newProfile) {
+  const newResourceProfile = { ...newProfile };
+  newResourceProfile.postsCount = null;
+  newResourceProfile.followersCount = null;
+  newResourceProfile.followingsCount = null;
+
+  newResourceProfile.userDataPath = `./data/instaResourcesData/${newResourceProfile.userName}/${newResourceProfile.userName}-data.json`;
+  await fs.outputJson(newResourceProfile.userDataPath, newResourceProfile, { spaces: 2 });
+
+  this.state.profilesData.push(newResourceProfile);
+  await writeProfilesData.call(this, this.state.profilesData);
+  await writeUserProfileData.call(this, newResourceProfile);
   return true;
 };
 
