@@ -3,15 +3,15 @@
   "automatedFollow": [
     {
       "userName": "kajalmahioffical143",
-      "date": "2025-06-23T13:17:26.410Z"
+      "date": "2025-06-26T17:42:23.243Z"
     }
   ],
   "userDataPath": "data/instaProfilesData/agentsData/manisha.sen.25-data.json",
   "dueTasks": [
     {
       "parentModuleName": "instaAuto",
-      "actionName": "follow",
-      "argumentsString": "kajalmahioffical143"
+      "actionName": "updateUserData",
+      "argumentsString": true
     }
   ],
   "postsCount": 1,
@@ -98,7 +98,16 @@
     },
     "edges": []
   },
-  "followers": ["kajalmahioffical143", "anujroll1971", "bharat_nath_beragi", "rmu_sai_121", "hemantrajput701827", "laltu.rajwar.1460", "nawazsharif226_salon", "rizwan.idrishi.378"],
+  "followers": [
+    "kajalmahioffical143",
+    "anujroll1971",
+    "bharat_nath_beragi",
+    "rmu_sai_121",
+    "hemantrajput701827",
+    "laltu.rajwar.1460",
+    "nawazsharif226_salon",
+    "rizwan.idrishi.378"
+  ],
   "followings": [
     "kajalmahioffical143",
     "roshnigupta0075",
@@ -133,5 +142,5 @@
   "password": "hhjsm001",
   "automatedlike": [],
   "automatedcomment": [],
-  "lastDataOverwrite": "2025-06-26T03:09:03.040Z"
+  "lastDataOverwrite": "2025-06-26T17:42:23.263Z"
 }

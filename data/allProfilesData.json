@@ -16,8 +16,8 @@
     "dueTasks": [
       {
         "parentModuleName": "instaAuto",
-        "actionName": "follow",
-        "argumentsString": "kajalmahioffical143"
+        "actionName": "updateUserData",
+        "argumentsString": true
       }
     ]
   },

@@ -218,14 +218,133 @@ const like = async function (likeOptions) {
   console.log(`Random Post likes is Completed.`);
 };
 
-// ======= Data Scraping Functions =======
-const scrapeUserData = async function (userName, needFollowers = true, needFollowings = true) {
+// ============== 👇 Data Scraping Functions 👇 ==============
+const targetStringAnalyzer = async function (targetString) {
+  if (!targetString) throw new Error("Target string (as argument) is required for targetStringAnalyzer Function.");
+
+  // 1. Analyze the targetString to identify the type of scraping required (e.g., user profile, hashtag, location).
+  let targetStringType;
+  if (!targetString.startsWith("https://www.instagram.com/")) targetStringType = "userName";
+  else if (targetString.includes("/p/")) targetStringType = "postUrl"; // i.e. a post modal window opened, it can be a image post or video post or carousel post.
+  else if (targetString.includes("/reels/")) targetStringType = "reelsHomePageUrl"; // i.e. Reels home page ex. https://www.instagram.com/nanu_cute_00/reels/.
+  else if (targetString.includes("/reel/")) targetStringType = "reelUrl"; // i.e. a reel modal window opened, it is a video post. ex. https://www.instagram.com/reel/DLKZmEATRYH/
+  else if (targetString.includes("/highlights/")) targetStringType = "highlightsUrl"; // ex. https://www.instagram.com/stories/its_cute_girl__85/
+  else if (targetString.includes("/stories/")) targetStringType = "storiesUrl";
+  else throw new Error(`Target String: ${targetString} doesn't fall into any category.`);
+  return targetStringType;
+};
+const getOrSetScraperConfig = async function (targetString) {
+  const agentConfig = {
+    userName: targetString,
+    typeOfProfile: agent,
+    scrapeMetaDataOfProfile: true,
+    scrapeFollowers: true,
+    scrapeFollowings: true, // Default is true
+  };
+  const scraperConfig = {
+    userName: targetString,
+    typeOfProfile: scraper,
+    scrapeMetaDataOfProfile: true,
+  };
+  const resourceConfig = {
+    userName: targetString,
+    typeOfProfile: resource,
+    scrapeMetaDataOfProfile: true,
+    scrapeFollowers: true,
+    scrapeFollowings: true, // Default is true
+    scrapePosts: true, // Default is true
+  };
+
+  if (this.state.targetToScrape.targetStringType === "userName") this.state.targetToScrape.typeOfProfile = tempAllProfilesData.find((profile) => profile.userName === userName)?.type;
+
+  this.state.targetToScrape.config = { agent: agentConfig, scraper: scraperConfig, resource: resourceConfig }[this.state.targetToScrape.typeOfProfile] || {};
+
+  console.log(`-=-=- Default scraper configuration is as below -=-=-`);
+  console.log(this.state.targetToScrape.config);
+
+  if ((await this.utils.askUser(`Do you want to change the default scraper configuration? (y/n): `)).toLowerCase() === "y") {
+    console.log(`Stopping the Process....\nPlease change the config wirrten in db.js and restart the process.`);
+    process.exit(0);
+  }
+
+  return true;
+};
+
+const targetScraper = async function (targetString) {
+  if (!targetString) throw new Error(`targetScraper Function needs a URL string targetString as Argument.`);
+  this.state.targetToScrape = { targetString };
+  this.state.targetToScrape.targetStringType = await targetStringAnalyzer(target.targetString);
+  this.state.targetToScrape.config = await getOrSetScraperConfig();
+  console.log(`-=-=- Target to scrape is as below -=-=-`);
+  console.log(this.state.targetToScrape);
+  if (this.state.targetToScrape.targetStringType === "userName") await scrapeProfile.call(this);
+};
+targetScraper.doNotParseArgumentsString = true; // This is used to skip parsing of argumentsString as it is not needed here.
+
+const scrapeProfile = async function () {
+  const config = this?.state?.targetToScrape?.config;
+  if (!config.userName) throw new Error(`this?.state?.targetToScrape?.config doesn't have any userName Property.`);
+  /* It is not needed to navigate to user before scraping but it is better so not get banned.*/
+  if (this.page.url() !== `https://www.instagram.com/${config.userName}`) await this.page.navigateTo(`https://www.instagram.com/${config.userName}`);
+
+  // ------ 👇 Logic to Scrape MetaData of Profile 👇 ------
+  // --- Logic for scraping data is copied from "getUserDataFromInterceptedRequest" function of instaAuto git repo of mifi.
+  let scrapedMetaData;
+  const t = setTimeout(async () => {
+    console.log("Unable to intercept request, will send manually");
+    try {
+      await this.page.evaluate(async (username2) => {
+        const response = await window.fetch(`https://i.instagram.com/api/v1/users/web_profile_info/?username=${encodeURIComponent(username2.toLowerCase())}`, {
+          mode: "cors",
+          credentials: "include",
+          headers: { "x-ig-app-id": "936619743392459" },
+        });
+        await response.json(); // else it will not finish the request
+      }, userName);
+      // todo `https://i.instagram.com/api/v1/users/${userId}/info/`
+      // https://www.javafixing.com/2022/07/fixed-can-get-instagram-profile-picture.html?m=1
+    } catch (err) {
+      console.error("Failed to manually send request", err);
+    }
+  }, 5000);
+
+  try {
+    const [foundResponse] = await Promise.all([
+      this.page.waitForResponse(
+        (response) => {
+          const request = response.request();
+          return (
+            request.method() === "GET" &&
+            new RegExp(`https:\\/\\/i\\.instagram\\.com\\/api\\/v1\\/users\\/web_profile_info\\/\\?username=${encodeURIComponent(userName.toLowerCase())}`).test(request.url())
+          );
+        },
+        { timeout: 30000 }
+      ),
+      // navigateToUserWithCheck(userName),
+      // page.waitForNavigation({ waitUntil: 'networkidle0' }),
+    ]);
+
+    const json = JSON.parse(await foundResponse.text());
+    scrapedMetaData = json.data.user;
+  } finally {
+    clearTimeout(t);
+  }
+  // ------ 👆 Logic to Scrape MetaData of Profile 👆 ------
+
+  if (config.scrapeFollowers || config.scrapeFollowings) {
+    const { followers, followings } = await getListOfFollowersOrFollowings.call(this, scrapedMetaData.id, config.scrapeFollowers, config.scrapeFollowings);
+    scrapedMetaData.followers = followers;
+    scrapedMetaData.followings = followings;
+  }
+};
+
+const scrapeUserData = async function (userName, scrapeFollowers = true, scrapeFollowings = true) {
   // const userName = "diwanshi1619";
   // const userName = "best.frnds.jsm";
   /* It is not needed to navigate to user before scraping but it is better so not get banned.*/
   if (this.page.url() !== `https://www.instagram.com/${userName}`) await this.page.navigateTo(`https://www.instagram.com/${userName}`);
 
-  let scrapedData;
+  let scrapedMetaData;
   // --- Logic for scraping data is copied from "getUserDataFromInterceptedRequest" function of instaAuto git repo of mifi.
   const t = setTimeout(async () => {
     console.log("Unable to intercept request, will send manually");
@@ -262,32 +381,32 @@ const scrapeUserData = async function (userName, needFollowers = true, needFollo
     ]);
 
     const json = JSON.parse(await foundResponse.text());
-    scrapedData = json.data.user;
+    scrapedMetaData = json.data.user;
   } finally {
     clearTimeout(t);
   }
   console.log("the scraped data is as: ");
-  console.log(`User name is: ${scrapedData.username}`);
-  console.log(`User's id is: ${scrapedData.id}`);
-  console.log(`Number of Posts are: ${scrapedData.edge_owner_to_timeline_media.count}`);
-  console.log(`followers are: ${scrapedData.edge_followed_by.count}`);
-  console.log(`followings are: ${scrapedData.edge_follow.count}`);
-  console.log(`mutual followers are: ${scrapedData.edge_mutual_followed_by.count}`);
-  console.log(`1st mutual follower: ${scrapedData.edge_mutual_followed_by.edges[0]}`);
+  console.log(`User name is: ${scrapedMetaData.username}`);
+  console.log(`User's id is: ${scrapedMetaData.id}`);
+  console.log(`Number of Posts are: ${scrapedMetaData.edge_owner_to_timeline_media.count}`);
+  console.log(`followers are: ${scrapedMetaData.edge_followed_by.count}`);
+  console.log(`followings are: ${scrapedMetaData.edge_follow.count}`);
+  console.log(`mutual followers are: ${scrapedMetaData.edge_mutual_followed_by.count}`);
+  console.log(`1st mutual follower: ${scrapedMetaData.edge_mutual_followed_by.edges[0]}`);
 
   // Logic to get followers and followings also
 
-  if (needFollowers || needFollowings) {
-    const { followers, followings } = await getListOfFollowersOrFollowings.call(this, scrapedData.id, needFollowers, needFollowings);
-    scrapedData.followers = followers;
-    scrapedData.followings = followings;
+  if (scrapeFollowers || scrapeFollowings) {
+    const { followers, followings } = await getListOfFollowersOrFollowings.call(this, scrapedMetaData.id, scrapeFollowers, scrapeFollowings);
+    scrapedMetaData.followers = followers;
+    scrapedMetaData.followings = followings;
   }
   console.log(`Successfully scraped data for user: ${userName}`);
 
-  return scrapedData;
+  return scrapedMetaData;
 };
 
-const getListOfFollowersOrFollowings = async function (targetUserId, needFollowers, needFollowings) {
+const getListOfFollowersOrFollowings = async function (targetUserId, scrapeFollowers, scrapeFollowings) {
   console.log(`Starting to get list of followers or followings...`);
 
   let page = this.page;
@@ -358,7 +477,7 @@ const getListOfFollowersOrFollowings = async function (targetUserId, needFollowe
 
   // Getting all followers
   let followers, followings;
-  if (needFollowers) {
+  if (scrapeFollowers) {
     followers = await getFollowersOrFollowing({
       userId: targetUserId,
       getFollowers: true,
@@ -367,7 +486,7 @@ const getListOfFollowersOrFollowings = async function (targetUserId, needFollowe
     // console.log(followers);
   }
   await goInstaHome.call(this);
-  if (needFollowings) {
+  if (scrapeFollowings) {
     followings = await getFollowersOrFollowing({
       userId: targetUserId,
       getFollowers: false,
@@ -509,6 +628,7 @@ module.exports = {
   updateUserData: catchAsync(updateUserData),
   follow: catchAsync(follow),
   like: catchAsync(like),
+  targetScraper: catchAsync(targetScraper),
   // startListeners: catchAsync(startListeners),
   // scrapeUserData: catchAsync(scrapeUserData),
   // getListOfFollowersOrFollowings: catchAsync(getListOfFollowersOrFollowings),

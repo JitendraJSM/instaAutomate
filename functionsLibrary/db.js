@@ -26,7 +26,7 @@ const writeProfilesData = async function (profilesData) {
   return true;
 };
 
-// ==== Specific Profile Data Functions ====
+// ==== Profile Specific Data Functions ====
 const getUserDataPathByUserName = async function (userName) {
   const tempAllProfilesData = this?.state?.profilesData || (await readProfilesData());
 
@@ -176,7 +176,7 @@ const addNewResourceProfile = async function (newProfile) {
   return true;
 };
 
-// ==== Agent Task Related Data Functions ====
+// ==== Task's Specific Data Functions ====
 // NOTE: addDueTask() adds due task in the data file of that userName it doesn't update the memory.
 const addDueTask = async function (userName, dueTaskObj) {
   console.log(`Adding due task for user: ${userName}, ${JSON.stringify(dueTaskObj)}`);
@@ -276,6 +276,7 @@ const updateDatabaseOnFollow = async function (userObject) {
   return true;
 };
 
+// ==== General Purpose / Other Functions ====
 const filterProfilesToAutomate = async function () {
   // As agent's dueTasks are more important than scraper's dueTasks.
   console.log(`Before this.state.profilesToLoop`);
