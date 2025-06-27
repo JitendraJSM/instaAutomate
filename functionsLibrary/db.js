@@ -282,9 +282,12 @@ const filterProfilesToAutomate = async function () {
   console.log(`Before this.state.profilesToLoop`);
   console.log(this.state.profilesToLoop);
 
+  // 1. All Agent Profiles having DueTasks
   // this.state.profilesToLoop = this.state.profilesData.filter((profile) => profile.type === "agent");
   this.state.profilesToLoop = this.state.profilesData.filter((profile) => profile.type === "agent" && profile.dueTasks.length !== 0);
 
+  // 2. When agent tasks completed start scraper tasks
+  if (this.state.profilesToLoop.length === 0) this.state.profilesToLoop = this.state.profilesData.filter((profile) => profile.type === "scraper" && profile.dueTasks.length !== 0);
   console.log(`Before this.state.profilesToLoop`);
   console.log(this.state.profilesToLoop);
 

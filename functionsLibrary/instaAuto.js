@@ -235,27 +235,28 @@ const targetStringAnalyzer = async function (targetString) {
 };
 const getOrSetScraperConfig = async function (targetString) {
   const agentConfig = {
-    userName: targetString,
-    typeOfProfile: agent,
+    userName: this.state.targetToScrape.targetString,
+    typeOfProfile: `agent`,
     scrapeMetaDataOfProfile: true,
     scrapeFollowers: true,
     scrapeFollowings: true, // Default is true
   };
   const scraperConfig = {
-    userName: targetString,
-    typeOfProfile: scraper,
+    userName: this.state.targetToScrape.targetString,
+    typeOfProfile: `scraper`,
     scrapeMetaDataOfProfile: true,
   };
   const resourceConfig = {
-    userName: targetString,
-    typeOfProfile: resource,
+    userName: this.state.targetToScrape.targetString,
+    typeOfProfile: `resource`,
     scrapeMetaDataOfProfile: true,
     scrapeFollowers: true,
     scrapeFollowings: true, // Default is true
     scrapePosts: true, // Default is true
   };
 
-  if (this.state.targetToScrape.targetStringType === "userName") this.state.targetToScrape.typeOfProfile = tempAllProfilesData.find((profile) => profile.userName === userName)?.type;
+  if (this.state.targetToScrape.targetStringType === "userName")
+    this.state.targetToScrape.typeOfProfile = this.state.profilesData.find((profile) => profile.userName === this.state.targetToScrape.targetString)?.type;
 
   this.state.targetToScrape.config = { agent: agentConfig, scraper: scraperConfig, resource: resourceConfig }[this.state.targetToScrape.typeOfProfile] || {};
 
@@ -267,14 +268,14 @@ const getOrSetScraperConfig = async function (targetString) {
     process.exit(0);
   }
 
-  return true;
+  return this.state.targetToScrape.config;
 };
 
 const targetScraper = async function (targetString) {
   if (!targetString) throw new Error(`targetScraper Function needs a URL string targetString as Argument.`);
   this.state.targetToScrape = { targetString };
-  this.state.targetToScrape.targetStringType = await targetStringAnalyzer(target.targetString);
-  this.state.targetToScrape.config = await getOrSetScraperConfig();
+  this.state.targetToScrape.targetStringType = await targetStringAnalyzer.call(this, this.state.targetToScrape.targetString);
+  this.state.targetToScrape.config = await getOrSetScraperConfig.call(this);
   console.log(`-=-=- Target to scrape is as below -=-=-`);
   console.log(this.state.targetToScrape);
   if (this.state.targetToScrape.targetStringType === "userName") await scrapeProfile.call(this);
@@ -300,7 +301,7 @@ const scrapeProfile = async function () {
           headers: { "x-ig-app-id": "936619743392459" },
         });
         await response.json(); // else it will not finish the request
-      }, userName);
+      }, config.userName);
       // todo `https://i.instagram.com/api/v1/users/${userId}/info/`
       // https://www.javafixing.com/2022/07/fixed-can-get-instagram-profile-picture.html?m=1
     } catch (err) {
@@ -315,7 +316,7 @@ const scrapeProfile = async function () {
           const request = response.request();
           return (
             request.method() === "GET" &&
-            new RegExp(`https:\\/\\/i\\.instagram\\.com\\/api\\/v1\\/users\\/web_profile_info\\/\\?username=${encodeURIComponent(userName.toLowerCase())}`).test(request.url())
+            new RegExp(`https:\\/\\/i\\.instagram\\.com\\/api\\/v1\\/users\\/web_profile_info\\/\\?username=${encodeURIComponent(config.userName.toLowerCase())}`).test(request.url())
           );
         },
         { timeout: 30000 }
@@ -336,6 +337,11 @@ const scrapeProfile = async function () {
     scrapedMetaData.followers = followers;
     scrapedMetaData.followings = followings;
   }
+  console.log(`Successfully scraped : ${JSON.stringify(config)}`);
+
+  scrapedMetaData.userName = scrapedMetaData.username;
+  await db.writeUserProfileData.call(this, scrapedMetaData);
+  console.log(`Check file scraped data is written or not.`);
 };
 
 const scrapeUserData = async function (userName, scrapeFollowers = true, scrapeFollowings = true) {

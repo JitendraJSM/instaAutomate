@@ -7,8 +7,8 @@
   "dueTasks": [
     {
       "parentModuleName": "instaAuto",
-      "actionName": "follow",
-      "argumentsString": "kajalmahioffical143"
+      "actionName": "targetScraper",
+      "argumentsString": "jitendra_goswami132"
     }
   ],
   "ai_agent_type": null,
