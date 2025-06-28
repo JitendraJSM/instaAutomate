@@ -85,7 +85,8 @@ const goInstaHome = async function () {
     console.log(`Home button clicked.`);
   } catch (error) {
     console.log(`Home Button of Instagram is not availble so going to navigate home page for : ${this.state.currentProfile.userName}`);
-    if (this.page.url() !== `https://www.instagram.com/${this.state.currentProfile.userName}`) await this.page.navigateTo(`https://www.instagram.com/${this.state.currentProfile.userName}/`);
+    if (this.page.url() !== `https://www.instagram.com/${this.state.currentProfile.userName}`)
+      await this.page.navigateTo(`https://www.instagram.com/${this.state.currentProfile.userName}/`);
   }
 
   await this.utils.randomDelay(1.25, 0.25);
@@ -225,9 +226,11 @@ const targetStringAnalyzer = async function (targetString) {
   // 1. Analyze the targetString to identify the type of scraping required (e.g., user profile, hashtag, location).
   let targetStringType;
   if (!targetString.startsWith("https://www.instagram.com/")) targetStringType = "userName";
-  else if (targetString.includes("/p/")) targetStringType = "postUrl"; // i.e. a post modal window opened, it can be a image post or video post or carousel post.
+  else if (targetString.includes("/p/"))
+    targetStringType = "postUrl"; // i.e. a post modal window opened, it can be a image post or video post or carousel post.
   else if (targetString.includes("/reels/")) targetStringType = "reelsHomePageUrl"; // i.e. Reels home page ex. https://www.instagram.com/nanu_cute_00/reels/.
-  else if (targetString.includes("/reel/")) targetStringType = "reelUrl"; // i.e. a reel modal window opened, it is a video post. ex. https://www.instagram.com/reel/DLKZmEATRYH/
+  else if (targetString.includes("/reel/"))
+    targetStringType = "reelUrl"; // i.e. a reel modal window opened, it is a video post. ex. https://www.instagram.com/reel/DLKZmEATRYH/
   else if (targetString.includes("/highlights/")) targetStringType = "highlightsUrl"; // ex. https://www.instagram.com/stories/its_cute_girl__85/
   else if (targetString.includes("/stories/")) targetStringType = "storiesUrl";
   else throw new Error(`Target String: ${targetString} doesn't fall into any category.`);
@@ -237,19 +240,24 @@ const getOrSetScraperConfig = async function () {
   if (this.state.targetToScrape.targetStringType === "userName") {
     // Creating config File by compairing oldDataOfProfile and scrapedMetaData
     // 1. Followers
-    if (this.state.targetToScrape.scrapedMetaData.edge_followed_by.count * 1 - this.state.targetToScrape.oldDataOfProfile.edge_followed_by.count * 1 > 10)
+    if (this.state.targetToScrape.scrapedMetaData.edge_followed_by.count - (this.state.targetToScrape.oldDataOfProfile?.edge_followed_by?.count || 0) > 10)
       this.state.targetToScrape.needFollowers = true;
     else this.state.targetToScrape.needFollowers = false;
     // 2. Followings
-    if (this.state.targetToScrape.scrapedMetaData.edge_follow.count * 1 - this.state.targetToScrape.oldDataOfProfile.edge_follow.count * 1 > 10) this.state.targetToScrape.needFollowings = true;
+    if (this.state.targetToScrape.scrapedMetaData.edge_follow.count - (this.state.targetToScrape.oldDataOfProfile?.edge_follow?.count || 0) > 10)
+      this.state.targetToScrape.needFollowings = true;
     else this.state.targetToScrape.needFollowings = false;
     // 3. Posts
-    if (this.state.targetToScrape.scrapedMetaData.edge_owner_to_timeline_media.count * 1 - this.state.targetToScrape.oldDataOfProfile.edge_owner_to_timeline_media.count * 1 > 10)
+    if (
+      this.state.targetToScrape.scrapedMetaData.edge_owner_to_timeline_media.count -
+        (this.state.targetToScrape.oldDataOfProfile?.edge_owner_to_timeline_media?.count || 0) >
+      10
+    )
       this.state.targetToScrape.needPosts = true;
     else this.state.targetToScrape.needPosts = false;
 
     console.log(`-=-=- Profile to scrape is as below -=-=-`);
-    console.log(this.state.targetToScrape.profile);
+    console.log(this.state.targetToScrape);
 
     return true;
   }
@@ -298,7 +306,9 @@ const scrapeMetaDataOfProfile = async function (userName) {
           const request = response.request();
           return (
             request.method() === "GET" &&
-            new RegExp(`https:\\/\\/i\\.instagram\\.com\\/api\\/v1\\/users\\/web_profile_info\\/\\?username=${encodeURIComponent(userName.toLowerCase())}`).test(request.url())
+            new RegExp(
+              `https:\\/\\/i\\.instagram\\.com\\/api\\/v1\\/users\\/web_profile_info\\/\\?username=${encodeURIComponent(userName.toLowerCase())}`
+            ).test(request.url())
           );
         },
         { timeout: 30000 }
@@ -326,13 +336,17 @@ const scrapeProfile = async function () {
   // TODO: This is unneccessary to scrape each time followers, followings and metaData as it takes time, data and increase the chances to get banned.
 
   if (this.state.targetToScrape.needFollowers || this.state.targetToScrape.needFollowings) {
-    const { followers, followings } = await getListOfFollowersOrFollowings.call(this, scrapedMetaData.id, this.state.targetToScrape.needFollowers, this.state.targetToScrape.needFollowings);
+    const { followers, followings } = await getListOfFollowersOrFollowings.call(
+      this,
+      this.state.targetToScrape.scrapedMetaData.id,
+      this.state.targetToScrape.needFollowers,
+      this.state.targetToScrape.needFollowings
+    );
     this.state.targetToScrape.scrapedMetaData.followers = followers;
     this.state.targetToScrape.scrapedMetaData.followings = followings;
   }
-  console.log(`Successfully scraped : ${JSON.stringify(config)}`);
 
-  scrapedMetaData.userName = scrapedMetaData.username;
+  this.state.targetToScrape.scrapedMetaData.userName = scrapedMetaData.username;
   await db.writeUserProfileData.call(this, scrapedMetaData);
   console.log(`As this.state.targetToScrape.needPosts is : ${this.state.targetToScrape.needPosts}.`);
   const res = await scrapePosts.call(this);
