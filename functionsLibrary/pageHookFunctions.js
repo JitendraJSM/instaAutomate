@@ -49,6 +49,23 @@ const navigateTo = async function (url) {
     console.log(`Error in app.page.navigateTo(${url}) is as: ${error.message}`);
   }
 };
+const goBackToPreviousPage = async function () {
+  try {
+    console.log(`app.page.goBack() called...`);
+    await this.page.goBack({
+      waitUntil: "networkidle0", // Wait until network is idle
+      timeout: 300000, // 5 minutes Timeout in milliseconds
+      // referer: "https://www.google.com", // Custom referer header
+      // userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36", // Custom user agent
+      // ignoreHTTPSErrors: true, // Ignore HTTPS errors
+      domContentLoaded: true, // Wait for DOMContentLoaded event
+      // defaultViewport: { width: 1920, height: 1080 }, // Custom viewport settings
+    });
+    console.log(`Completed Back Navigation.`);
+  } catch (error) {
+    console.log(`Error in app.page.navigateTo() is as: ${error.message}`);
+  }
+};
 // ==== 👇🏻 for Testing & Debugging 👇🏻 ====
 const waitForElementRobust = async function (textOrSelector, text = false) {
   // text = false;
@@ -316,6 +333,7 @@ const listAllElementsTextAndSelector = async function () {
  *                              Receives request and response (if completed) as arguments.
  * @returns {Promise<void>}
  */
+/*
 const interceptRequests = async function (options, filterFn, handlerFn) {
   if (!this.page) {
     throw new Error("Page instance is required");
@@ -370,11 +388,106 @@ const interceptRequests = async function (options, filterFn, handlerFn) {
     });
   }
 };
+*/
+// Above function is upgraded and divided into two functions: `addRequestListener` and `addResponseListener`.
+
+/**
+ * Adds a temporary 'response' listener to the page.
+ * Returns a function that removes the listener when called.
+ *
+ * @param {Function} filterFn - Function to filter responses.
+ * @param {Function} handlerFn - Function to handle filtered responses.
+ * @returns {Function} removeListener - Call this to remove the listener.
+ */
+const addResponseListener = async function (filterFn, handlerFn) {
+  if (!this.page) {
+    throw new Error("Page instance is required");
+  }
+
+  if (typeof filterFn !== "function") {
+    throw new Error("Filter function is required");
+  }
+
+  if (typeof handlerFn !== "function") {
+    throw new Error("Handler function is required");
+  }
+  // Define the listener function
+  const listener = async (response) => {
+    try {
+      const request = response.request();
+      if (await filterFn(request, response)) {
+        await handlerFn(request, response);
+      }
+    } catch (error) {
+      console.error("Error in response interceptor:", error);
+    }
+  };
+
+  // Attach the listener
+  this.page.on("response", listener);
+
+  // Return a function to remove the listener
+  return () => {
+    this.page.off("response", listener);
+  };
+};
+
+/** * Adds a temporary 'request' listener to the page.
+ * Returns a function that removes the listener when called.
+ * @param {Function} filterFn - Function to filter requests.
+ * @param {Function} handlerFn - Function to handle filtered requests.
+ * @return {Function} removeListener - Call this to remove the listener.
+ * */
+const addRequestListener = async function (filterFn, handlerFn) {
+  if (!this.page) {
+    throw new Error("Page instance is required");
+  }
+
+  if (typeof filterFn !== "function") {
+    throw new Error("Filter function is required");
+  }
+
+  if (typeof handlerFn !== "function") {
+    throw new Error("Handler function is required");
+  }
+
+  // Enable request interception
+  await this.page.setRequestInterception(true);
+
+  // Define the listener function
+  const listener = async (request) => {
+    try {
+      if (await filterFn(request, null)) {
+        await handlerFn(request, null);
+      }
+      // Continue the request
+      if (!request.isInterceptionHandled()) {
+        await request.continue();
+      }
+    } catch (error) {
+      console.error("Error in request interceptor:", error);
+      // Ensure the request continues even if there's an error
+      if (!request.isInterceptionHandled()) {
+        await request.continue();
+      }
+    }
+  };
+
+  // Attach the listener
+  this.page.on("request", listener);
+
+  // Return a function to remove the listener
+  return () => {
+    this.page.off("request", listener);
+    this.page.setRequestInterception(false); // Disable request interception
+  };
+};
 
 // === Implementation ===
 const hookMethodsOnPage = async function (page) {
   page.waitForPageLoad = catchAsync(waitForPageLoad.bind(this));
   page.navigateTo = catchAsync(navigateTo.bind(this));
+  page.goBackToPreviousPage = catchAsync(goBackToPreviousPage.bind(this));
   page.waitForElementRobust = catchAsync(waitForElementRobust.bind(this));
   page.clickNotClickable = catchAsync(clickNotClickable.bind(this));
   page.getText = catchAsync(getText.bind(this));
@@ -388,7 +501,9 @@ const hookMethodsOnPage = async function (page) {
   page.listAllElements = catchAsync(listAllElements.bind(this));
   page.listAllElementsText = catchAsync(listAllElementsText.bind(this));
   page.listAllElementsTextAndSelector = catchAsync(listAllElementsTextAndSelector.bind(this));
-  page.interceptRequests = catchAsync(interceptRequests.bind(this));
+  // page.interceptRequests = catchAsync(interceptRequests.bind(this));
+  page.addResponseListener = catchAsync(addResponseListener.bind(this));
+  page.addRequestListener = catchAsync(addRequestListener.bind(this));
   // ==== 👇🏻 Event Handler 👇🏻 ====
   page.on("framenavigated", async (frame) => {
     if (frame === this.page.mainFrame()) {

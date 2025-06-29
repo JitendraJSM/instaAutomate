@@ -115,7 +115,7 @@ async function executeAction(actionDetails) {
 
   this.currentAction.index = this.currentActionIndex;
   try {
-    await this.utils.randomDelay(3, 1);
+    // await this.utils.randomDelay(3, 1);
 
     // Only parse as JSON if it's an object-like string
     let parsedArguments = !!doNotParseArgumentsString ? [argumentsString] : parseArguments.call(this, argumentsString);
@@ -145,7 +145,8 @@ async function executeAction(actionDetails) {
     }
     this.appLogger.logAction();
     // await this.utils.devWaitCheckContinue.call(this);
-    await this.utils.randomDelay(4, 1);
+    await this.utils.randomDelay(1.5, 0.5); // For testing
+    // await this.utils.randomDelay(4, 1);  // For production
 
     return result;
   } catch (error) {

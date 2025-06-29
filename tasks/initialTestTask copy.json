@@ -11,7 +11,17 @@
     "parentModuleName": "page",
     "actionName": "navigateTo",
     "argumentsString": "https://www.youtube.com",
-    "doNotParseArgumentString": true
+    "doNotParseArgumentsString": true
+  },
+  {
+    "parentModuleName": "page",
+    "actionName": "navigateTo",
+    "argumentsString": "https://www.youtube.com/shorts/HiQ8L-doqGI",
+    "doNotParseArgumentsString": true
+  },
+  {
+    "parentModuleName": "page",
+    "actionName": "goBackToPreviousPage"
   },
   {
     "parentModuleName": "devOrTest",

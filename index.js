@@ -6,6 +6,9 @@ const App = require("./modules/AppModule.js");
 const initialTestTask = require("./tasks/initialTestTask.json");
 initialTestTask.taskName = "initialTestTask";
 
+const initialTestTask_copy = require("./tasks/initialTestTask copy.json");
+initialTestTask_copy.taskName = "initialTestTask_copy";
+
 const instaAutomationTask = require("./tasks/instaAutomationTask.json");
 instaAutomationTask.taskName = "instaAutomationTask";
 
@@ -20,6 +23,7 @@ async function main() {
 
   // await app.run(initialTestTask);
   await app.run(instaAutomationTask);
+  // await app.run(initialTestTask_copy);
   // console.log(`=================================`);
   // console.log(app);
   // console.log(`=================================`);
