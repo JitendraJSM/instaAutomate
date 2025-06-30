@@ -3028,3 +3028,92 @@ const nodes = [
   },
 ];
 console.log(`Node's lenght: ${nodes.length}`);
+const links = [
+  {
+    carousel_container: [
+      {
+        url: "https://instagram.fjdh1-3.fna.fbcdn.net/v/t51.29350-15/476371142_3793412917577771_2297974804685601698_n.heic?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0uaW1hZ2VfdXJsZ2VuLjEwODB4MTA4MC5zZHIuZjI5MzUwLmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fjdh1-3.fna.fbcdn.net&_nc_cat=111&_nc_oc=Q6cZ2QF1QljddUWL_rrhdVkJRW8UBq3NxmSH87mKlk7ZLDXgnsyvYocW_jGFOVG2r_NfsjL9VN9PElEQbObYY2s9cCUB&_nc_ohc=r0QOxZ1XKZgQ7kNvwGSlzLE&_nc_gid=mtvXrhm0PvJSoN2gFxUD9g&edm=AP4sbd4BAAAA&ccb=7-5&ig_cache_key=MzU2MTgxNzg5ODM3NTE5ODQ2NA%3D%3D.3-ccb7-5&oh=00_AfNS68f4DNw7UsKSJeu64Efvz7eX7HqQzGbQwlqGwgFLJQ&oe=6867C060&_nc_sid=7a9f4b",
+        imgIndex: 0,
+      },
+      {
+        url: "https://instagram.fjdh1-2.fna.fbcdn.net/v/t51.29350-15/476447197_4038457159770176_956185782484213720_n.heic?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0uaW1hZ2VfdXJsZ2VuLjEwODB4MTA4MC5zZHIuZjI5MzUwLmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fjdh1-2.fna.fbcdn.net&_nc_cat=108&_nc_oc=Q6cZ2QF1QljddUWL_rrhdVkJRW8UBq3NxmSH87mKlk7ZLDXgnsyvYocW_jGFOVG2r_NfsjL9VN9PElEQbObYY2s9cCUB&_nc_ohc=IEHNovxd7RkQ7kNvwErqKFz&_nc_gid=mtvXrhm0PvJSoN2gFxUD9g&edm=AP4sbd4BAAAA&ccb=7-5&ig_cache_key=MzU2MTgxNzg5ODM3NTQwNjA1OA%3D%3D.3-ccb7-5&oh=00_AfOyEvjjpsdLTBUwN5HasDZy6d2sbLiFdolatf-xwnDufA&oe=6867BDC4&_nc_sid=7a9f4b",
+        imgIndex: 1,
+      },
+      {
+        url: "https://instagram.fjdh1-2.fna.fbcdn.net/v/t51.29350-15/476379556_521237227124621_7030014898697846321_n.heic?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0uaW1hZ2VfdXJsZ2VuLjEwODB4MTA3OS5zZHIuZjI5MzUwLmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fjdh1-2.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2QF1QljddUWL_rrhdVkJRW8UBq3NxmSH87mKlk7ZLDXgnsyvYocW_jGFOVG2r_NfsjL9VN9PElEQbObYY2s9cCUB&_nc_ohc=W5BqdnKYe-8Q7kNvwE8VNyv&_nc_gid=mtvXrhm0PvJSoN2gFxUD9g&edm=AP4sbd4BAAAA&ccb=7-5&ig_cache_key=MzU2MTgxNzg5ODM3NTI4ODQ3Mw%3D%3D.3-ccb7-5&oh=00_AfPSgZTw9LZr7xcP6x1XXkjFwNFoH3I8WQgzeh2Xk0GZiw&oe=6867DE65&_nc_sid=7a9f4b",
+        imgIndex: 2,
+      },
+      {
+        url: "https://instagram.fjdh1-3.fna.fbcdn.net/v/t51.29350-15/476389056_1012472920722346_7663445797973777881_n.heic?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0uaW1hZ2VfdXJsZ2VuLjEwODB4MTA3OS5zZHIuZjI5MzUwLmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fjdh1-3.fna.fbcdn.net&_nc_cat=110&_nc_oc=Q6cZ2QF1QljddUWL_rrhdVkJRW8UBq3NxmSH87mKlk7ZLDXgnsyvYocW_jGFOVG2r_NfsjL9VN9PElEQbObYY2s9cCUB&_nc_ohc=cF95DgCdSeMQ7kNvwFhs1Xo&_nc_gid=mtvXrhm0PvJSoN2gFxUD9g&edm=AP4sbd4BAAAA&ccb=7-5&ig_cache_key=MzU2MTgxNzg5ODM3NTM2NjI1MA%3D%3D.3-ccb7-5&oh=00_AfP-SLeorlwNjj-V1JnkzJovOQ-0beU_CN11wSDrMp-9cg&oe=6867F1BC&_nc_sid=7a9f4b",
+        imgIndex: 3,
+      },
+    ],
+  },
+  {
+    clips:
+      "https://instagram.fjdh1-5.fna.fbcdn.net/o1/v/t2/f2/m86/AQP9L3QkoTvtYs7hHyqxnklzFxcFyqvZJYeTJH6zRAUvC4jmgu9mdZxyRCR7ghg0QZXdfKlJM6J3nZHDeztP3GQ9m1z5rDsCDWAu9wI.mp4?_nc_cat=100&_nc_oc=AdnVMmASeP7sIzmAiPClDBopL2OlV3mUywRV7YnneT2Cu7XNuCzmjkNHjm1v39m_FrPPU5RfY-4HBjVhRw4jriyK&_nc_sid=5e9851&_nc_ht=instagram.fjdh1-5.fna.fbcdn.net&_nc_ohc=ulVIa10idvEQ7kNvwG3uoaP&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNDgwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MTA0OTYwMTU2NzExMjIxNywidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjE1LCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=42ddbc86f30e6839&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC81MjQzRUQ3MzI3NzUyRUJFREQ4N0M5RjY5MjUwNkJCMl92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYOnBhc3N0aHJvdWdoX2V2ZXJzdG9yZS9HQzJmNmgxeVFTX016eWdIQUNCSzZnejdwNUU4YnFfRUFBQUYVAgLIARIAKAAYABsCiAd1c2Vfb2lsATEScHJvZ3Jlc3NpdmVfcmVjaXBlATEVAAAmsvCBie2m3QMVAigCQzMsF0Avd0vGp--eGBJkYXNoX2Jhc2VsaW5lXzFfdjERAHX-B2XmnQEA&_nc_zt=28&oh=00_AfNY5z37zERpRzC50sTCx-QvebH2BAwo9EkwUieMmmIeSw&oe=6863FD15",
+  },
+  {
+    feed: "https://instagram.fjdh1-5.fna.fbcdn.net/v/t51.29350-15/497840194_1209979663966324_3870894558813664420_n.heic?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkZFRUQuaW1hZ2VfdXJsZ2VuLjEwODB4MTA4MC5zZHIuZjI5MzUwLmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fjdh1-5.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QHih8xlfmjEk6w6diak53NGX4S_Agr6zfl-jZYCMaKmXYf9KmNK2aWqtmg8Zvyulj8yc6eyV62WW8CV3duvCHca&_nc_ohc=9TTouhSRnQIQ7kNvwENsGGx&_nc_gid=Tce1IdPd1QKDkzQThlq-zg&edm=APoiHPcBAAAA&ccb=7-5&ig_cache_key=MzYzNDk5NTk2NzA2OTA5OTgwMQ%3D%3D.3-ccb7-5&oh=00_AfP7kvC0Ga0Wawi72HtDqfFSZLUOAAswUpFhspZraJCRqA&oe=6867E08E&_nc_sid=22de04",
+  },
+];
+
+// The question i initially have in mind is as below
+// Question: Please analyse the attached .json file, this file contains meta Data of profile in which there is a property field named posts which contains array of posts objects. I want to create a script (in file ) which downloads all the media items of posts, this script must follow the given below rules / notes / ideas:
+// 1. As each element of posts array have a property named "code" the downloaded media of that posts array element must be named by that code.
+// 2. As i analyse the file ... i know that if post element's "product_type" is "clips" then media is video and if "product_type" is "feed" then media is just one image but if "product_type" is "carousel_container" then that post element have more then on images so when script must download all those images and name them as `${post.code}_${imgIndex}`
+// 3. downloading process must be in this way one download completes then wait 1 second then another download starts.
+// 4. script must console log that how many posts are processed, how many remainging and total number of posts at any time in terminal.
+// 5. Input for script is just a userName / resourceUserName this script must use db.readUserProfileData(userName) to get the profile data and then use that profile data to get the posts array and then process each post element in that posts array.
+// 6. script must download all media items in the directory stored in profileData object in the property named `${userDataPath}/media` and if that property is not present then script must create that directory using fs-extra and then store the downloaded media in that directory.
+
+// After analysing the above notes / ideas / rules i have a solution please check this solution and let me know if it is correct or not and if there is any issue in this solution then please let me know what is the issue and how to fix that issue and in the end i want you to implement that solution in the file
+
+// From the JSON file's analysis, we can derive the following:
+
+// - Posts have different `product_type` values: "carousel_container", "clips", "feed"
+// - Each post has a `code` property for naming
+// - Carousel posts have `carousel_media` array with multiple images, their file extension will be .jfif
+// - Clips have `video_versions` URLs, their file extension will be .mp4
+// - Feed posts have `image_versions2` URLs, their file extension will be .jfif
+// - The db.js shows a `readUserProfileData()` function available
+
+// ## Proposed Script Architecture
+
+// ### Core Features:
+
+// 1. __Input__: Takes a userName parameter
+// 2. __Data Retrieval__: Uses `db.readUserProfileData(userName)` to get profile data
+// 3. __Media Processing__: Handles different post types (clips, feed, carousel_container)
+// 4. __Download Management__: Sequential downloads with 1-second delays
+// 5. __Progress Tracking__: Console logging of progress
+// 6. __Directory Management__: Creates/uses `userDataPath` from profile data
+
+// ### Download Logic:
+
+// 1. __Clips__ (`product_type: "clips"`): Download video from `video_versions` URL
+// 2. __Feed__ (`product_type: "feed"`): Download single image from `image_versions2` URL
+// 3. __Carousel__ (`product_type: "carousel_container"`): Download all images from `carousel_media` array
+
+// ### Naming Convention:
+
+// - Single media: `${post.code}.ext` (e.g., "DFuHoQjSLuU.jpg")
+// - Multiple media: `${post.code}_${imgIndex}.ext` (e.g., "DFuHoQjSLuU_0.jpg", "DFuHoQjSLuU_1.jpg")
+
+// ### Dependencies Needed:
+
+// The current package.json is missing `fs-extra` which is used in db.js. We'll need to add it.
+
+// ### Error Handling:
+
+// - Validate userName input
+// - Handle missing profile data
+// - Handle network errors during downloads
+// - Handle file system errors
+// - Skip corrupted/inaccessible media URLs
+
+// Notable points: 1. Overwrite Behavior: Script must not overwrite existing files or skip them and console log that this file is already download.
+// 2. There must a option that tells the script to stop & console log the error if any fail occur or to continue the downloading process for other media
+
+// 6. script must use db.saveMediaItem(mediaItem) to save the downloaded media
+// 3. downloading process can be in two possible methods first parallel (means 2 or 3 downloads running simultaneously at any time ) or one download complete then another download starts
