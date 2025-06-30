@@ -25,7 +25,7 @@
       {
         "parentModuleName": "instaAuto",
         "actionName": "targetScraper",
-        "argumentsString": "jitendra_goswami132"
+        "argumentsString": "ashu.samota.1612"
       }
     ]
   },
@@ -37,5 +37,14 @@
     "followersCount": null,
     "followingsCount": null,
     "userDataPath": "./data/instaResourcesData/jitendra_goswami132/jitendra_goswami132-data.json"
+  },
+  {
+    "userName": "ashu.samota.1612",
+    "password": "hhjsm001",
+    "type": "resource",
+    "postsCount": null,
+    "followersCount": null,
+    "followingsCount": null,
+    "userDataPath": "./data/instaResourcesData/ashu.samota.1612/ashu.samota.1612-data.json"
   }
 ]

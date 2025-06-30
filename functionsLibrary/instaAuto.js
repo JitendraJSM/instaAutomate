@@ -236,15 +236,20 @@ const targetStringAnalyzer = async function (targetString) {
 const getOrSetScraperConfig = async function () {
   if (this.state.targetToScrape.targetStringType === "userName") {
     // Creating config File by compairing oldDataOfProfile and scrapedMetaData
-    // 1. Followers
-    if (this.state.targetToScrape.scrapedMetaData.edge_followed_by.count - (this.state.targetToScrape.oldDataOfProfile?.followers?.length || 0) > 10) this.state.targetToScrape.needFollowers = true;
+
+    // 1. needFollowers
+    const followersDifference = this.state.targetToScrape.scrapedMetaData.edge_followed_by.count - (this.state.targetToScrape.oldDataOfProfile?.followers?.length || 0);
+    if (followersDifference > 10 && followersDifference < 100) this.state.targetToScrape.needFollowers = true;
     else this.state.targetToScrape.needFollowers = false;
-    // 2. Followings
-    if (this.state.targetToScrape.scrapedMetaData.edge_follow.count - (this.state.targetToScrape.oldDataOfProfile?.followings?.length || 0) > 10) this.state.targetToScrape.needFollowings = true;
+
+    // 2. needFollowings
+    const followingsDifference = this.state.targetToScrape.scrapedMetaData.edge_follow.count - (this.state.targetToScrape.oldDataOfProfile?.followings?.length || 0);
+    if (followingsDifference > 10 && followingsDifference < 100) this.state.targetToScrape.needFollowings = true;
     else this.state.targetToScrape.needFollowings = false;
-    // 3. Posts
-    if (this.state.targetToScrape.scrapedMetaData.edge_owner_to_timeline_media.count - (this.state.targetToScrape.oldDataOfProfile?.posts?.length || 0) > 10)
-      this.state.targetToScrape.needPosts = true;
+
+    // 3. needPosts
+    const postsDifference = this.state.targetToScrape.scrapedMetaData.edge_owner_to_timeline_media.count - (this.state.targetToScrape.oldDataOfProfile?.posts?.length || 0);
+    if (postsDifference > 10) this.state.targetToScrape.needPosts = true;
     else this.state.targetToScrape.needPosts = false;
 
     console.log(`-=-=- Profile to scrape is as below -=-=-`);
@@ -303,7 +308,7 @@ const scrapeMetaDataOfProfile = async function (userName) {
         { timeout: 30000 }
       ),
       // navigateToUserWithCheck(userName),
-      // page.waitForNavigation({ waitUntil: 'networkidle0' }),
+      // this.page.waitForNavigation({ waitUntil: 'networkidle0' }),
     ]);
 
     const json = JSON.parse(await foundResponse.text());
@@ -351,9 +356,7 @@ const scrapePosts = async function () {
   if (!this.state.targetToScrape.scrapedMetaData.posts) this.state.targetToScrape.scrapedMetaData.posts = []; // Initialize posts array if not already initialized
   // Posts Scraping from response
   const extractPostsFromResponse = async function (responseJSON) {
-    // const postsArray = [];
-    // this.state.currentResourceData.posts = []
-
+    // Scrape the post nodes & pushes then to this.state.targetToScrape.scrapedMetaData.posts
     responseJSON.data.xdt_api__v1__feed__user_timeline_graphql_connection.edges.forEach((postNode) => {
       if (this.state.targetToScrape.scrapedMetaData.posts.some((post) => post.code === postNode.node.code)) return;
       try {
@@ -392,7 +395,19 @@ const scrapePosts = async function () {
         console.log(`-=-=-=-=-=-=-=-`);
       }
     });
-    return true;
+
+    // Sort posts by taken_at date in descending order
+    this.state.targetToScrape.scrapedMetaData.posts.sort((a, b) => b.taken_at - a.taken_at);
+
+    // responseJSON.data.xdt_api__v1__feed__user_timeline_graphql_connection.page_info.has_next_page decides to scroll for more posts (true) or all posts are scraped (false).
+
+    if ("has_next_page" in responseJSON.data?.xdt_api__v1__feed__user_timeline_graphql_connection?.page_info) {
+      if (responseJSON.data.xdt_api__v1__feed__user_timeline_graphql_connection.page_info.has_next_page) return "scroll";
+      else return "stop Scrolling";
+    } else {
+      console.log(`Please check in debugger mode that why has_next_page does not exists.`);
+      await this.utils.askUser("Press Enter to Continue...");
+    }
   };
 
   // Filter function - process requests
@@ -413,30 +428,40 @@ const scrapePosts = async function () {
       const resJSON = await response.json();
 
       console.log(`==============================================`); // for testing purpose only
-      // await fs.appendFile("./scraperTesting/responseAsItIs.json", JSON.stringify(resJSON, null, 2) + ",\n"); // for testing purpose only
+      await fs.appendFile("./scraperTesting/responseAsItIs.json", JSON.stringify(resJSON, null, 2) + ",\n"); // for testing purpose only
       console.log(`Currently length of scrapedMetaDataOfPosts is : ${this.state.targetToScrape.scrapedMetaData.posts.length}`); // for testing purpose only
       console.log(`==============================================`); // for testing purpose only
 
-      await extractPostsFromResponse.call(this, resJSON);
+      this.state.targetToScrape.scrapingVariables.has_next_page = await extractPostsFromResponse.call(this, resJSON);
 
+      this.state.targetToScrape.scrapingVariables.pagesScraped++;
       // await fs.writeFile("./scraperTesting/extractedPosts.json", JSON.stringify(this.state.currentResourceData.posts, null, 2));
     }
   };
   //
   console.log(`Starting to response Listener for posts scraping ....`);
 
+  this.state.targetToScrape.scrapingVariables = { pagesScraped: 0, has_next_page: true };
   this.state.targetToScrape.removeResponseListener = await this.page.addResponseListener.call(this, postsScrapingFilterFn.bind(this), postsScrapingHandlerFn.bind(this));
+
   await this.page.navigateTo(`chrome://new-tab-page/`); // Navigate to a new tab to reset the page state
   await this.page.navigateTo(`https://www.instagram.com/${this.state.targetToScrape?.targetString}/`);
-  let isAllPostsScraped = false;
-  while (!isAllPostsScraped) {
-    if (this.state.targetToScrape.scrapedMetaData.posts.length >= this.state.targetToScrape.scrapedMetaData.edge_owner_to_timeline_media.count) isAllPostsScraped = true;
-    this.state.targetToScrape.scrapedMetaData.posts.sort((a, b) => b.taken_at - a.taken_at); // Sort posts by taken_at date in descending order
+
+  while (this.state.targetToScrape.scrapingVariables.has_next_page !== "stop Scrolling") {
+    // if (this.state.targetToScrape.scrapedMetaData.posts.length >= this.state.targetToScrape.scrapedMetaData.edge_owner_to_timeline_media.count) {
+    //   has_next_page = true;
+    //   console.log(`Breaking the loop as All posts get scraped.`);
+    //   break;
+    // }
     await this.utils.randomDelay(1.5, 0.5); // Wait for 1.5 seconds before next request
-    // Scroll down for next posts requests
-    await this.page.evaluate(() => {
-      window.scrollTo(0, document.body.scrollHeight, { behavior: "smooth" });
-    });
+    if (this.state.targetToScrape.scrapingVariables.has_next_page === "scroll") {
+      // Scroll down for next posts requests
+      await this.page.evaluate(() => {
+        window.scrollTo(0, document.body.scrollHeight, { behavior: "smooth" });
+      });
+      this.state.targetToScrape.scrapingVariables.has_next_page = "wait";
+    }
+    console.log(`--- After wait for response has_next_page is as: ${this.state.targetToScrape.scrapingVariables.has_next_page}`);
   }
 
   // await this.page.navigateTo(`https://www.instagram.com/${this.state.targetToScrape?.targetString}/`);

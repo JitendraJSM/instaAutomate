@@ -417,6 +417,7 @@ const addResponseListener = async function (filterFn, handlerFn) {
       const request = response.request();
       if (await filterFn(request, response)) {
         await handlerFn(request, response);
+        return;
       }
     } catch (error) {
       console.error("Error in response interceptor:", error);
