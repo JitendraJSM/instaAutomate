@@ -1,222 +1,371 @@
+// NOTE: Develop this script in such a way that it can work with App module and also with out App Module NOTE: without app Module execution of scraper is not possible.
+const db = require("./db.js");
 const fs = require("fs-extra");
+// ============== 👇 Data Scraping Functions 👇 ==============
+// ===== Main Scraper function =====
+// const scrapeProfile = async function () {     // Old code may be needed until fully developed.
+const scrapeInstaProfile = async function (userName) {
+  userName ||= this.state.targetToScrape.targetString;
 
-// ==== All Resources Data Functions ====
-const readAllResourcesData = async () => JSON.parse(await fs.readFile("./data/instaResourcesData/allResourcesData.json"));
-readAllResourcesData.shouldStoreState = "allResourcesData";
+  this.state.targetToScrape.alreadyExistedProfileData = await db.readUserProfileData.call(this, userName);
+  // TODO: This is unneccessary to scrape each time followers, followings and metaData as it takes time, data and increase the chances to get banned.
+  this.state.targetToScrape.latestScrapedMetaData = await scrapeMetaDataOfProfile.call(this, userName); // This scrapes latest meta Data of profile
 
-const writeAllResourcesData = async function (allResourcesData) {
-  if (!allResourcesData || !Array.isArray(allResourcesData)) throw new Error(`Invalid allResourcesData object provided. It must be an array.`);
+  await getInstaProfileScraperConfig.call(this); // NOTE: This function decides what to scrape and what not to scrape.
 
-  // Ensure all profiles have userName, userDataPath properties and do not have duplicate objects in dueTasks
-  allResourcesData.forEach((resourceProfile) => {
-    if (!resourceProfile.userName || !resourceProfile.resourceDataPath) throw new Error(`Invalid resourcesProfile object provided. It must contain userName and resourceDataPath properties.`);
-  });
-
-  await fs.writeFile("./data/instaResourcesData/allResourcesData.json", JSON.stringify(allResourcesData, null, 2));
-  this.state.allResourcesData = allResourcesData; // Update the state with the new data
-  console.log(`Updated allResourcesData.json with ${allResourcesData.length} resources.`);
-  return true;
-};
-writeAllResourcesData.doNotParseArgumentString = true;
-
-const updateAllResourcesDataForLastUpdate = async function (userName) {
-  if (!this.state.allResourcesData) this.state.allResourcesData = await readAllResourcesData.call(this);
-  if (!userName) throw new Error("UserName is required to update allResourcesData for last update.");
-  const index = this.state.allResourcesData.findIndex((resource) => resource.userName === userName);
-  if (index === -1) throw new Error(`Resource data for user: ${userName} not found in allResourcesData.`);
-  this.state.allResourcesData[index].lastUpdate = new Date().toISOString();
-  await writeAllResourcesData.call(this, this.state.allResourcesData);
-  return true;
-};
-updateAllResourcesDataForLastUpdate.doNotParseArgumentString = true;
-
-// ==== Specific Resource Data Functions ====
-const getResourceDataPath = async function (userName) {
-  if (!this.state.allResourcesData) this.state.allResourcesData = await readAllResourcesData();
-
-  if (!userName) throw new Error("UserName is required to get resources data path.");
-
-  let resourceDataPath = this.state.allResourcesData.find((resource) => resource.userName === userName)?.resourceDataPath;
-
-  if (!resourceDataPath) {
-    console.log(
-      `No resourceDataPath found for user: ${userName}, Either there is no user details in allResources for : ${userName}, or the ${userName} has no "resourceDataPath" defined in allResourcesData.json`
+  if (this.state.targetToScrape.needFollowers || this.state.targetToScrape.needFollowings) {
+    const { followers, followings } = await getListOfFollowersOrFollowings.call(
+      this,
+      this.state.targetToScrape.latestScrapedMetaData.id,
+      this.state.targetToScrape.needFollowers,
+      this.state.targetToScrape.needFollowings
     );
-
-    resourceDataPath = `./data/instaResourcesData/${userName}/${userName}-data.json`;
-    console.log("\x1b[33m%s\x1b[0m", `Creating a new resourceDataPath for user: ${userName} at ${resourceDataPath}`);
+    this.state.targetToScrape.latestScrapedMetaData.followers = followers;
+    this.state.targetToScrape.latestScrapedMetaData.followings = followings;
   }
-  return resourceDataPath;
-};
-getResourceDataPath.doNotParseArgumentString = true;
 
-const createNewResourceDir = async function (userName) {
-  if (!userName) throw new Error("UserName is required to create a new resource directory.");
+  this.state.targetToScrape.latestScrapedMetaData.userName = this.state.targetToScrape.latestScrapedMetaData.username;
 
-  if (!this.state.allResourcesData) this.state.allResourcesData = await readAllResourcesData();
-  if (this.state.allResourcesData.some((resource) => resource.userName === userName)) throw new Error(`Resource directory for user: ${userName} already exists.`);
+  const res = await scrapeProfilePosts.call(this);
+  console.log(`Posts scraping done by function scrapeProfilePosts: ${res}.`);
 
-  const userInput = await this.utils.askUser(`Do you want to create a new resource directory for user: ${userName}? (y/n): `);
-  if (userInput.toLowerCase() === "y") {
-    const resourceDataPath = `./data/instaResourcesData/${userName}/${userName}-data.json`;
-    const newResourceObj = { userName, resourceDataPath, posts: [], followers: [], followings: [] };
+  await updateDatabaseAfterProfileScraping.call(this);
 
-    await fs.ensureDir(`./data/instaResourcesData/${userName}`);
-    await fs.writeJSON(resourceDataPath, newResourceObj, { spaces: 2 });
-    this.state.allResourcesData.push({ userName, resourceDataPath });
-    await writeAllResourcesData.call(this, this.state.allResourcesData);
-    console.log(`Created new resource directory for user: ${userName} at ${resourceDataPath}`);
-    return resourceDataPath;
-  }
-  return false; // If user chooses not to create a new directory, return false
-};
-createNewResourceDir.doNotParseArgumentString = true;
-
-const readResourceData = async function (userName) {
-  const resourceDataPath = await getResourceDataPath.call(this, userName);
-
-  if (!fs.existsSync(resourceDataPath)) await createNewResourceDir.call(this, userName);
-
-  return await fs.readJSON(resourceDataPath);
-};
-readResourceData.shouldStoreState = "currentResourceData";
-readResourceData.doNotParseArgumentString = true;
-
-const updateResourceData = async function (resourceData) {
-  if (!resourceData || typeof resourceData !== "object") throw new Error("Resource data must be a valid object.");
-  if (!resourceData.userName) throw new Error("UserName is required to write resources data.");
-
-  const userName = resourceData.userName;
-  // const resourceDataPath = await getResourceDataPath.call(this, userName);
-  const oldResourceData = await readResourceData.call(this, userName); // This will call createNewResourceDir if not exist.
-  const newResourceData = { ...oldResourceData, ...resourceData, lastUpdate: new Date().toISOString() };
-
-  await fs.writeJSON(newResourceData.resourceDataPath, newResourceData, { spaces: 2 });
-
-  const isAllResourcesDataUpdated = await updateAllResourcesDataForLastUpdate.call(this, userName);
-
-  console.log(`Resource data for ${userName} written successfully to ${newResourceData.resourceDataPath} & allResourcesData updated: ${isAllResourcesDataUpdated}.`);
-  return true;
-};
-updateResourceData.doNotParseArgumentString = true;
-
-const testing = async function () {
-  const resultOfTestingFunction = await updateResourceData.call(this, {
-    userName: "its_cute_girl__85",
-    testProrty: "testValue",
-  });
-  console.log(`Result of testing function: ${resultOfTestingFunction}`);
+  console.log(`Check file scraped data is written or not.`);
 };
 
-// (async () => {
-//   try {
-//     const res = await readResourceData("its_cute_girl__85");
-//     console.log(`res is as below:`);
-//     console.log(res);
-//   } catch (err) {
-//     console.error("Error in IIFE:", err);
-//   }
-// })();
+// ----- To Scrape Meta Data of Profile -----
+const scrapeMetaDataOfProfile = async function (userName) {
+  if (!userName) throw new Error(`scrapeMetaDataOfProfile Function needs userName of profile as Argument.`);
 
-const extractPostsFromResponse = async function (responseJSON) {
-  // const postsArray = [];
-  // this.state.currentResourceData.posts = []
+  /* It is not needed to navigate to user before scraping but it is better so not get banned.*/
+  if (this.page.url() !== `https://www.instagram.com/${userName}`) await this.page.navigateTo(`https://www.instagram.com/${userName}`);
 
-  responseJSON.data.xdt_api__v1__feed__user_timeline_graphql_connection.edges.forEach((postNode) => {
-    if (this.state.currentResourceData.posts.some((post) => post.code === postNode.node.code)) return;
+  // ------ 👇 Logic to Scrape MetaData of Profile 👇 ------
+  // --- Logic for scraping data is copied from "getUserDataFromInterceptedRequest" function of instaAuto git repo of mifi.
+  // TODO: This given below code creates a request but it must first use the request interceptor if that won't work then use this.
+
+  let scrapedMetaData;
+  const t = setTimeout(async () => {
+    console.log("Unable to intercept request, will send manually");
     try {
-      const node = {
-        code: postNode.node.code,
-        pk: postNode.node.pk,
-        caption: postNode.node.caption,
-        caption: postNode.node.taken_at, // this is date and time of post upload/1000
-        userName: postNode.node.owner.username,
-        coauthor_producers: postNode.node.coauthor_producers,
-        title: postNode.node.title,
-        comment_count: postNode.node.comment_count,
-        like_count: postNode.node.like_count,
-        product_type: postNode.node.product_type,
-        media_type: postNode.node.media_type,
-        clips_metadata: postNode.node.clips_metadata,
-        comments: postNode.node.comments,
-        location: postNode.node?.location,
-      };
-      if (postNode.node.product_type === "clips") node.video_versions = postNode.node.video_versions[0].url;
-      else if (postNode.node.product_type === "feed") {
-        node.image_versions2 = postNode.node.image_versions2.candidates[0].url;
-        node.accessibility_caption = postNode.node.accessibility_caption;
-      } else if (postNode.node.product_type === "carousel_container") {
-        node.carousel_media_count = postNode.node.carousel_media_count;
-        node.carousel_media = [];
-        node.carousel_media_count = postNode.node.carousel_media.forEach((obj, i) => node.carousel_media.push({ url: obj.image_versions2.candidates[0].url, imgIndex: i }));
-      }
-      this.state.currentResourceData.posts.push(node);
-    } catch (error) {
-      console.log(error);
-
-      console.log(`Cannot extract data from postNade: ${postNode}`);
-      console.log(`-=-=-=-=-=-=-=-`);
-      console.log(postNode.node.code);
-      console.log(`-=-=-=-=-=-=-=-`);
+      await this.page.evaluate(async (username2) => {
+        const response = await window.fetch(`https://i.instagram.com/api/v1/users/web_profile_info/?username=${encodeURIComponent(username2.toLowerCase())}`, {
+          mode: "cors",
+          credentials: "include",
+          headers: { "x-ig-app-id": "936619743392459" },
+        });
+        await response.json(); // else it will not finish the request
+      }, userName);
+      // todo `https://i.instagram.com/api/v1/users/${userId}/info/`
+      // https://www.javafixing.com/2022/07/fixed-can-get-instagram-profile-picture.html?m=1
+    } catch (err) {
+      console.error("Failed to manually send request", err);
     }
-  });
+  }, 5000);
+
+  try {
+    const [foundResponse] = await Promise.all([
+      this.page.waitForResponse(
+        (response) => {
+          const request = response.request();
+          return (
+            request.method() === "GET" &&
+            new RegExp(`https:\\/\\/i\\.instagram\\.com\\/api\\/v1\\/users\\/web_profile_info\\/\\?username=${encodeURIComponent(userName.toLowerCase())}`).test(request.url())
+          );
+        },
+        { timeout: 30000 }
+      ),
+      // navigateToUserWithCheck(userName),
+      // this.page.waitForNavigation({ waitUntil: 'networkidle0' }),
+    ]);
+
+    const json = JSON.parse(await foundResponse.text());
+    scrapedMetaData = json.data.user;
+  } finally {
+    clearTimeout(t);
+  }
+  return scrapedMetaData;
+  // ------ 👆 Logic to Scrape MetaData of Profile 👆 ------
+};
+
+// ----- Creates config by compairing alreadyExistedProfileData and scrapedMetaData -----
+const getInstaProfileScraperConfig = async function () {
+  // 1. needFollowers
+  const followersDifference = this.state.targetToScrape.latestScrapedMetaData.edge_followed_by.count - (this.state.targetToScrape.alreadyExistedProfileData?.followers?.length || 0);
+  if (followersDifference > 10 && followersDifference < 100) this.state.targetToScrape.needFollowers = true;
+  else this.state.targetToScrape.needFollowers = false;
+
+  // 2. needFollowings
+  const followingsDifference = this.state.targetToScrape.latestScrapedMetaData.edge_follow.count - (this.state.targetToScrape.alreadyExistedProfileData?.followings?.length || 0);
+  if (followingsDifference > 10 && followingsDifference < 100) this.state.targetToScrape.needFollowings = true;
+  else this.state.targetToScrape.needFollowings = false;
+
+  // 3. needPosts
+  const postsDifference = this.state.targetToScrape.latestScrapedMetaData.edge_owner_to_timeline_media.count - (this.state.targetToScrape.alreadyExistedProfileData?.posts?.length || 0);
+  if (postsDifference > 10) this.state.targetToScrape.needPosts = true;
+  else this.state.targetToScrape.needPosts = false;
+
   return true;
 };
 
-const getScraperConfig = async function (targetString) {
-  // Default scraper configuration
-  this.state.scraperConftg = {
-    isResource: true,
-  };
-  console.log(`-=-=- Default scraper configuration is as below -=-=-`);
-  console.log(this.state.scraperConftg);
-  if ((await this.utils.askUser(`Do you want to change the default scraper configuration? (y/n): `)).toLowerCase() === "y") {
-    const isResource = await this.utils.askUser(`Is this a resource scraping? (y/n): `);
-    this.state.scraperConftg.isResource = isResource.toLowerCase() === "y";
+// ----- Scrape userName of all Followers and Followings of a Profile -----
+const getListOfFollowersOrFollowings = async function (targetUserId, needFollowers, needFollowings) {
+  console.log(`Starting to get list of followers or followings...`);
+
+  let page = this.page;
+
+  const instagramBaseUrl = "https://www.instagram.com";
+
+  async function getPageJson() {
+    return JSON.parse(await (await (await page.$("pre")).getProperty("textContent")).jsonValue());
   }
-  return this.state.scraperConftg;
+  async function* graphqlQueryUsers({ queryHash, getResponseProp, graphqlVariables: graphqlVariablesIn }) {
+    const graphqlUrl = `${instagramBaseUrl}/graphql/query/?query_hash=${queryHash}`;
+
+    const graphqlVariables = {
+      first: 50,
+      ...graphqlVariablesIn,
+    };
+
+    const outUsers = [];
+
+    let hasNextPage = true;
+    let i = 0;
+
+    while (hasNextPage) {
+      const url = `${graphqlUrl}&variables=${JSON.stringify(graphqlVariables)}`;
+      // logger.log(url);
+      await page.navigateTo(url);
+      // await page.goBackToPreviousPage();
+      // await page.goto(url);
+      const json = await getPageJson();
+
+      const subProp = getResponseProp(json);
+      const pageInfo = subProp.page_info;
+      const { edges } = subProp;
+
+      const ret = [];
+      edges.forEach((e) => ret.push(e.node.username));
+
+      graphqlVariables.after = pageInfo.end_cursor;
+      hasNextPage = pageInfo.has_next_page;
+      i += 1;
+
+      if (hasNextPage) {
+        // logger.log(`Has more pages (current ${i})`);
+        await new Promise((resolve) => setTimeout(resolve, 1500)); // Wait for 1 second before next request
+      }
+
+      yield ret;
+    }
+
+    return outUsers;
+  }
+  function getFollowersOrFollowingGenerator({ userId, getFollowers = false }) {
+    return graphqlQueryUsers({
+      getResponseProp: (json) => json.data.user[getFollowers ? "edge_followed_by" : "edge_follow"],
+      graphqlVariables: { id: userId },
+      queryHash: getFollowers ? "37479f2b8209594dde7facb0d904896a" : "58712303d941c6855d4e888c5f0cd22f",
+    });
+  }
+  async function getFollowersOrFollowing({ userId, getFollowers = false }) {
+    let users = [];
+    for await (const usersBatch of getFollowersOrFollowingGenerator({
+      userId,
+      getFollowers,
+    })) {
+      users = [...users, ...usersBatch];
+    }
+
+    return users;
+  }
+
+  // Getting all followers
+  let followers, followings;
+  if (needFollowers) {
+    followers = await getFollowersOrFollowing({
+      userId: targetUserId,
+      getFollowers: true,
+    });
+    // console.log(`Followers are as:`);
+    // console.log(followers);
+  }
+  // await goInstaHome.call(this);
+  if (needFollowings) {
+    followings = await getFollowersOrFollowing({
+      userId: targetUserId,
+      getFollowers: false,
+    });
+    // console.log(`followings are as:`);
+    // console.log(followings);
+  }
+  await this.page.navigateTo(`https://www.instagram.com/${this.state.targetToScrape?.targetString}/`);
+  // await page.goBackToPreviousPage.call(this);
+  return { followers, followings };
 };
 
-const resourceScraper = async function (userName) {
-  if (!userName) throw new Error("Target string is required for resourceScraper function.");
+// ----- Scrape all Posts of a Profile -----
+const scrapeProfilePosts = async function () {
+  if (!this.state.targetToScrape.needPosts) {
+    console.log(`No need to scrape posts as this.state.targetToScrape.needPosts is false.`);
+    return true;
+  }
 
-  this.state.currentResourceData = await readResourceData.call(this, userName);
+  // TODO: This given below statement creates a problem when some posts are already scraped
+  if (!this.state.targetToScrape.latestScrapedMetaData.posts) this.state.targetToScrape.latestScrapedMetaData.posts = []; // Initialize posts array if not already initialized
+
+  // Posts Scraping from response
+  const extractPostsFromResponse = async function (responseJSON) {
+    // Scrape the post nodes & pushes then to this.state.targetToScrape.latestScrapedMetaData.posts
+    responseJSON.data.xdt_api__v1__feed__user_timeline_graphql_connection.edges.forEach((postNode) => {
+      if (this.state.targetToScrape.latestScrapedMetaData.posts.some((post) => post.code === postNode.node.code)) return;
+      try {
+        const node = {
+          code: postNode.node.code,
+          pk: postNode.node.pk,
+          caption: postNode.node.caption,
+          caption: postNode.node.taken_at, // this is date and time of post upload/1000
+          userName: postNode.node.owner.username,
+          coauthor_producers: postNode.node.coauthor_producers,
+          title: postNode.node.title,
+          comment_count: postNode.node.comment_count,
+          like_count: postNode.node.like_count,
+          product_type: postNode.node.product_type,
+          media_type: postNode.node.media_type,
+          clips_metadata: postNode.node.clips_metadata,
+          comments: postNode.node.comments,
+          location: postNode.node?.location,
+        };
+        if (postNode.node.product_type === "clips") node.video_versions = postNode.node.video_versions[0].url;
+        else if (postNode.node.product_type === "feed") {
+          node.image_versions2 = postNode.node.image_versions2.candidates[0].url;
+          node.accessibility_caption = postNode.node.accessibility_caption;
+        } else if (postNode.node.product_type === "carousel_container") {
+          node.carousel_media_count = postNode.node.carousel_media_count;
+          node.carousel_media = [];
+          node.carousel_media_count = postNode.node.carousel_media.forEach((obj, i) => node.carousel_media.push({ url: obj.image_versions2.candidates[0].url, imgIndex: i }));
+        }
+        this.state.targetToScrape.latestScrapedMetaData.posts.push(node);
+      } catch (error) {
+        console.log(error);
+
+        console.log(`Cannot extract data from postNade: ${postNode}`);
+        console.log(`-=-=-=-=-=-=-=-`);
+        console.log(postNode.node.code);
+        console.log(`-=-=-=-=-=-=-=-`);
+      }
+    });
+
+    // Sort posts by taken_at date in descending order
+    this.state.targetToScrape.latestScrapedMetaData.posts.sort((a, b) => b.taken_at - a.taken_at);
+
+    // responseJSON.data.xdt_api__v1__feed__user_timeline_graphql_connection.page_info.has_next_page decides to scroll for more posts (true) or all posts are scraped (false).
+
+    if ("has_next_page" in responseJSON.data?.xdt_api__v1__feed__user_timeline_graphql_connection?.page_info) {
+      if (responseJSON.data.xdt_api__v1__feed__user_timeline_graphql_connection.page_info.has_next_page) return "scroll";
+      else return "stop Scrolling";
+    } else {
+      console.log(`Please check in debugger mode that why has_next_page does not exists.`);
+      await this.utils.askUser("Press Enter to Continue...");
+    }
+  };
 
   // Filter function - process requests
-  const filterFn = async (request, response) => {
+  const postsScrapingFilterFn = async (request, response) => {
     {
       if (request.url() === "https://www.instagram.com/graphql/query") {
         const headers = request.headers()["x-fb-friendly-name"];
         console.log("Request Headers:", headers);
         return true;
       }
-      // return request.resourceType() === "image" && response.status() === 200;
     }
   };
 
   // Handler function - successful requests
-  const handlerFn = async (request, response) => {
+  const postsScrapingHandlerFn = async (request, response) => {
     if (request.headers()["x-fb-friendly-name"] === "PolarisProfilePostsQuery" || request.headers()["x-fb-friendly-name"] === "PolarisProfilePostsTabContentQuery_connection") {
       const resJSON = await response.json();
 
       console.log(`==============================================`); // for testing purpose only
       await fs.appendFile("./scraperTesting/responseAsItIs.json", JSON.stringify(resJSON, null, 2) + ",\n"); // for testing purpose only
-      console.log(`Currently length of scrapedMetaDataOfPosts is : ${this.state.currentResourceData.posts.length}`); // for testing purpose only
+      console.log(`Currently length of scrapedMetaDataOfPosts is : ${this.state.targetToScrape.latestScrapedMetaData.posts.length}`); // for testing purpose only
       console.log(`==============================================`); // for testing purpose only
 
-      await extractPostsFromResponse.call(this, resJSON);
-      await fs.writeFile("./scraperTesting/extractedPosts.json", JSON.stringify(this.state.currentResourceData.posts, null, 2));
+      this.state.targetToScrape.scrapingVariables.has_next_page = await extractPostsFromResponse.call(this, resJSON);
+
+      this.state.targetToScrape.scrapingVariables.pagesScraped++;
+      // await fs.writeFile("./scraperTesting/extractedPosts.json", JSON.stringify(this.state.currentResourceData.posts, null, 2));
     }
   };
+  //
+  console.log(`Starting to response Listener for posts scraping ....`);
 
-  // Start the interceptor over completed requests
-  await this.page.interceptRequests({ interceptCompletedOnly: true }, filterFn.bind(this), handlerFn.bind(this));
+  this.state.targetToScrape.scrapingVariables = { pagesScraped: 0, has_next_page: true };
+  this.state.targetToScrape.removeResponseListener = await this.page.addResponseListener.call(this, postsScrapingFilterFn.bind(this), postsScrapingHandlerFn.bind(this));
 
-  console.log("postsScraper function completed.");
+  await this.page.navigateTo(`chrome://new-tab-page/`); // Navigate to a new tab to reset the page state
+  await this.page.navigateTo(`https://www.instagram.com/${this.state.targetToScrape?.targetString}/`);
+
+  while (this.state.targetToScrape.scrapingVariables.has_next_page !== "stop Scrolling") {
+    // if (this.state.targetToScrape.latestScrapedMetaData.posts.length >= this.state.targetToScrape.latestScrapedMetaData.edge_owner_to_timeline_media.count) {
+    //   has_next_page = true;
+    //   console.log(`Breaking the loop as All posts get scraped.`);
+    //   break;
+    // }
+    await this.utils.randomDelay(1.5, 0.5); // Wait for 1.5 seconds before next request
+    if (this.state.targetToScrape.scrapingVariables.has_next_page === "scroll") {
+      // Scroll down for next posts requests
+      await this.page.evaluate(() => {
+        window.scrollTo(0, document.body.scrollHeight, { behavior: "smooth" });
+      });
+      this.state.targetToScrape.scrapingVariables.has_next_page = "wait";
+    }
+    console.log(`--- After wait for response has_next_page is as: ${this.state.targetToScrape.scrapingVariables.has_next_page}`);
+  }
+
+  return true;
 };
 
-const postsScraper = async function (targetString) {
-  if (!targetString) throw new Error("Target string is required for postsScraper function.");
+// ----- Update Data-base with latest information after scraping profile -----
+const updateDatabaseAfterProfileScraping = async function () {
+  const userName = this.state.targetToScrape.targetString;
+  //  1. Update user's Data
+  this.state.targetToScrape.latestScrapedMetaData.postsCount = this.state.targetToScrape.latestScrapedMetaData.posts.length;
+  this.state.targetToScrape.latestScrapedMetaData.followersCount = this.state.targetToScrape.latestScrapedMetaData.edge_followed_by.count;
+  this.state.targetToScrape.latestScrapedMetaData.followingsCount = this.state.targetToScrape.latestScrapedMetaData.edge_follow.count;
+  this.state.targetToScrape.latestScrapedMetaData.lastScrapingDate = new Date().toISOString();
+
+  // 2. Get profile in allProfilesData.json
+  if (!this?.state?.profilesData) this.state.profilesData = await db.readProfilesData();
+  this.state.targetToScrape.profile = this.state.profilesData.find((profile) => profile.userName === userName);
+
+  // 3. Update allProfilesData.json
+  this.state.targetToScrape.profile.postsCount = this.state.targetToScrape.latestScrapedMetaData.postsCount;
+  this.state.targetToScrape.profile.followersCount = this.state.targetToScrape.latestScrapedMetaData.followersCount;
+  this.state.targetToScrape.profile.followingsCount = this.state.targetToScrape.latestScrapedMetaData.followingsCount;
+  this.state.targetToScrape.profile.lastScrapingDate = new Date().toISOString();
+
+  await db.removeDueTask(this.state.currentProfile.userName, {
+    parentModuleName: "instaScraper",
+    actionName: "targetScraper",
+    argumentsString: `${this.currentAction.argumentsString}`,
+  });
+
+  await db.writeUserProfileData.call(this, { ...this.state.targetToScrape.alreadyExistedProfileData, ...this.state.targetToScrape.latestScrapedMetaData });
+  await db.writeProfilesData.call(this, this.state.profilesData);
+
+  return true;
+  // this.state.targetToScrape.profile.postsDownloaded ||= 0;   // This data should only be mutated in instaMediaDownloader.js
+  // this.state.targetToScrape.latestScrapedMetaData.postsDownloaded ||= 0;   // This data should only be mutated in instaMediaDownloader.js
+  // this.state.targetToScrape.profile.postsEdited ||= 0;     // This data should only be mutated in mediaEditor.js
+  // this.state.targetToScrape.latestScrapedMetaData.postsEdited ||= 0;     // This data should only be mutated in mediaEditor.js
+  // this.state.targetToScrape.profile.postsReadyToUpload ||= 0;     // This data should only be mutated in mediaEditor.js
+  // this.state.targetToScrape.latestScrapedMetaData.postsReadyToUpload ||= 0;     // This data should only be mutated in mediaEditor.js
+};
+
+const targetStringAnalyzer = async function (targetString) {
+  if (!targetString) throw new Error("Target string (as argument) is required for targetStringAnalyzer Function.");
 
   // 1. Analyze the targetString to identify the type of scraping required (e.g., user profile, hashtag, location).
   let targetStringType;
@@ -226,19 +375,18 @@ const postsScraper = async function (targetString) {
   else if (targetString.includes("/reel/")) targetStringType = "reelUrl"; // i.e. a reel modal window opened, it is a video post. ex. https://www.instagram.com/reel/DLKZmEATRYH/
   else if (targetString.includes("/highlights/")) targetStringType = "highlightsUrl"; // ex. https://www.instagram.com/stories/its_cute_girl__85/
   else if (targetString.includes("/stories/")) targetStringType = "storiesUrl";
-
-  // 2. Get the scraper configuration based on the targetString type.
-  this.state.scraperConftg = await getScraperConfig.call(this, targetString);
-
-  // 3. Execute the scraping logic based on the scraperConfig type.
-  if (this.state.scraperConftg.isResource) {
-    // If it's a resource scraping, we will scrape the metaData & posts of the user.
-    const isScrapingSuccess = await resourceScraper.call(this, targetString);
-  }
+  else throw new Error(`Target String: ${targetString} doesn't fall into any category.`);
+  return targetStringType;
 };
+
+const targetScraper = async function (targetString) {
+  if (!targetString) throw new Error(`targetScraper Function needs a URL string targetString as Argument.`);
+  this.state.targetToScrape = { targetString };
+  this.state.targetToScrape.targetStringType = await targetStringAnalyzer.call(this, this.state.targetToScrape.targetString);
+  if (this.state.targetToScrape.targetStringType === "userName") await scrapeInstaProfile.call(this);
+  console.log(`-=-=- Target Scraping Completed. -=-=-`);
+};
+targetScraper.doNotParseArgumentsString = true; // This is used to skip parsing of argumentsString as it is not needed here.
+
 const catchAsync = require("../utils/catchAsync.js");
-module.exports = {
-  postsScraper: catchAsync(postsScraper),
-  readResourceData: catchAsync(readResourceData),
-  testing: catchAsync(testing),
-};
+module.exports = { targetScraper: catchAsync(targetScraper) };

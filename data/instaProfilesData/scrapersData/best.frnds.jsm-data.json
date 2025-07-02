@@ -4,13 +4,7 @@
   "password": "hhjsm001",
   "type": "scraper",
   "userDataPath": "data/instaProfilesData/scrapersData/best.frnds.jsm-data.json",
-  "dueTasks": [
-    {
-      "parentModuleName": "instaAuto",
-      "actionName": "targetScraper",
-      "argumentsString": "ashu.samota.1612"
-    }
-  ],
+  "dueTasks": [],
   "ai_agent_type": null,
   "biography": "",
   "bio_links": [],
@@ -192,5 +186,5 @@
   "automatedlike": [],
   "automatedcomment": [],
   "lastUpdate": "2025-06-10T18:10:45.786Z",
-  "lastDataOverwrite": "2025-06-26T03:09:03.047Z"
+  "lastDataOverwriteDate": "2025-07-01T13:15:41.472Z"
 }

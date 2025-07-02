@@ -23,28 +23,36 @@
     "userDataPath": "data/instaProfilesData/scrapersData/best.frnds.jsm-data.json",
     "dueTasks": [
       {
-        "parentModuleName": "instaAuto",
+        "parentModuleName": "instaScraper",
         "actionName": "targetScraper",
-        "argumentsString": "ashu.samota.1612"
+        "argumentsString": "jitendra_goswami132"
       }
     ]
-  },
-  {
-    "userName": "jitendra_goswami132",
-    "password": "hhjsm001",
-    "type": "resource",
-    "postsCount": null,
-    "followersCount": null,
-    "followingsCount": null,
-    "userDataPath": "./data/instaResourcesData/jitendra_goswami132/jitendra_goswami132-data.json"
   },
   {
     "userName": "ashu.samota.1612",
     "password": "hhjsm001",
     "type": "resource",
     "postsCount": null,
+    "postsDownload": null,
+    "postsEdited": null,
+    "postsReadyToUpload": null,
     "followersCount": null,
     "followingsCount": null,
     "userDataPath": "./data/instaResourcesData/ashu.samota.1612/ashu.samota.1612-data.json"
+  },
+  {
+    "userName": "jitendra_goswami132",
+    "type": "resource",
+    "postsCount": 14,
+    "followersCount": 248,
+    "followingsCount": 697,
+    "postsDownloaded": 14,
+    "postsEdited": 14,
+    "postsReadyToUpload": 0,
+    "userDataPath": "./data/instaResourcesData/jitendra_goswami132/jitendra_goswami132-data.json",
+    "lastScrapingDate": "2025-07-01T13:15:21.693Z",
+    "lastMediaDownloadDate": "2025-07-02T02:27:10.268Z",
+    "lastMediaEditingDate": "2025-07-02T02:47:08.325Z"
   }
 ]

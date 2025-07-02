@@ -1,3 +1,5 @@
+// NOTE: this module is independent from other modules means it can be run without app the example usage without app is given in the last of script.
+
 const fs = require("fs-extra");
 const path = require("path");
 const axios = require("axios");
@@ -35,16 +37,18 @@ function getExtension(url, fallback) {
  * @param {string} userName
  * @param {object} options { stopOnError: boolean }
  */
-async function downloadUserMedia(userName, options = { stopOnError: false }) {
+async function downloadUserMedia(userName) {
+  options = { stopOnError: true };
   if (!userName) {
     console.error("No userName provided.");
     return;
   }
   const profileData = await db.readUserProfileData(userName);
-  if (!profileData || !profileData.posts) {
-    console.error("Profile data or posts not found for user:", userName);
+  if (!profileData || !profileData.posts || !("postsDownloaded" in profileData)) {
+    console.error("Profile data or posts Array not found for user:", userName);
     return;
   }
+
   const posts = profileData.posts;
   const total = posts.length;
   const userDir = profileData.userDataPath.replace(/\/[^\/]*$/, "");
@@ -75,18 +79,25 @@ async function downloadUserMedia(userName, options = { stopOnError: false }) {
       } else {
         console.log(`Unknown or unsupported post type for code: ${post.code}`);
       }
-
+      const mediaPathArr = [];
       for (const file of filesToDownload) {
-        const destPath = path.join(userMediaDir, file.filename);
-        if (fs.existsSync(destPath)) {
+        const mediaPath = path.join(userMediaDir, file.filename);
+        mediaPathArr.push(mediaPath);
+        if (profileData.posts[i].isDownloaded || fs.existsSync(mediaPath)) {
           console.log(`[SKIP] ${file.filename} already exists.`);
           continue;
         }
         console.log(`[DOWNLOAD] ${file.filename} ...`);
-        await downloadFile(file.url, destPath);
+        await downloadFile(file.url, mediaPath);
         console.log(`[DONE] ${file.filename}`);
         await new Promise((res) => setTimeout(res, 1000));
       }
+
+      if (!profileData.posts[i].isDownloaded) {
+        profileData.posts[i].isDownloaded = true;
+        profileData.posts[i].downloadDate = new Date().toISOString();
+      }
+      profileData.posts[i].mediaPathArr = [...new Set(mediaPathArr)];
     } catch (err) {
       console.error(`[ERROR] Processing post ${post.code}:`, err.message);
       if (options.stopOnError) {
@@ -97,11 +108,33 @@ async function downloadUserMedia(userName, options = { stopOnError: false }) {
     processed++;
     console.log(`Progress: ${processed}/${total} processed, ${total - processed} remaining.`);
   }
-  console.log("All posts processed.");
+  await updateDatabaseAfterDownloadingPosts(profileData);
+  console.log(`All posts processed & user data is updated.`);
 }
+// ----- Update Data-base with latest information after Downloading profile -----
+const updateDatabaseAfterDownloadingPosts = async function (profileData) {
+  const userName = profileData.userName;
+
+  // 1. Calculating how many posts are downloaded
+  profileData.postsDownloaded = profileData.posts.reduce((acc, post) => acc + (post.isDownloaded ? 1 : 0), 0);
+
+  // 2. Update allProfilesData.json
+  const allProfilesData = await db.readProfilesData();
+  const tempMiniProfileData = allProfilesData.find((profile) => profile.userName === userName);
+  tempMiniProfileData.postsDownloaded = profileData.postsDownloaded;
+  tempMiniProfileData.lastMediaDownloadDate = new Date().toISOString();
+
+  tempMiniProfileData.lastMediaDownloadDate = new Date().toISOString();
+  profileData.lastMediaDownloadDate = new Date().toISOString();
+
+  // 3. Update user's Data
+  await db.writeUserProfileData(profileData); // Updates the data of user about which post isDownloaded.
+  await db.writeProfilesData.call(this, allProfilesData);
+  return true;
+};
 
 // Example usage:
-// downloadUserMedia('ashu.samota.1612', { stopOnError: false });
-// downloadUserMedia("jitendra_goswami132", { stopOnError: false });
+// downloadUserMedia('ashu.samota.1612');
+downloadUserMedia("jitendra_goswami132");
 
 module.exports = { downloadUserMedia };

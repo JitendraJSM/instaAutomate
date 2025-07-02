@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node ./functionsLibrary/instaMediaDownloader.js",
-    "start2": "node ./index.js"
+    "start1": "node ./index.js",
+    "start2": "node ./functionsLibrary/instaMediaDownloader.js",
+    "start": "node ./functionsLibrary/instaMediaEditor.js"
   },
   "keywords": [],
   "author": "",

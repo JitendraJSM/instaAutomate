@@ -27,11 +27,16 @@ const writeProfilesData = async function (profilesData) {
 };
 
 // ==== Profile Specific Data Functions ====
-const getUserDataPathByUserName = async function (userName) {
-  const tempAllProfilesData = this?.state?.profilesData || (await readProfilesData());
+const getProfileByUserName = async function (userName) {
+  const allProfilesData = this?.state?.profilesData || (await readProfilesData());
 
-  const userDataPath = tempAllProfilesData.find((profile) => profile.userName === userName)?.userDataPath;
-  if (!userDataPath) throw new Error(`User profile with userName: ${userName} not found in profilesData.`);
+  const profile = allProfilesData.find((profile) => profile.userName === userName);
+  if (!profile) throw new Error(`There is no profile in allProfilesData.json by userName : ${userName}.`);
+  return profile;
+};
+const getUserDataPathByUserName = async function (userName) {
+  const userDataPath = (await getProfileByUserName(userName))?.userDataPath;
+  if (!userDataPath) throw new Error(`userDataPath property does not exists on ${userName}'s profile in allProfilesData.json.`);
 
   // Check if file exists
   if (!(await fs.pathExists(userDataPath))) throw new Error(`User data file does not exist for user: ${userName}, at path userDataPath: ${userDataPath}`);
@@ -49,7 +54,7 @@ const getUserDataPathByUserName = async function (userName) {
  * @throws {Error} If the userProfile object is invalid or the user data file does not exist.
  *
  * @example
- * const userData = await readUserProfileData({ userName: "john_doe", type: "agent" });
+ * const userData = await readUserProfileData(userName);
  */
 const readUserProfileData = async function (userName) {
   if (!userName) throw new Error(`userName must be provided to read user profile data.`);
@@ -67,7 +72,7 @@ const writeUserProfileData = async function (userData) {
 
   const storedUserData = await readUserProfileData.call(this, userData.userName);
   // NOTE: lastDataOverwrite doesn't means that the profile is updated, it is for caution so that if any time data get's written accidentally then it can be tracked.
-  userData = { ...storedUserData, ...userData, lastDataOverwrite: new Date().toISOString() };
+  userData = { ...storedUserData, ...userData, lastDataOverwriteDate: new Date().toISOString() };
 
   // Remove updateUserData task if exists
   userData.dueTasks && (userData.dueTasks = utils.removeDuplicates(userData.dueTasks));
@@ -91,8 +96,6 @@ const addNewProfile = async function () {
   newProfile.userName = await this.utils.askUser(`Enter user name:`);
   if (this.state.profilesData.find((profile) => profile.userName == newProfile.userName)) throw new Error(`Profile with user name: ${newProfile.userName} already exists`);
 
-  newProfile.password = await this.utils.askUser(`Enter password:`);
-
   userInput = await this.utils.askUser("Enter type of profile: 1 for 'agent', 2 for 'scrper' or 3 for 'resource': ");
   if (userInput === "1") newProfile.type = "agent";
   else if (userInput === "2") newProfile.type = "scraper";
@@ -102,6 +105,8 @@ const addNewProfile = async function () {
     if (!result) throw new Error(`Failed to add new resource profile: ${JSON.stringify(newProfile)}`);
     return;
   } else throw new Error(`Invalid input`);
+
+  newProfile.password = await this.utils.askUser(`Enter password:`);
 
   newProfile.profileTarget = await this.utils.askUser("Enter profile target: ");
   if (this.state.profilesData.find((profile) => profile.profileTarget == newProfile.profileTarget)) throw new Error(`Profile with target ${newProfile.profileTarget} already exists`);
@@ -163,9 +168,12 @@ const addNewProfile = async function () {
 
 const addNewResourceProfile = async function (newProfile) {
   const newResourceProfile = { ...newProfile };
-  newResourceProfile.postsCount = null;
-  newResourceProfile.followersCount = null;
-  newResourceProfile.followingsCount = null;
+  newResourceProfile.postsCount = 0;
+  newResourceProfile.followersCount = 0;
+  newResourceProfile.followingsCount = 0;
+  newResourceProfile.postsDownloaded = 0;
+  newResourceProfile.postsEdited = 0;
+  newResourceProfile.postsReadyToUpload = 0;
 
   newResourceProfile.userDataPath = `./data/instaResourcesData/${newResourceProfile.userName}/${newResourceProfile.userName}-data.json`;
   await fs.outputJson(newResourceProfile.userDataPath, newResourceProfile, { spaces: 2 });

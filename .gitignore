@@ -4,3 +4,6 @@ tmp.md
 logs*
 data/thisAtThisPoint.json
 currentWS.txt
+media/
+**/media/
+**/media/**
