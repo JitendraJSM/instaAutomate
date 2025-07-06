@@ -60,6 +60,7 @@ const editPostsBeforeUpload = async function (userName) {
     post.isEdited = true;
   }
   await updateDatabaseAfterEditingPosts(profileData);
+  console.log(`========= Posts Editing completed for ${userName}. =========`);
 };
 
 // ---- Video Editor Function ----
@@ -218,7 +219,4 @@ const updateDatabaseAfterEditingPosts = async function (profileData) {
   return true;
 };
 
-editPostsBeforeUpload("jitendra_goswami132");
-
-// no i want advance editing so i preffer to use scr.py in my current project, now tell me how i can use scr.py if you have any better suggestion then give me that also, what i have in mind is actually as given below:
-// 1. Create a videoEditor function in instaMediaEditor.js, this videoEditor function needs one argument that is path of video file what this function does is actually it uses the scr.py to edit video file and output video file in the same directory in which input file is stored, just rename as `edited_${originalName}`. what i need this function is mainly error handling and console output all the logs of scr.py so that in case any error occur i can detect and debug and this process should be async process so that if i want to wait process completion i can or if i want this to run in background i can use this without await. in this soltion you need to edit scr.py also so that can take path of file as argument and console logs if needed, and output the file in same dir and can run in async-await and also in background
+// editPostsBeforeUpload("jitendra_goswami132");
