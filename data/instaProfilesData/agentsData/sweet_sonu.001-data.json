@@ -1,0 +1,26 @@
+{
+  "userName": "sweet_sonu.001",
+  "type": "agent",
+  "password": "hhjsm001",
+  "profileTarget": "6",
+  "userDataPath": "./data/instaProfilesData/agentsData/sweet_sonu.001-data.json",
+  "dueTasks": [
+    {
+      "parentModuleName": "instaAuto",
+      "actionName": "updateUserData",
+      "argumentsString": true
+    },
+    {
+      "parentModuleName": "instaAuto",
+      "actionName": "follow",
+      "argumentsString": "kajalmahioffical143"
+    },
+    {
+      "parentModuleName": "instaAuto",
+      "actionName": "follow",
+      "argumentsString": "manisha.sen.25"
+    }
+  ],
+  "automatedFollow": [],
+  "lastDataOverwriteDate": "2025-07-07T14:03:05.147Z"
+}

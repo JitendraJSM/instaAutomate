@@ -5,7 +5,13 @@
     "password": "hhjsm001",
     "type": "agent",
     "userDataPath": "data/instaProfilesData/agentsData/kajalmahioffical143-data.json",
-    "dueTasks": []
+    "dueTasks": [
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "follow",
+        "argumentsString": "sweet_sonu.001"
+      }
+    ]
   },
   {
     "profileTarget": "2",
@@ -13,7 +19,13 @@
     "password": "hhjsm001",
     "type": "agent",
     "userDataPath": "data/instaProfilesData/agentsData/manisha.sen.25-data.json",
-    "dueTasks": []
+    "dueTasks": [
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "follow",
+        "argumentsString": "sweet_sonu.001"
+      }
+    ]
   },
   {
     "profileTarget": "21",
@@ -21,7 +33,13 @@
     "password": "hhjsm001",
     "type": "scraper",
     "userDataPath": "data/instaProfilesData/scrapersData/best.frnds.jsm-data.json",
-    "dueTasks": []
+    "dueTasks": [
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "follow",
+        "argumentsString": "sweet_sonu.001"
+      }
+    ]
   },
   {
     "userName": "ashu.samota.1612",
@@ -48,5 +66,30 @@
     "lastScrapingDate": "2025-07-01T13:15:21.693Z",
     "lastMediaDownloadDate": "2025-07-02T02:27:10.268Z",
     "lastMediaEditingDate": "2025-07-06T14:11:08.413Z"
+  },
+  {
+    "userName": "sweet_sonu.001",
+    "type": "agent",
+    "password": "hhjsm001",
+    "profileTarget": "6",
+    "userDataPath": "./data/instaProfilesData/agentsData/sweet_sonu.001-data.json",
+    "dueTasks": [
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "updateUserData",
+        "argumentsString": true
+      },
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "follow",
+        "argumentsString": "kajalmahioffical143"
+      },
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "follow",
+        "argumentsString": "manisha.sen.25"
+      }
+    ],
+    "automatedFollow": []
   }
 ]

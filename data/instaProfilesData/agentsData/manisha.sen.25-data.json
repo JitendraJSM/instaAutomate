@@ -7,7 +7,13 @@
     }
   ],
   "userDataPath": "data/instaProfilesData/agentsData/manisha.sen.25-data.json",
-  "dueTasks": [],
+  "dueTasks": [
+    {
+      "parentModuleName": "instaAuto",
+      "actionName": "follow",
+      "argumentsString": "sweet_sonu.001"
+    }
+  ],
   "postsCount": 1,
   "followersCount": 8,
   "followingsCount": 23,
@@ -92,7 +98,16 @@
     },
     "edges": []
   },
-  "followers": ["kajalmahioffical143", "anujroll1971", "bharat_nath_beragi", "rmu_sai_121", "hemantrajput701827", "laltu.rajwar.1460", "nawazsharif226_salon", "rizwan.idrishi.378"],
+  "followers": [
+    "kajalmahioffical143",
+    "anujroll1971",
+    "bharat_nath_beragi",
+    "rmu_sai_121",
+    "hemantrajput701827",
+    "laltu.rajwar.1460",
+    "nawazsharif226_salon",
+    "rizwan.idrishi.378"
+  ],
   "followings": [
     "kajalmahioffical143",
     "roshnigupta0075",
@@ -127,5 +142,6 @@
   "password": "hhjsm001",
   "automatedlike": [],
   "automatedcomment": [],
-  "lastDataOverwrite": "2025-06-26T17:42:23.263Z"
+  "lastDataOverwrite": "2025-06-26T17:42:23.263Z",
+  "lastDataOverwriteDate": "2025-07-07T14:03:02.340Z"
 }

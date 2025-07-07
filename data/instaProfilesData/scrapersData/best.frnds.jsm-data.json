@@ -4,7 +4,13 @@
   "password": "hhjsm001",
   "type": "scraper",
   "userDataPath": "data/instaProfilesData/scrapersData/best.frnds.jsm-data.json",
-  "dueTasks": [],
+  "dueTasks": [
+    {
+      "parentModuleName": "instaAuto",
+      "actionName": "follow",
+      "argumentsString": "sweet_sonu.001"
+    }
+  ],
   "ai_agent_type": null,
   "biography": "",
   "bio_links": [],
@@ -85,7 +91,13 @@
     },
     "edges": []
   },
-  "followers": ["itis__molex", "lami__ne__", "therocky_verma", "nanu_cute_00", "jitendra_goswami132"],
+  "followers": [
+    "itis__molex",
+    "lami__ne__",
+    "therocky_verma",
+    "nanu_cute_00",
+    "jitendra_goswami132"
+  ],
   "followings": [
     "kittu___rawat____143",
     "sunita_poswal_",
@@ -186,5 +198,5 @@
   "automatedlike": [],
   "automatedcomment": [],
   "lastUpdate": "2025-06-10T18:10:45.786Z",
-  "lastDataOverwriteDate": "2025-07-01T13:15:41.472Z"
+  "lastDataOverwriteDate": "2025-07-07T14:03:08.235Z"
 }
