@@ -21,13 +21,7 @@
     "password": "hhjsm001",
     "type": "scraper",
     "userDataPath": "data/instaProfilesData/scrapersData/best.frnds.jsm-data.json",
-    "dueTasks": [
-      {
-        "parentModuleName": "instaScraper",
-        "actionName": "targetScraper",
-        "argumentsString": "jitendra_goswami132"
-      }
-    ]
+    "dueTasks": []
   },
   {
     "userName": "ashu.samota.1612",
