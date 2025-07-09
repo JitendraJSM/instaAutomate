@@ -389,4 +389,7 @@ const targetScraper = async function (targetString) {
 targetScraper.doNotParseArgumentsString = true; // This is used to skip parsing of argumentsString as it is not needed here.
 
 const catchAsync = require("../utils/catchAsync.js");
-module.exports = { targetScraper: catchAsync(targetScraper) };
+module.exports = {
+  targetScraper: catchAsync(targetScraper),
+  scrapeMetaDataOfProfile: catchAsync(scrapeMetaDataOfProfile),
+};

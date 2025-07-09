@@ -9,7 +9,8 @@
       {
         "parentModuleName": "instaAuto",
         "actionName": "follow",
-        "argumentsString": "sweet_sonu.001"
+        "argumentsString": "sweet_sonu.001",
+        "assignedAt": "2025-07-08T13:54:38.169Z"
       }
     ]
   },
@@ -23,7 +24,8 @@
       {
         "parentModuleName": "instaAuto",
         "actionName": "follow",
-        "argumentsString": "sweet_sonu.001"
+        "argumentsString": "sweet_sonu.001",
+        "assignedAt": "2025-07-08T13:54:38.187Z"
       }
     ]
   },
@@ -37,7 +39,8 @@
       {
         "parentModuleName": "instaAuto",
         "actionName": "follow",
-        "argumentsString": "sweet_sonu.001"
+        "argumentsString": "sweet_sonu.001",
+        "assignedAt": "2025-07-08T13:54:38.206Z"
       }
     ]
   },
@@ -77,17 +80,20 @@
       {
         "parentModuleName": "instaAuto",
         "actionName": "updateUserData",
-        "argumentsString": true
+        "argumentsString": true,
+        "assignedAt": "2025-07-08T13:54:35.906Z"
       },
       {
         "parentModuleName": "instaAuto",
         "actionName": "follow",
-        "argumentsString": "kajalmahioffical143"
+        "argumentsString": "kajalmahioffical143",
+        "assignedAt": "2025-07-08T13:54:38.178Z"
       },
       {
         "parentModuleName": "instaAuto",
         "actionName": "follow",
-        "argumentsString": "manisha.sen.25"
+        "argumentsString": "manisha.sen.25",
+        "assignedAt": "2025-07-08T13:54:38.197Z"
       }
     ],
     "automatedFollow": []

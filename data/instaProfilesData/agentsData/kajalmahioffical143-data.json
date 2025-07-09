@@ -8,7 +8,8 @@
     {
       "parentModuleName": "instaAuto",
       "actionName": "follow",
-      "argumentsString": "sweet_sonu.001"
+      "argumentsString": "sweet_sonu.001",
+      "assignedAt": "2025-07-08T13:54:38.169Z"
     }
   ],
   "ai_agent_type": null,
@@ -255,5 +256,5 @@
   "automatedcomment": [],
   "lastUpdate": "2025-06-23T11:51:34.381Z",
   "lastDataOverwrite": "2025-06-26T03:09:03.026Z",
-  "lastDataOverwriteDate": "2025-07-07T14:03:00.339Z"
+  "lastDataOverwriteDate": "2025-07-08T13:54:38.172Z"
 }

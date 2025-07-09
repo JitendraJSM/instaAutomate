@@ -1,5 +1,6 @@
 const fs = require("fs-extra");
 const utils = require("../utils/utils.js");
+const instaScraper = require("./instaScraper.js");
 // ====== Flow ======
 /* 
 1. Read profilesData.json file.
@@ -51,7 +52,7 @@ const updateUserData = async function (needUpadte) {
   if (needUpadte) {
     console.log(`UserData of ${this.state.currentProfile.userName} needs to be updated.`);
 
-    const scrapedUserData = await scrapeUserData.call(this, this.state.currentProfile.userName);
+    const scrapedUserData = await instaScraper.scrapeMetaDataOfProfile.call(this, this.state.currentProfile.userName);
 
     this.state.currentProfile.postsCount = scrapedUserData.edge_owner_to_timeline_media.count;
     this.state.currentProfile.followersCount = scrapedUserData.edge_followed_by.count;

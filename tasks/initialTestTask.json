@@ -1,5 +1,9 @@
 [
   {
+    "parentModuleName": "testFunctionModule",
+    "actionName": "testFunction"
+  },
+  {
     "parentModuleName": "instaScraper",
     "actionName": "readResourceData",
     "argumentsString": "its_cute_girl__85"

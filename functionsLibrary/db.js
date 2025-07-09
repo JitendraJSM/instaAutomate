@@ -200,6 +200,7 @@ const addDueTask = async function (userName, dueTaskObj) {
 
       const userData = await readUserProfileData.call(this, userName);
 
+      dueTaskObj.assignedAt = new Date().toISOString();
       userData.dueTasks.push(dueTaskObj);
 
       await writeUserProfileData.call(this, userData);
@@ -278,6 +279,7 @@ const updateDatabaseOnFollow = async function (userObject) {
 
   this.state.currentProfile = await readUserProfileData.call(this, this.state.currentProfile.userName);
 
+  // TODO: Just get the task from current Action don't need to use .find() method
   const currentfollowDueTask = this.state.currentProfile.dueTasks.find((task) => task.argumentsString === userObject.userName && task.actionName === "follow");
   if (!currentfollowDueTask) throw new Error(`currentfollowDueTask {"argumentsString"===${userObject.userName}, "actionName" === "follow"} not found in ${JSON.stringify(this.state.currentProfile)}`);
   await removeDueTask.call(this, this.state.currentProfile.userName, currentfollowDueTask);

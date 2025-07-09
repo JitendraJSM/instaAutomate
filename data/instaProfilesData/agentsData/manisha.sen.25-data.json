@@ -11,7 +11,8 @@
     {
       "parentModuleName": "instaAuto",
       "actionName": "follow",
-      "argumentsString": "sweet_sonu.001"
+      "argumentsString": "sweet_sonu.001",
+      "assignedAt": "2025-07-08T13:54:38.187Z"
     }
   ],
   "postsCount": 1,
@@ -143,5 +144,5 @@
   "automatedlike": [],
   "automatedcomment": [],
   "lastDataOverwrite": "2025-06-26T17:42:23.263Z",
-  "lastDataOverwriteDate": "2025-07-07T14:03:02.340Z"
+  "lastDataOverwriteDate": "2025-07-08T13:54:38.190Z"
 }

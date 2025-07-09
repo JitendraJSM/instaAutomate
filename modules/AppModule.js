@@ -21,6 +21,7 @@ const devOrTest = require("../functionsLibrary/devOrTest.js");
 const instaAuto = require("../functionsLibrary/instaAuto.js");
 const db = require("../functionsLibrary/db.js");
 const instaScraper = require("../functionsLibrary/instaScraper.js");
+const testFunctionModule = require("../functionsLibrary/testFunctionModule.js");
 
 class App extends EventEmitter {
   constructor() {
@@ -32,6 +33,7 @@ class App extends EventEmitter {
     this.instaAuto = instaAuto;
     this.db = db;
     this.instaScraper = instaScraper;
+    this.testFunctionModule = testFunctionModule;
 
     // == Modules ==
     this.monitor = new Monitor();
