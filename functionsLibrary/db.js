@@ -1,4 +1,5 @@
 const fs = require("fs-extra");
+const path = require("path");
 const utils = require("../utils/utils.js");
 
 // ======= Constants =======
@@ -6,6 +7,96 @@ const botWorkShiftHours = 16;
 
 const dayMs = 24 * 60 * 60 * 1000;
 const hourMs = 60 * 60 * 1000;
+const LOGS_DIR = path.join(__dirname, "../data/logs");
+
+// ==== Task History json ====
+const generateFileName = (date) => {
+  return `tasksHistory_${date.getDate().toString().padStart(2, "0")}_${(date.getMonth() + 1).toString().padStart(2, "0")}_${date.getFullYear().toString().slice(-2)}.json`;
+};
+
+// ==== Task History json ====
+const readTaskHistrory = async function (date = new Date()) {
+  const fileName = generateFileName(date);
+
+  const filePath = path.join(LOGS_DIR, fileName);
+
+  if (!fs.existsSync(filePath)) throw new Error(`${fileName} does not exist.`);
+  const tasksHistory = JSON.parse(await fs.readFile(filePath, "utf8"));
+  return tasksHistory;
+};
+
+const writeTasksHistory = async function (tasksHistory, overwrite = false) {
+  if (!tasksHistory || !Array.isArray(tasksHistory)) {
+    throw new Error("tasksHistory must be an array");
+  }
+
+  const date = tasksHistory.length > 0 && tasksHistory[0]?.completedAt ? new Date(tasksHistory[0].completedAt) : new Date();
+
+  const fileName = generateFileName(date);
+  const filePath = path.join(LOGS_DIR, fileName);
+
+  // Ensure logs directory exists
+  await fs.ensureDir(LOGS_DIR);
+
+  if (!overwrite && fs.existsSync(filePath)) {
+    throw new Error(`${fileName} already exists.`);
+  }
+
+  await fs.writeFile(filePath, JSON.stringify(tasksHistory, null, 2));
+  return true;
+};
+
+/**
+ * Adds one or more completed tasks to the task history log file.
+ *
+ * Handles both single task objects and arrays of task objects. Ensures the log directory exists,
+ * creates a new log file for the date if it doesn't exist, reads the existing task history,
+ * appends the new tasks, and writes the updated history back to the file.
+ *
+ * @async
+ * @function
+ * @param {Object|Object[]} tasks - A single task object or an array of task objects to be logged as completed.
+ * @returns {Promise<boolean>} Resolves to true if tasks are successfully added to the log.
+ * @throws {Error} Throws an error if reading or writing the task history fails.
+ * @example
+ * // Add a single completed task
+ * await pushCompletedTask.call(this, { "parentModuleName": "instaAuto", "actionName": "follow", "argumentsString": "kajalmahioffical143","assignedAt": "2025-07-08T13:54:38.178Z" });
+ *
+ * @example
+ * // Add multiple completed tasks
+ * await pushCompletedTask.call(this, [
+ *   { "parentModuleName": "instaAuto", "actionName": "follow", "argumentsString": "kajalmahioffical143", "assignedAt": "2025-07-08T13:54:38.178Z" },
+ *   { "parentModuleName": "instaAuto", "actionName": "follow", "argumentsString": "manisha.sen.25", "assignedAt": "2025-07-08T13:54:38.197Z" }
+ * ]);
+ */
+const pushCompletedTask = async function (tasks) {
+  // As task can be an object or array of objects it is not easy to check for task validation
+  let tasksArray = !Array.isArray(tasks) ? [tasks] : tasks;
+  const date = tasksArray.length > 0 && tasksArray[0]?.completedAt ? new Date(tasksArray[0].completedAt) : new Date();
+
+  const fileName = generateFileName(date);
+  const filePath = path.join(LOGS_DIR, fileName);
+
+  // Ensure logs directory exists
+  await fs.ensureDir(LOGS_DIR);
+
+  // If file doesn't exist, create it with empty array
+  if (!fs.existsSync(filePath)) {
+    await writeTasksHistory([], false);
+  }
+
+  // Read existing tasks, add new ones, and write back
+  try {
+    const tasksHistory = await readTaskHistrory(date);
+    tasksArray.forEach((task) => (task.currentProfile = this.currentProfile.userName));
+    const updatedTasksHistory = [...tasksHistory, ...tasksArray];
+    await writeTasksHistory(updatedTasksHistory, true);
+    return true;
+  } catch (error) {
+    console.error(`Error pushing completed tasks: ${error.message}`);
+    throw error;
+  }
+};
 
 // ==== All Profiles Data Functions ====
 const readProfilesData = async () => JSON.parse(await fs.readFile("./data/allProfilesData.json"));
@@ -188,6 +279,13 @@ const addNewResourceProfile = async function (newProfile) {
 };
 
 // ==== Task's Specific Data Functions ====
+const removeDuplicatesFormDueTasksArray = (dueTasksArr) =>
+  utils.removeDuplicates(
+    dueTasksArr,
+    ["parentModuleName", "actionName", "argumentsString"],
+    "assignedAt" // If you want to keep the latest assignedAt, otherwise omit this argument
+  );
+
 // NOTE: addDueTask() adds due task in the data file of that userName it doesn't update the memory.
 const addDueTask = async function (userName, dueTaskObj) {
   console.log(`Adding due task for user: ${userName}, ${JSON.stringify(dueTaskObj)}`);
@@ -197,11 +295,13 @@ const addDueTask = async function (userName, dueTaskObj) {
   for (const profile of profilesData) {
     if (profile.userName === `${userName}` && profile.type !== "resource") {
       profile.dueTasks.push(dueTaskObj);
+      profile.dueTasks = removeDuplicatesFormDueTasksArray(profile.dueTasks);
 
       const userData = await readUserProfileData.call(this, userName);
 
       dueTaskObj.assignedAt = new Date().toISOString();
       userData.dueTasks.push(dueTaskObj);
+      userData.dueTasks = removeDuplicatesFormDueTasksArray(userData.dueTasks);
 
       await writeUserProfileData.call(this, userData);
       await writeProfilesData(profilesData);
@@ -218,8 +318,12 @@ const removeDueTask = async function (userName, dueTaskObj) {
 
   for (const profile of profilesData) {
     if (profile.userName === userName && profile.type !== "resource") {
+      profile.dueTasks = removeDuplicatesFormDueTasksArray(profile.dueTasks);
+
       // 1. find the index of dueTaskObj in profile.dueTasks
-      const index = profile.dueTasks.findIndex((task) => JSON.stringify(task) === JSON.stringify(dueTaskObj));
+      const index = profile.dueTasks.findIndex(
+        (task) => task.parentModuleName === dueTaskObj.parentModuleName && task.actionName === dueTaskObj.actionName && task.argumentsString === dueTaskObj.argumentsString
+      );
       // 2. If index is -1 then break the loop and throw error that dueTaskObj for userName is not found, else remove it
       if (index === -1) {
         throw new Error(`This particular due task ${JSON.stringify(dueTaskObj)} for user: ${userName} not found in profilesData.`);
@@ -228,16 +332,30 @@ const removeDueTask = async function (userName, dueTaskObj) {
 
       // 3. Update user-specific data file
       const userData = await readUserProfileData(userName);
+      userData.dueTasks = removeDuplicatesFormDueTasksArray(userData.dueTasks);
 
-      const dueTaskIndex = userData.dueTasks.findIndex((task) => JSON.stringify(task) === JSON.stringify(dueTaskObj));
+      const dueTaskIndex = userData.dueTasks.findIndex(
+        (task) => task.parentModuleName === dueTaskObj.parentModuleName && task.actionName === dueTaskObj.actionName && task.argumentsString === dueTaskObj.argumentsString
+      );
       if (dueTaskIndex === -1) {
-        throw new Error(`This particular due task ${JSON.stringify(dueTaskObj)} for user: ${userName} doesn't exists in file ${dataPath}.`);
+        throw new Error(`This particular due task ${JSON.stringify(dueTaskObj)} for user: ${userName} doesn't exists in file ${userData.userDataPath}.`);
       }
+
+      // When the task get completed
+      dueTaskObj.completeAt = new Date().toISOString();
+
+      if (!userData?.completedTasks) userData.completedTasks = [];
+      userData.completedTasks.push(dueTaskObj);
+
       userData.dueTasks.splice(dueTaskIndex, 1);
 
-      // 4. Write the updated userData to the file
+      // 4. Add completed Task to ./data/logs/taskHistory_dd_mm_yy.json
+      await pushCompletedTask.call(this, dueTaskObj);
+
+      // 5. Write the updated userData to the file
       await writeUserProfileData.call(this, userData);
-      // 5. Write the updated profilesData to the file
+
+      // 6. Write the updated profilesData to the file
       await writeProfilesData(profilesData);
 
       return true;
@@ -247,16 +365,7 @@ const removeDueTask = async function (userName, dueTaskObj) {
   console.log(`Removed task for user: ${userName}`);
 };
 
-const removeDuplicatesFormAutomatedFollowArray = function (arr) {
-  const map = new Map();
-  for (const item of arr) {
-    const d = new Date(item.date);
-    const entry = map.get(item.userName);
-    if (!entry || d > entry[1]) map.set(item.userName, [item, d]);
-  }
-  arr = Array.from(map.values(), ([item]) => item);
-  return arr;
-};
+const removeDuplicatesFormAutomatedFollowArray = (arr) => utils.removeDuplicates(arr, ["userName"], "date");
 
 const updateDatabaseOnFollow = async function (userObject) {
   console.log(`Adding ${JSON.stringify(userObject)} to ${this.state.currentProfile.userName}.automatedFollow: [].`);
@@ -367,6 +476,9 @@ module.exports = {
   updateDatabaseOnFollow: catchAsync(updateDatabaseOnFollow),
   addNewProfile: catchAsync(addNewProfile),
   filterProfilesToAutomate: catchAsync(filterProfilesToAutomate),
+  readTaskHistrory,
+  writeTasksHistory,
+  pushCompletedTask,
 };
 
 // 1. Imports

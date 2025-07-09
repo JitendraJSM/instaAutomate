@@ -156,11 +156,32 @@ async function log(message) {
 exports.log = log;
 
 /**
- * Removes duplicate objects from an array by comparing their JSON string representations
- * @param {Array<Object>} tasks - Array of task objects to deduplicate
- * @returns {Array<Object>} Array with duplicate objects removed
+ * Removes duplicates from an array of objects based on specified key fields.
+ * If keyFields is not provided, all fields are used as the key.
+ * Optionally, keeps the latest entry based on a date field.
+ *
+ * @param {Array} arr - The array to deduplicate.
+ * @param {Array} [keyFields] - The fields to use as the unique key. If not provided, all fields are used.
+ * @param {String} [latestField] - Optional. The field to use to keep the latest entry.
+ * @returns {Array} - Deduplicated array.
  */
-const removeDuplicates = (tasks) => tasks.filter((task, index, self) => index === self.findIndex((t) => JSON.stringify(t) === JSON.stringify(task)));
+function removeDuplicates(arr, keyFields, latestField) {
+  const map = new Map();
+  for (const item of arr) {
+    // If keyFields not provided, use all keys of the object
+    const fields = keyFields && keyFields.length ? keyFields : Object.keys(item).sort(); // sort for consistent key order
+    const key = fields.map((f) => String(item[f])).join("|");
+    if (!map.has(key)) {
+      map.set(key, item);
+    } else if (latestField) {
+      const existing = map.get(key);
+      if (new Date(item[latestField]) > new Date(existing[latestField])) {
+        map.set(key, item);
+      }
+    }
+  }
+  return Array.from(map.values());
+}
 exports.removeDuplicates = removeDuplicates;
 
 // --------------------------------------------------------------
