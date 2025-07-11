@@ -90,6 +90,7 @@ const scrapeMetaDataOfProfile = async function (userName) {
 };
 
 // ----- Creates config by compairing alreadyExistedProfileData and scrapedMetaData -----
+// TODO: Shift getInstaProfileScraperConfig() to restrictor.js
 const getInstaProfileScraperConfig = async function () {
   // 1. needFollowers
   const followersDifference = this.state.targetToScrape.latestScrapedMetaData.edge_followed_by.count - (this.state.targetToScrape.alreadyExistedProfileData?.followers?.length || 0);
@@ -327,6 +328,19 @@ const scrapeProfilePosts = async function () {
   return true;
 };
 
+// ----- Scrape all Datails of a Post (MetaData, likers, Comments) -----
+const scrapeInstaPost = async function () {
+  // 1. Check  if ever this postURL scraped before, (Check if data file for this url exists or not.)
+  // 2. If exists
+  //      2.1  Read already existsed scraped data of that post
+  //      2.2  After reading and storing that data on this.state.alreadyScrapedPostData call restrictor.js to confirm what to scrape and what not to scrape, is required data already scraped or not.
+  // 3. If not exists then create a new base file for data of a post
+  // 4. Navigate to that postURL
+  // 5. Use page.waitForResponse() to scrape meta data of post with timeout, if not completed then again page.waitForResponse() and reload page again, do this until you get the results.
+  // 6. Store meta data on this.state.latestScrapedMetaData and call again restricor.js  and wait for resultObj.
+  //      - resultObj {noOfLikers, noOfLikersScraped, noOfLikersToBeScraped, noOfComments, noOfComments, noOfCommentsToBeScraped }
+};
+
 // ----- Update Data-base with latest information after scraping profile -----
 const updateDatabaseAfterProfileScraping = async function () {
   const userName = this.state.targetToScrape.targetString;
@@ -384,6 +398,7 @@ const targetScraper = async function (targetString) {
   this.state.targetToScrape = { targetString };
   this.state.targetToScrape.targetStringType = await targetStringAnalyzer.call(this, this.state.targetToScrape.targetString);
   if (this.state.targetToScrape.targetStringType === "userName") await scrapeInstaProfile.call(this);
+  if (this.state.targetToScrape.targetStringType === "postUrl") await scrapeInstaPost.call(this);
   console.log(`-=-=- Target Scraping Completed. -=-=-`);
 };
 targetScraper.doNotParseArgumentsString = true; // This is used to skip parsing of argumentsString as it is not needed here.
