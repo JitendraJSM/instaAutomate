@@ -10,6 +10,12 @@
       "actionName": "follow",
       "argumentsString": "sweet_sonu.001",
       "assignedAt": "2025-07-08T13:54:38.169Z"
+    },
+    {
+      "parentModuleName": "instaAuto",
+      "actionName": "updateUserData",
+      "argumentsString": true,
+      "assignedAt": "2025-07-10T13:32:29.156Z"
     }
   ],
   "ai_agent_type": null,
@@ -249,6 +255,14 @@
     {
       "userName": "manisha.sen.25",
       "date": "2025-06-23T03:46:14.707Z"
+    },
+    {
+      "userName": "ashu.samota.1612",
+      "date": "2025-07-10T13:31:07.374Z"
+    },
+    {
+      "userName": "best.frnds.jsm",
+      "date": "2025-07-10T13:32:24.226Z"
     }
   ],
   "automatedUnfollow": [],
@@ -256,5 +270,23 @@
   "automatedcomment": [],
   "lastUpdate": "2025-06-23T11:51:34.381Z",
   "lastDataOverwrite": "2025-06-26T03:09:03.026Z",
-  "lastDataOverwriteDate": "2025-07-08T13:54:38.172Z"
+  "lastDataOverwriteDate": "2025-07-10T13:32:29.177Z",
+  "completedTasks": [
+    {
+      "parentModuleName": "instaAuto",
+      "actionName": "follow",
+      "argumentsString": "ashu.samota.1612",
+      "assignedAt": "2025-07-08T13:54:38.169Z",
+      "completeAt": "2025-07-10T13:31:10.922Z",
+      "currentProfile": "kajalmahioffical143"
+    },
+    {
+      "parentModuleName": "instaAuto",
+      "actionName": "follow",
+      "argumentsString": "best.frnds.jsm",
+      "assignedAt": "2025-07-08T13:54:38.169Z",
+      "completeAt": "2025-07-10T13:32:29.171Z",
+      "currentProfile": "kajalmahioffical143"
+    }
+  ]
 }

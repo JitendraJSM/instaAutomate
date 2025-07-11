@@ -88,7 +88,8 @@ const pushCompletedTask = async function (tasks) {
   // Read existing tasks, add new ones, and write back
   try {
     const tasksHistory = await readTaskHistrory(date);
-    tasksArray.forEach((task) => (task.currentProfile = this.currentProfile.userName));
+
+    if (tasksArray.length > 0) tasksArray.forEach((task) => (task.currentProfile = this.state.currentProfile.userName));
     const updatedTasksHistory = [...tasksHistory, ...tasksArray];
     await writeTasksHistory(updatedTasksHistory, true);
     return true;

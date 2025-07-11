@@ -7,25 +7,38 @@
   "dueTasks": [
     {
       "parentModuleName": "instaAuto",
+      "actionName": "follow",
+      "argumentsString": "bad.8323",
+      "assignedAt": "2025-07-10T13:33:55.374Z"
+    },
+    {
+      "parentModuleName": "instaAuto",
+      "actionName": "follow",
+      "argumentsString": "arman7168khan",
+      "assignedAt": "2025-07-10T13:33:55.374Z"
+    },
+    {
+      "parentModuleName": "instaAuto",
       "actionName": "updateUserData",
       "argumentsString": true,
-      "assignedAt": "2025-07-08T13:54:35.906Z"
-    },
-    {
-      "parentModuleName": "instaAuto",
-      "actionName": "follow",
-      "argumentsString": "kajalmahioffical143",
-      "assignedAt": "2025-07-08T13:54:38.178Z"
-    },
-    {
-      "parentModuleName": "instaAuto",
-      "actionName": "follow",
-      "argumentsString": "manisha.sen.25",
-      "assignedAt": "2025-07-08T13:54:38.197Z"
+      "assignedAt": "2025-07-11T21:10:01.874Z"
     }
   ],
-  "automatedFollow": [],
-  "lastDataOverwriteDate": "2025-07-08T14:04:57.268Z",
+  "automatedFollow": [
+    {
+      "userName": "kajalmahioffical143",
+      "date": "2025-07-10T11:46:24.072Z"
+    },
+    {
+      "userName": "manisha.sen.25",
+      "date": "2025-07-10T13:28:38.243Z"
+    },
+    {
+      "userName": "veeranna_nani_25",
+      "date": "2025-07-11T21:10:01.856Z"
+    }
+  ],
+  "lastDataOverwriteDate": "2025-07-11T21:11:58.150Z",
   "ai_agent_type": null,
   "biography": "",
   "bio_links": [],
@@ -106,8 +119,71 @@
     "edges": []
   },
   "postsCount": 0,
-  "followersCount": 4,
-  "followingsCount": 4,
+  "followersCount": 5,
+  "followingsCount": 7,
   "mutualFollowersCount": 0,
-  "lastUpdate": "2025-07-08T14:04:57.261Z"
+  "lastUpdate": "2025-07-11T21:04:29.060Z",
+  "completedTasks": [
+    {
+      "parentModuleName": "instaAuto",
+      "actionName": "updateUserData",
+      "argumentsString": true,
+      "completeAt": "2025-07-10T11:45:42.954Z",
+      "currentProfile": "sweet_sonu.001"
+    },
+    {
+      "parentModuleName": "instaAuto",
+      "actionName": "follow",
+      "argumentsString": "kajalmahioffical143",
+      "assignedAt": "2025-07-08T13:54:38.178Z",
+      "completeAt": "2025-07-10T11:50:04.987Z",
+      "currentProfile": "sweet_sonu.001"
+    },
+    {
+      "parentModuleName": "instaAuto",
+      "actionName": "updateUserData",
+      "argumentsString": true,
+      "completeAt": "2025-07-10T13:28:57.606Z",
+      "currentProfile": "sweet_sonu.001"
+    },
+    {
+      "parentModuleName": "instaAuto",
+      "actionName": "follow",
+      "argumentsString": "veeranna_nani_25",
+      "assignedAt": "2025-07-10T13:33:55.374Z",
+      "completeAt": "2025-07-10T14:42:00.046Z",
+      "currentProfile": "sweet_sonu.001"
+    },
+    {
+      "parentModuleName": "instaAuto",
+      "actionName": "follow",
+      "argumentsString": "veeranna_nani_25",
+      "assignedAt": "2025-07-10T13:33:55.374Z",
+      "completeAt": "2025-07-11T20:45:00.566Z",
+      "currentProfile": "sweet_sonu.001"
+    },
+    {
+      "parentModuleName": "instaAuto",
+      "actionName": "follow",
+      "argumentsString": "veeranna_nani_25",
+      "assignedAt": "2025-07-10T13:33:55.374Z",
+      "completeAt": "2025-07-11T20:55:16.811Z",
+      "currentProfile": "sweet_sonu.001"
+    },
+    {
+      "parentModuleName": "instaAuto",
+      "actionName": "updateUserData",
+      "argumentsString": true,
+      "completeAt": "2025-07-11T21:04:29.073Z",
+      "currentProfile": "sweet_sonu.001"
+    },
+    {
+      "parentModuleName": "instaAuto",
+      "actionName": "follow",
+      "argumentsString": "veeranna_nani_25",
+      "assignedAt": "2025-07-10T13:33:55.374Z",
+      "completeAt": "2025-07-11T21:11:53.557Z",
+      "currentProfile": "sweet_sonu.001"
+    }
+  ]
 }

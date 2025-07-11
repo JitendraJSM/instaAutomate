@@ -42,15 +42,15 @@ function parseArguments(argumentsString) {
   return parsedArguments;
 }
 async function verifyPreCondition(preCondition) {
-  let evaluatePerCondition = async function (preCondition) {
+  let evaluatePreCondition = async function (preCondition) {
     let preConditionResult = false;
-    console.log(`preCondition for action: ${this.currentAction.actionName} exists as : ${preCondition}`);
+    console.log(`preCondition for action: ${this.currentAction.actionName} exists as : ${preCondition.name}`);
 
     if (typeof preCondition === "string" && !!this.page) {
-      console.log(`preCondition is a string and page is defined.`);
+      console.log(`preCondition for action: ${this.currentAction.actionName} is a string and page is defined.`);
       preConditionResult = this.page.url() === preCondition || this.page.url().includes(preCondition);
     } else {
-      console.log(`preCondition is a function as below.\n preCondition: ${preCondition.toString()}`);
+      console.log(`preCondition for action: ${this.currentAction.actionName} is a function named as ${preCondition.name}`);
       preConditionResult = await preCondition.call(this);
     }
     if (!preConditionResult) {
@@ -62,9 +62,9 @@ async function verifyPreCondition(preCondition) {
     }
     return preConditionResult;
   };
-  evaluatePerCondition = evaluatePerCondition.bind(this);
+  evaluatePreCondition = evaluatePreCondition.bind(this);
   await this.monitor.robustPolling(
-    evaluatePerCondition,
+    evaluatePreCondition,
     {
       infintiePolling: true, // Keep asking until user enters 'y'
       waitForFunctionCompletion: true, // Will wait for function to complete before next attempt
@@ -122,8 +122,6 @@ async function executeAction(actionDetails) {
 
     // console.log(`parsed args: ${parsedArgs}`);
     // console.log(`Array.isArray parsed args: ${Array.isArray(parsedArgs)}`);
-
-    // Check the preCondition if they exist
 
     if (preCondition) {
       await verifyPreCondition.call(this, preCondition);

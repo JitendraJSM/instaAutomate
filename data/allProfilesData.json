@@ -1,20 +1,5 @@
 [
   {
-    "profileTarget": "22",
-    "userName": "kajalmahioffical143",
-    "password": "hhjsm001",
-    "type": "agent",
-    "userDataPath": "data/instaProfilesData/agentsData/kajalmahioffical143-data.json",
-    "dueTasks": [
-      {
-        "parentModuleName": "instaAuto",
-        "actionName": "follow",
-        "argumentsString": "sweet_sonu.001",
-        "assignedAt": "2025-07-08T13:54:38.169Z"
-      }
-    ]
-  },
-  {
     "profileTarget": "2",
     "userName": "manisha.sen.25",
     "password": "hhjsm001",
@@ -23,9 +8,24 @@
     "dueTasks": [
       {
         "parentModuleName": "instaAuto",
-        "actionName": "follow",
-        "argumentsString": "sweet_sonu.001",
-        "assignedAt": "2025-07-08T13:54:38.187Z"
+        "actionName": "updateUserData",
+        "argumentsString": true,
+        "assignedAt": "2025-07-10T13:33:55.374Z"
+      }
+    ]
+  },
+  {
+    "profileTarget": "22",
+    "userName": "kajalmahioffical143",
+    "password": "hhjsm001",
+    "type": "agent",
+    "userDataPath": "data/instaProfilesData/agentsData/kajalmahioffical143-data.json",
+    "dueTasks": [
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "updateUserData",
+        "argumentsString": true,
+        "assignedAt": "2025-07-10T13:31:10.907Z"
       }
     ]
   },
@@ -79,21 +79,21 @@
     "dueTasks": [
       {
         "parentModuleName": "instaAuto",
+        "actionName": "follow",
+        "argumentsString": "bad.8323",
+        "assignedAt": "2025-07-10T13:33:55.374Z"
+      },
+      {
+        "parentModuleName": "instaAuto",
+        "actionName": "follow",
+        "argumentsString": "arman7168khan",
+        "assignedAt": "2025-07-10T13:33:55.374Z"
+      },
+      {
+        "parentModuleName": "instaAuto",
         "actionName": "updateUserData",
         "argumentsString": true,
-        "assignedAt": "2025-07-08T13:54:35.906Z"
-      },
-      {
-        "parentModuleName": "instaAuto",
-        "actionName": "follow",
-        "argumentsString": "kajalmahioffical143",
-        "assignedAt": "2025-07-08T13:54:38.178Z"
-      },
-      {
-        "parentModuleName": "instaAuto",
-        "actionName": "follow",
-        "argumentsString": "manisha.sen.25",
-        "assignedAt": "2025-07-08T13:54:38.197Z"
+        "assignedAt": "2025-07-11T21:10:01.874Z"
       }
     ],
     "automatedFollow": []

@@ -1,5 +1,17 @@
 [
   {
+    "parentModuleName": "db",
+    "actionName": "readProfilesData"
+  },
+  {
+    "parentModuleName": "db",
+    "actionName": "addNewProfile"
+  },
+  {
+    "parentModuleName": "db",
+    "actionName": "filterProfilesToAutomate"
+  },
+  {
     "parentModuleName": "testFunctionModule",
     "actionName": "testFunction"
   },

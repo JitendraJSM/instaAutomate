@@ -1,6 +1,7 @@
 const fs = require("fs-extra");
 const utils = require("../utils/utils.js");
 const instaScraper = require("./instaScraper.js");
+const restrictor = require("./restrictor.js");
 // ====== Flow ======
 /* 
 1. Read profilesData.json file.
@@ -94,6 +95,11 @@ const goInstaHome = async function () {
 };
 
 const follow = async function (userName, likeOptions) {
+  if ((await restrictor.isDueTaskApprovedToPerform.call(this)) === "not Allowed") {
+    console.log(`More Follow due Tasks by ${this.state.currentProfile.userName} are not allowed, so returning true as done. `);
+    return true;
+  }
+  this.counter++;
   await goInstaHome.call(this);
   await this.page.clickNotClickable('[aria-label="Search"]');
   await this.page.clickNotClickable('input[aria-label="Search input"]');
@@ -141,6 +147,7 @@ const follow = async function (userName, likeOptions) {
   return true;
 };
 follow.doNotParseArgumentsString = true;
+// follow.preCondition = restrictor.isDueTaskApprovedToPerform;
 
 const like = async function (likeOptions) {
   const { userName, minNumberOfPostsToLike = 1, maxNumberOfPostsToLike = 5 } = likeOptions;

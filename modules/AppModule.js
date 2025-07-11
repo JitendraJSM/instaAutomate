@@ -48,6 +48,7 @@ class App extends EventEmitter {
     this.state = {};
     this.isApp = true; // Flag to identify this as an App instance
     // console.log(`Your Automation-App (i.e. app) Instanciated.`);
+    this.counter = 1;
   }
 
   async init() {
