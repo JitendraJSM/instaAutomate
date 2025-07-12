@@ -333,12 +333,22 @@ const scrapeInstaPost = async function () {
   // 1. Check  if ever this postURL scraped before, (Check if data file for this url exists or not.)
   // 2. If exists
   //      2.1  Read already existsed scraped data of that post
-  //      2.2  After reading and storing that data on this.state.alreadyScrapedPostData call restrictor.js to confirm what to scrape and what not to scrape, is required data already scraped or not.
+  //      2.2  After reading and storing that data on this.state.alreadyScrapedPostData call restrictor.js to confirm lastScrapingDate for data is already scraped or not.
   // 3. If not exists then create a new base file for data of a post
   // 4. Navigate to that postURL
   // 5. Use page.waitForResponse() to scrape meta data of post with timeout, if not completed then again page.waitForResponse() and reload page again, do this until you get the results.
-  // 6. Store meta data on this.state.latestScrapedMetaData and call again restricor.js  and wait for resultObj.
+  // 6. Store meta data on this.state.latestScrapedMetaData and call again restricor.js to compare and to confirm what to scrape and what not to scrape, is required data already scraped or not and wait for resultObj.
   //      - resultObj {noOfLikers, noOfLikersScraped, noOfLikersToBeScraped, noOfComments, noOfComments, noOfCommentsToBeScraped }
+  // 7. Update the metaData in file.
+  // 8. For scraping Likers userName from list & all the comments from comments list use the similar methodology that used in "scrapeProfilePosts" function to scrape all posts,
+  // 9. Let me try to explain that methodology
+  // 9.1   function scrapeLikersOfPost
+  //          1. Check is Approved & get resultObj
+  //          2. Check postUrl Page is opened
+  //          3. Define "extractLikersFromResponse"   i.e. Scrape userName of likers from response
+  //          4. Define a Filter function to filter requests similar to "postsScrapingFilterFn"
+  //          5. Define a Handler function that handles the responses of filtered requests similar to "postsScrapingHandlerFn" function
+  //          6. Remaining logic of "scrapeLikersOfPost" should be similar to logic of "scrapeProfilePosts" so that this function scrapes all userNames from a response then scroll down so next request gets triggered only after first response get processed / scraped.
 };
 
 // ----- Update Data-base with latest information after scraping profile -----
