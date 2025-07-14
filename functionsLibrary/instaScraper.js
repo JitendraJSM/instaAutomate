@@ -329,28 +329,100 @@ const scrapeProfilePosts = async function () {
 };
 
 // ----- Scrape all Datails of a Post (MetaData, likers, Comments) -----
-const scrapeInstaPost = async function () {
-  // 1. Check  if ever this postURL scraped before, (Check if data file for this url exists or not.)
-  // 2. If exists
-  //      2.1  Read already existsed scraped data of that post
-  //      2.2  After reading and storing that data on this.state.alreadyScrapedPostData call restrictor.js to confirm lastScrapingDate for data is already scraped or not.
-  // 3. If not exists then create a new base file for data of a post
-  // 4. Navigate to that postURL
-  // 5. Use page.waitForResponse() to scrape meta data of post with timeout, if not completed then again page.waitForResponse() and reload page again, do this until you get the results.
-  // 6. Store meta data on this.state.latestScrapedMetaData and call again restricor.js to compare and to confirm what to scrape and what not to scrape, is required data already scraped or not and wait for resultObj.
-  //      - resultObj {noOfLikers, noOfLikersScraped, noOfLikersToBeScraped, noOfComments, noOfComments, noOfCommentsToBeScraped }
-  // 7. Update the metaData in file.
-  // 8. For scraping Likers userName from list & all the comments from comments list use the similar methodology that used in "scrapeProfilePosts" function to scrape all posts,
-  // 9. Let me try to explain that methodology
-  // 9.1   function scrapeLikersOfPost
-  //          1. Check is Approved & get resultObj
-  //          2. Check postUrl Page is opened
-  //          3. Define "extractLikersFromResponse"   i.e. Scrape userName of likers from response
-  //          4. Define a Filter function to filter requests similar to "postsScrapingFilterFn"
-  //          5. Define a Handler function that handles the responses of filtered requests similar to "postsScrapingHandlerFn" function
-  //          6. Remaining logic of "scrapeLikersOfPost" should be similar to logic of "scrapeProfilePosts" so that this function scrapes all userNames from a response then scroll down so next request gets triggered only after first response get processed / scraped.
-};
+// const scrapeInstaPost = async function () {
+//   // 1. Check  if ever this postURL scraped before, (Check if data file for this url exists or not.)
+//   // 2. If exists
+//   //      2.1  Read already existsed scraped data of that post
+//   //      2.2  After reading and storing that data on this.state.alreadyScrapedPostData call restrictor.js to confirm lastScrapingDate for data is already scraped or not.
+//   // 3. If not exists then create a new base file for data of a post
+//   // 4. Navigate to that postURL
+//   // 5. Use page.waitForResponse() to scrape meta data of post with timeout, if not completed then again page.waitForResponse() and reload page again, do this until you get the results.
+//   // 6. Store meta data on this.state.latestScrapedMetaData and call again restricor.js to compare and to confirm what to scrape and what not to scrape, is required data already scraped or not and wait for resultObj.
+//   //      - resultObj {noOfLikers, noOfLikersScraped, noOfLikersToBeScraped, noOfComments, noOfComments, noOfCommentsToBeScraped }
+//   // 7. Update the metaData in file.
+//   // 8. For scraping Likers userName from list & all the comments from comments list use the similar methodology that used in "scrapeProfilePosts" function to scrape all posts,
+//   // 9. Let me try to explain that methodology
+//   // 9.1   function scrapeLikersOfPost
+//   //          1. Check is Approved & get resultObj
+//   //          2. Check postUrl Page is opened
+//   //          3. Define "extractLikersFromResponse"   i.e. Scrape userName of likers from response
+//   //          4. Define a Filter function to filter requests similar to "postsScrapingFilterFn"
+//   //          5. Define a Handler function that handles the responses of filtered requests similar to "postsScrapingHandlerFn" function
+//   //          6. Remaining logic of "scrapeLikersOfPost" should be similar to logic of "scrapeProfilePosts" so that this function scrapes all userNames from a response then scroll down so next request gets triggered only after first response get processed / scraped.
+// };
+// ===============================================================================
+// ========================== likers scrape function =============================
+// const scrapeInstaPost = async function () {
+//   async function scrapeComments(page) {
+//     // const commentContainer = await page.$(".x78zum5.xdt5ytf.x1iyjqo2");   // nope
+//     const commentContainer = await page.$(
+//       ".html-div.xdj266r.x14z9mp.xat24cr.x1lziwak.xexx8yu.xyri2b.x18d9i69.x1c1uobl.x9f619.xjbqb8w.x78zum5.x15mokao.x1ga7v0g.x16uus16.xbiv7yw.x1uhb9sk.x1plvlek.xryxfnj.x1c4vz4f.x2lah0s.xdt5ytf.xqjyukv.x1qjc9v5.x1oa3qoh.x1nhvcw1"
+//     );
+//     const commentContainer = await page.$(
+//       "html-div.xdj266r.x14z9mp.xat24cr.x1lziwak.xexx8yu.xyri2b.x18d9i69.x1c1uobl.x9f619.xjbqb8w.x78zum5.x15mokao.x1ga7v0g.x16uus16.xbiv7yw.x1uhb9sk.x1plvlek.xryxfnj.x1c4vz4f.x2lah0s.xdt5ytf.xqjyukv.x1qjc9v5.x1oa3qoh.x1nhvcw1"
+//     );
+//     const commentContainer = await page.$("._ap3a._aaco._aacw._aacx._aad7._aade");
+//     return await page.evaluate(() => {
+//       // Find comments in the DOM
+//       const commentElements = Array.from(document.querySelectorAll('[role="button"][tabindex="0"]'));
+//       const comments = [];
 
+//       for (const element of commentElements) {
+//         // Look for username and comment text patterns
+//         const usernameElement = element.querySelector('a[role="link"]');
+//         const commentTextElement = element.querySelector("span:not([role])");
+
+//         if (usernameElement && commentTextElement) {
+//           comments.push({
+//             username: usernameElement.textContent.trim(),
+//             text: commentTextElement.textContent.trim(),
+//             timestamp: element.querySelector("time") ? element.querySelector("time").getAttribute("datetime") : null,
+//           });
+//         }
+//       }
+
+//       // Extract post description
+//       const postDescription = document.querySelector("h1") ? document.querySelector("h1").textContent : document.querySelector('article span[role="button"] > div > span')?.textContent;
+
+//       return {
+//         comments,
+//         postDescription,
+//       };
+//     });
+//   }
+//   async function scrapePostMetadata() {
+//     const metadata = await this.page.evaluate(() => {
+//       // Extract Open Graph metadata
+//       const ogDescription = document.querySelector('meta[property="og:description"]')?.content;
+//       const ogImage = document.querySelector('meta[property="og:image"]')?.content;
+//       const twitterTitle = document.querySelector('meta[name="twitter:title"]')?.content;
+
+//       // Parse like and comment counts from description
+//       let likes = 0;
+//       let comments = 0;
+
+//       if (ogDescription) {
+//         const likesMatch = ogDescription.match(/(\d+)\s+likes/);
+//         const commentsMatch = ogDescription.match(/(\d+)\s+comments/);
+
+//         if (likesMatch) likes = parseInt(likesMatch[1]);
+//         if (commentsMatch) comments = parseInt(commentsMatch[1]);
+//       }
+
+//       return {
+//         title: twitterTitle || document.title,
+//         description: ogDescription,
+//         imageUrl: ogImage,
+//         likes,
+//         comments,
+//       };
+//     });
+
+//     return metadata;
+//   }
+// };
+// ===============================================================================
+// ===============================================================================
 // ----- Update Data-base with latest information after scraping profile -----
 const updateDatabaseAfterProfileScraping = async function () {
   const userName = this.state.targetToScrape.targetString;

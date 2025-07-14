@@ -508,7 +508,7 @@ const hookMethodsOnPage = async function (page) {
   // ==== 👇🏻 Event Handler 👇🏻 ====
   page.on("framenavigated", async (frame) => {
     if (frame === this.page.mainFrame()) {
-      this.appLogger.logMSG(`Navigated to: ${frame.url()}`);
+      this.appLogger?.logMSG(`Navigated to: ${frame.url()}`);
 
       const randomPageHandlers = {
         // url:"selectorStringToClick"
@@ -519,7 +519,7 @@ const hookMethodsOnPage = async function (page) {
           const randomPage = (await this.browser.pages()).find((p) => p.url() === url || p.url().includes(url));
 
           if (randomPage) {
-            await this.appLogger.logMSG(`== Random Page : ${randomPage.url()}`);
+            await this.appLogger?.logMSG(`== Random Page : ${randomPage.url()}`);
             await this.utils.randomDelay(1.5, 2); // Add a small delay for stability
             console.log(`Random Page found: ${randomPage.url()}`);
             const selector = randomPageHandlers[url];

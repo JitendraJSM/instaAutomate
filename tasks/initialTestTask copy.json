@@ -7,25 +7,9 @@
     "actionName": "initializeBrowser"
   },
   {
-    "preCondition": "chrome://new-tab-page/",
-    "parentModuleName": "page",
-    "actionName": "navigateTo",
-    "argumentsString": "https://www.youtube.com",
+    "parentModuleName": "testFunctionModule",
+    "actionName": "testFunction",
+    "argumentsString": "https://www.instagram.com/chandani144__/reel/DMA1p8ahX33/",
     "doNotParseArgumentsString": true
-  },
-  {
-    "parentModuleName": "page",
-    "actionName": "navigateTo",
-    "argumentsString": "https://www.youtube.com/shorts/HiQ8L-doqGI",
-    "doNotParseArgumentsString": true
-  },
-  {
-    "parentModuleName": "page",
-    "actionName": "goBackToPreviousPage"
-  },
-  {
-    "parentModuleName": "devOrTest",
-    "actionName": "consoleLog",
-    "argumentsString": "this.state"
   }
 ]

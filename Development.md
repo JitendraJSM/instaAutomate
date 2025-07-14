@@ -46,3 +46,13 @@
 # Controller
 
 Controller decides which task should be assigned to which agent or scraper and when that task should be done.
+
+# Posts Scraper
+
+- From posts page $('meta[name="description"]') content will have all meta data of post number of likes, comments, date of post and the description of post, as given below
+<meta name="description" content="19 likes, 0 comments - javascript_tips on April 25, 2018: &quot;Hey fellows!
+Just a simple tips today: short-circuits conditionals.
+
+#javascript #js #ecmascript #ecmascript6 #es6 #tips #tricks #daily #programming&quot;. ">
+
+- The link of image if it is image is $(".\_aagv img").src

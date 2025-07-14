@@ -3,7 +3,7 @@ require("dotenv").config();
 const App = require("./modules/AppModule.js");
 
 // === Tasks ===
-const initialTestTask = require("./tasks/initialTestTask.json");
+const initialTestTask = require("./tasks/initialTestTask3.json");
 initialTestTask.taskName = "initialTestTask";
 
 const initialTestTask_copy = require("./tasks/initialTestTask copy.json");
@@ -22,8 +22,8 @@ async function main() {
   // ------------------ Testing purpose ---------------------------
 
   // await app.run(initialTestTask);
-  await app.run(instaAutomationTask);
-  // await app.run(initialTestTask_copy);
+  // await app.run(instaAutomationTask);
+  await app.run(initialTestTask_copy);
   // console.log(`=================================`);
   // console.log(app);
   // console.log(`=================================`);

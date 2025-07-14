@@ -7,27 +7,9 @@
     "actionName": "initializeBrowser"
   },
   {
-    "parentModuleName": "devOrTest",
-    "actionName": "consoleLog",
-    "argumentsString": "Before Closing Chrome",
-    "doNotParseArgumentsString": true
-  },
-  {
-    "parentModuleName": "devOrTest",
-    "actionName": "printNwriteThis"
-  },
-  {
-    "parentModuleName": "chrome",
-    "actionName": "closeBrowser"
-  },
-  {
-    "parentModuleName": "devOrTest",
-    "actionName": "consoleLog",
-    "argumentsString": "ok ji everything is ok....",
-    "doNotParseArgumentsString": true
-  },
-  {
-    "parentModuleName": "devOrTest",
-    "actionName": "endDevFunction"
+    "parentModuleName": "testFunctionModule",
+    "actionName": "testFunction",
+    "argumentsString": "bad.8323",
+    "assignedAt": "2025-07-10T13:33:55.374Z"
   }
 ]
