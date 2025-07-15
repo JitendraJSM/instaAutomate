@@ -120,7 +120,7 @@ const testFunction = async function (url) {
       postDate: dateMatch ? dateMatch[1] : "",
     };
   };
-  const postMetadata = await this.page.evaluate(extractPostMetadata);
+
   // Extract media ID for potential video content
   const getMediaId = () => {
     const mediaMetaTag = document.querySelector('meta[property="al:ios:url"]');
@@ -131,8 +131,6 @@ const testFunction = async function (url) {
     return mediaIdMatch ? mediaIdMatch[1] : null;
   };
 
-  postMetadata.postMediaId = await this.page.evaluate(getMediaId);
-  console.log(postMetadata);
   // Function to scroll down in comments container
   const scrollDownInCommentsDataBox = () => {
     const container = document.querySelector("._a9z6._a9z9._a9za");
@@ -142,7 +140,148 @@ const testFunction = async function (url) {
     }
     return false;
   };
-  const scrollRes = await this.page.evaluate(scrollDownInCommentsDataBox);
+
+  //  clickLoadMoreComments function clicks and checks if the button is clicked or not
+  //  if the button is clicked then it returns true
+  //  if the button is not clicked then it returns false
+  const clickLoadMoreComments = async function () {
+    // Get initial state of container
+    const getContainerState = () => {
+      const container = document.querySelector("._a9z6._a9z9._a9za");
+      if (!container) return null;
+
+      return {
+        childCount: container.children.length,
+        scrollHeight: container.scrollHeight,
+        scrollTop: container.scrollTop,
+      };
+    };
+
+    // Get state before clicking
+    const beforeState = await this.page.evaluate(getContainerState);
+    if (!beforeState) {
+      console.log("Container not found before clicking");
+      return false;
+    }
+
+    // Click the button
+    try {
+      await this.page.clickNotClickable('svg[aria-label="Load more comments"]');
+    } catch (error) {
+      console.log("Error clicking button:", error.message);
+      return false;
+    }
+
+    // Wait a moment for content to load
+    await this.utils.randomDelay(1, 2); // Adjust delay as needed
+    // await this.page.waitForNetworkIdle();
+
+    // Get state after clicking
+    const afterState = await this.page.evaluate(getContainerState);
+    if (!afterState) {
+      console.log("Container not found after clicking");
+      return false;
+    }
+
+    // Compare states to determine if click was successful
+    const isSuccess = afterState.childCount > beforeState.childCount || afterState.scrollHeight > beforeState.scrollHeight;
+
+    console.log(`Button click ${isSuccess ? "successful" : "failed"}:`);
+    console.log(`- Before: ${beforeState.childCount} children, height: ${beforeState.scrollHeight}`);
+    console.log(`- After: ${afterState.childCount} children, height: ${afterState.scrollHeight}`);
+
+    return isSuccess;
+  };
+
+  // Function to extract comments from DOM
+  const extractComments = () => {
+    const commentElements = document.querySelectorAll("._a9zj._a9zl");
+    const commentsArray = Array.from(commentElements).map((el) => el.innerText);
+
+    // Parse comments into structured objects
+    return commentsArray
+      .map((comment) => {
+        const parts = comment.split("\n");
+        if (parts.length >= 2) {
+          return {
+            username: parts[0],
+            text: parts[1],
+            metadata: parts.slice(2).join(" "), // Time, likes, reply info
+          };
+        }
+        return null;
+      })
+      .filter(Boolean); // Remove any null entries
+  };
+
+  // Main execution
+  try {
+    // Get post metadata
+    const metadata = await extractPostMetadata();
+    const mediaId = getMediaId();
+
+    // Initialize comments collection with deduplication
+    const uniqueComments = new Map();
+    let previousCommentsCount = 0;
+    let loadAttempts = 0;
+    const MAX_LOAD_ATTEMPTS = 20; // Prevent infinite loops
+
+    // First extraction of available comments
+    let currentComments = extractComments();
+    currentComments.forEach((comment) => {
+      uniqueComments.set(comment.username + "|" + comment.text, comment);
+    });
+
+    // Continue loading comments until we have all or reach max attempts
+    while (uniqueComments.size < metadata.commentsCount && loadAttempts < MAX_LOAD_ATTEMPTS && uniqueComments.size > previousCommentsCount) {
+      previousCommentsCount = uniqueComments.size;
+
+      // Try scrolling down first
+      const scrolled = scrollDownInCommentsDataBox();
+
+      // Wait for potential new comments to load
+      this.utils.randomDelay(1, 2);
+      // await this.page.waitForNetworkIdle();
+
+      // If scrolling didn't work or we're at the bottom, try clicking "Load more"
+      if (!scrolled || uniqueComments.size === previousCommentsCount) {
+        const clicked = clickLoadMoreComments();
+        if (!clicked) break; // No more comments to load
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+      }
+
+      // Extract newly loaded comments
+      currentComments = extractComments();
+      currentComments.forEach((comment) => {
+        uniqueComments.set(comment.username + "|" + comment.text, comment);
+      });
+
+      loadAttempts++;
+    }
+
+    // Prepare final result
+    return {
+      postMetadata: metadata,
+      mediaId,
+      comments: Array.from(uniqueComments.values()),
+      totalCommentsScraped: uniqueComments.size,
+    };
+  } catch (error) {
+    console.error("Error scraping post and comments:", error);
+    return { error: error.message };
+  }
+
+  // Check btn is clicked or not
+  // Create a function that checks if the button is clicked or not
+  // Apply this trick to check if the button is clicked or not
+  // first check the number of child elements in the container brfore clicking the button
+  //  Check the height of the container before clicking the button
+  // then click the button using await this.page.clickNotClickable('svg[aria-label="Load more comments"]');
+  // then check the number of child elements in the container after clicking the button
+  //  Check the height of the container after clicking the button
+  // if the number of child elements is increased and the height of the container is increased then the button is clicked
+  // if the number of child elements is same and the height of the container is same then the button is not clicked in that case random wait for 1 to 2 seconds and click the button again and check again and so on until the button is clicked.
+
   console.log(`====================================-===-=-=-=--=-=-=-==-=-`);
   console.log(scrollRes);
   console.log(`====================================-===-=-=-=--=-=-=-==-=-`);
