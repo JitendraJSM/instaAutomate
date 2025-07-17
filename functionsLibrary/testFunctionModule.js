@@ -103,9 +103,12 @@ const testFunction = async function (url) {
   console.log(`ok`);
 
   // Extract post metadata from meta tags
+  // NOTE: this function Works in page context
   const extractPostMetadata = async () => {
     const descriptionMeta = document.querySelector('meta[name="description"]');
-    const metaContent = descriptionMeta ? descriptionMeta.getAttribute("content") : "";
+    const metaContent = descriptionMeta
+      ? descriptionMeta.getAttribute("content")
+      : "";
 
     // Parse metadata using regex
     const likesMatch = metaContent.match(/(\d+(?:,\d+)*) likes/);
@@ -115,13 +118,16 @@ const testFunction = async function (url) {
 
     return {
       likesCount: likesMatch ? parseInt(likesMatch[1].replace(/,/g, "")) : 0,
-      commentsCount: commentsMatch ? parseInt(commentsMatch[1].replace(/,/g, "")) : 0,
+      commentsCount: commentsMatch
+        ? parseInt(commentsMatch[1].replace(/,/g, ""))
+        : 0,
       username: usernameMatch ? usernameMatch[1] : "",
       postDate: dateMatch ? dateMatch[1] : "",
     };
   };
 
   // Extract media ID for potential video content
+  // NOTE: this function Works in page context
   const getMediaId = () => {
     const mediaMetaTag = document.querySelector('meta[property="al:ios:url"]');
     if (!mediaMetaTag) return null;
@@ -131,20 +137,12 @@ const testFunction = async function (url) {
     return mediaIdMatch ? mediaIdMatch[1] : null;
   };
 
-  // Function to scroll down in comments container
-  const scrollDownInCommentsDataBox = () => {
-    const container = document.querySelector("._a9z6._a9z9._a9za");
-    if (container) {
-      container.scrollTop = container.scrollHeight;
-      return true;
-    }
-    return false;
-  };
-
-  //  clickLoadMoreComments function clicks and checks if the button is clicked or not
+  //  clickLoadMoreCommentsBTN function clicks and checks if the button is clicked or not
   //  if the button is clicked then it returns true
   //  if the button is not clicked then it returns false
-  const clickLoadMoreComments = async function () {
+  const clickLoadMoreCommentsBTN = async function () {
+    let isMoreCommentsLoaded = false;
+    let returnFlag; // possible values "load BTN not exists"
     // Get initial state of container
     const getContainerState = () => {
       const container = document.querySelector("._a9z6._a9z9._a9za");
@@ -157,43 +155,88 @@ const testFunction = async function (url) {
       };
     };
 
+    // Function to scroll down in comments container
+    // NOTE: this function Works in page context
+    const scrollDownInCommentsDataBox = () => {
+      const container = document.querySelector("._a9z6._a9z9._a9za");
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+        return true;
+      }
+      return false;
+    };
+
+    // Check LoadMoreCommentsBTN is available or not if exists then it returns true
+    const checkIsBTNExists = async function () {
+      const btn = document.querySelector(
+        'svg[aria-label="Load more comments"]'
+      );
+      return btn !== null;
+    };
+
+    const checkIsMoreCommentsLoaded = async function (beforeState) {
+      // Wait a moment for content to load
+      await this.utils.randomDelay(1, 2); // Adjust delay as needed
+      // await this.page.waitForNetworkIdle();
+
+      // Get state after clicking
+      const afterState = await this.page.evaluate(getContainerState);
+      if (!afterState) {
+        console.log(
+          `Comments Container (ie. "._a9z6._a9z9._a9za") not found after clicking`
+        );
+        return false;
+      }
+
+      // Compare states to determine if click was successful
+      const isSuccess =
+        afterState.childCount > beforeState.childCount ||
+        afterState.scrollHeight > beforeState.scrollHeight;
+
+      console.log(`Button click ${isSuccess ? "successful" : "failed"}:`);
+      console.log(
+        `- Before: ${beforeState.childCount} children, height: ${beforeState.scrollHeight}`
+      );
+      console.log(
+        `- After: ${afterState.childCount} children, height: ${afterState.scrollHeight}`
+      );
+
+      return isSuccess;
+    };
+
     // Get state before clicking
     const beforeState = await this.page.evaluate(getContainerState);
     if (!beforeState) {
-      console.log("Container not found before clicking");
+      console.log(
+        `Comments Container (ie. "._a9z6._a9z9._a9za") not found before clicking`
+      );
       return false;
     }
+    // Try scrolling down first
+    // const scrolled = scrollDownInCommentsDataBox(); // Will not works as scrollDownInCommentsDataBox function Works in page context
+    await this.page.evaluate(scrollDownInCommentsDataBox);
+
+    isMoreCommentsLoaded = await checkIsMoreCommentsLoaded.call(
+      this,
+      beforeState
+    );
+    if (isMoreCommentsLoaded) return isMoreCommentsLoaded;
+
+    const isBTNExists = await this.page.evaluate(checkIsBTNExists);
+    if (!isBTNExists) return isBTNExists;
 
     // Click the button
-    try {
-      await this.page.clickNotClickable('svg[aria-label="Load more comments"]');
-    } catch (error) {
-      console.log("Error clicking button:", error.message);
-      return false;
-    }
+    await this.page.clickNotClickable('svg[aria-label="Load more comments"]');
 
-    // Wait a moment for content to load
-    await this.utils.randomDelay(1, 2); // Adjust delay as needed
-    // await this.page.waitForNetworkIdle();
-
-    // Get state after clicking
-    const afterState = await this.page.evaluate(getContainerState);
-    if (!afterState) {
-      console.log("Container not found after clicking");
-      return false;
-    }
-
-    // Compare states to determine if click was successful
-    const isSuccess = afterState.childCount > beforeState.childCount || afterState.scrollHeight > beforeState.scrollHeight;
-
-    console.log(`Button click ${isSuccess ? "successful" : "failed"}:`);
-    console.log(`- Before: ${beforeState.childCount} children, height: ${beforeState.scrollHeight}`);
-    console.log(`- After: ${afterState.childCount} children, height: ${afterState.scrollHeight}`);
-
-    return isSuccess;
+    isMoreCommentsLoaded = await checkIsMoreCommentsLoaded.call(
+      this,
+      beforeState
+    );
+    return isMoreCommentsLoaded;
   };
 
   // Function to extract comments from DOM
+  // NOTE: this function Works in page context
   const extractComments = () => {
     const commentElements = document.querySelectorAll("._a9zj._a9zl");
     const commentsArray = Array.from(commentElements).map((el) => el.innerText);
@@ -217,8 +260,10 @@ const testFunction = async function (url) {
   // Main execution
   try {
     // Get post metadata
-    const metadata = await extractPostMetadata();
-    const mediaId = getMediaId();
+    // const metadata = await extractPostMetadata(); // NOTE: this function Works in page context
+    const metadata = await await this.page.evaluate(extractPostMetadata);
+    // const mediaId = getMediaId();   // NOTE: this function Works in page context
+    const mediaId = await this.page.evaluate(getMediaId);
 
     // Initialize comments collection with deduplication
     const uniqueComments = new Map();
@@ -227,36 +272,45 @@ const testFunction = async function (url) {
     const MAX_LOAD_ATTEMPTS = 20; // Prevent infinite loops
 
     // First extraction of available comments
-    let currentComments = extractComments();
+    // let currentComments = extractComments(); // Will not works as extractComments function Works in page context
+    let currentComments = await this.page.evaluate(extractComments);
+
     currentComments.forEach((comment) => {
       uniqueComments.set(comment.username + "|" + comment.text, comment);
     });
 
     // Continue loading comments until we have all or reach max attempts
-    while (uniqueComments.size < metadata.commentsCount && loadAttempts < MAX_LOAD_ATTEMPTS && uniqueComments.size > previousCommentsCount) {
+    while (
+      uniqueComments.size < metadata.commentsCount &&
+      loadAttempts < MAX_LOAD_ATTEMPTS
+    ) {
       previousCommentsCount = uniqueComments.size;
 
-      // Try scrolling down first
-      const scrolled = scrollDownInCommentsDataBox();
-
-      // Wait for potential new comments to load
-      this.utils.randomDelay(1, 2);
-      // await this.page.waitForNetworkIdle();
-
       // If scrolling didn't work or we're at the bottom, try clicking "Load more"
-      if (!scrolled || uniqueComments.size === previousCommentsCount) {
-        const clicked = clickLoadMoreComments();
-        if (!clicked) break; // No more comments to load
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      const clicked = await clickLoadMoreCommentsBTN.call(this);
+      if (clicked) loadAttempts = 0;
+      else {
+        loadAttempts++;
+        console.log(
+          `Load more button clicked Try number: ${loadAttempts} times.`
+        );
+        console.log(`Skipping the remaining loop.`);
+        continue;
       }
 
       // Extract newly loaded comments
-      currentComments = extractComments();
+      // currentComments = extractComments();  // Will not works as extractComments function Works in page context
+      currentComments = await this.page.evaluate(extractComments);
       currentComments.forEach((comment) => {
         uniqueComments.set(comment.username + "|" + comment.text, comment);
       });
-
-      loadAttempts++;
+      if (uniqueComments.size === metadata.commentsCount) {
+        console.log(
+          `Breaking the loop as total comments scraped is equal to total comments in the post.(ie uniqueComments.size: ${uniqueComments.size} and metadata.commentsCoun: ${metadata.commentsCoun})`
+        );
+        break;
+      }
     }
 
     // Prepare final result
