@@ -137,13 +137,14 @@ const testFunction = async function (url) {
     return mediaIdMatch ? mediaIdMatch[1] : null;
   };
 
-  //  clickLoadMoreCommentsBTN function clicks and checks if the button is clicked or not
-  //  if the button is clicked then it returns true
-  //  if the button is not clicked then it returns false
-  const clickLoadMoreCommentsBTN = async function () {
+  //  Scroll & click "Load more comments" button, wait and checks for more new comments loaded or not
+  //  if more new comments loaded it returns true
+  //  if more new comments not loaded it returns false
+  const loadMoreCommentsBTN = async function () {
     let isMoreCommentsLoaded = false;
-    let returnFlag; // possible values "load BTN not exists"
+
     // Get initial state of container
+    // NOTE: this function Works in page context
     const getContainerState = () => {
       const container = document.querySelector("._a9z6._a9z9._a9za");
       if (!container) return null;
@@ -167,6 +168,7 @@ const testFunction = async function (url) {
     };
 
     // Check LoadMoreCommentsBTN is available or not if exists then it returns true
+    // NOTE: this function Works in page context
     const checkIsBTNExists = async function () {
       const btn = document.querySelector(
         'svg[aria-label="Load more comments"]'
@@ -193,13 +195,13 @@ const testFunction = async function (url) {
         afterState.childCount > beforeState.childCount ||
         afterState.scrollHeight > beforeState.scrollHeight;
 
-      console.log(`Button click ${isSuccess ? "successful" : "failed"}:`);
-      console.log(
-        `- Before: ${beforeState.childCount} children, height: ${beforeState.scrollHeight}`
-      );
-      console.log(
-        `- After: ${afterState.childCount} children, height: ${afterState.scrollHeight}`
-      );
+      if (isSuccess)
+        console.log(
+          ` - ${
+            afterState.childCount - beforeState.childCount
+          }, More Comments loaded.`
+        );
+      else console.log(`No New comments loaded.`);
 
       return isSuccess;
     };
@@ -214,7 +216,8 @@ const testFunction = async function (url) {
     }
     // Try scrolling down first
     // const scrolled = scrollDownInCommentsDataBox(); // Will not works as scrollDownInCommentsDataBox function Works in page context
-    await this.page.evaluate(scrollDownInCommentsDataBox);
+    const scrolled = await this.page.evaluate(scrollDownInCommentsDataBox);
+    if (!scrolled) console.log(`Try but cannot scroll in Comments Container.`);
 
     isMoreCommentsLoaded = await checkIsMoreCommentsLoaded.call(
       this,
@@ -267,7 +270,6 @@ const testFunction = async function (url) {
 
     // Initialize comments collection with deduplication
     const uniqueComments = new Map();
-    let previousCommentsCount = 0;
     let loadAttempts = 0;
     const MAX_LOAD_ATTEMPTS = 20; // Prevent infinite loops
 
@@ -284,18 +286,13 @@ const testFunction = async function (url) {
       uniqueComments.size < metadata.commentsCount &&
       loadAttempts < MAX_LOAD_ATTEMPTS
     ) {
-      previousCommentsCount = uniqueComments.size;
-
       // If scrolling didn't work or we're at the bottom, try clicking "Load more"
 
-      const clicked = await clickLoadMoreCommentsBTN.call(this);
-      if (clicked) loadAttempts = 0;
+      const isMoreCommentsLoaded = await loadMoreCommentsBTN.call(this);
+      if (isMoreCommentsLoaded) loadAttempts = 0;
       else {
         loadAttempts++;
-        console.log(
-          `Load more button clicked Try number: ${loadAttempts} times.`
-        );
-        console.log(`Skipping the remaining loop.`);
+        console.log(`Load more comments try number ${loadAttempts} failed. `);
         continue;
       }
 
