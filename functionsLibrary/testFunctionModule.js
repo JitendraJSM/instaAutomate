@@ -106,9 +106,7 @@ const testFunction = async function (url) {
   // NOTE: this function Works in page context
   const extractPostMetadata = async () => {
     const descriptionMeta = document.querySelector('meta[name="description"]');
-    const metaContent = descriptionMeta
-      ? descriptionMeta.getAttribute("content")
-      : "";
+    const metaContent = descriptionMeta ? descriptionMeta.getAttribute("content") : "";
 
     // Parse metadata using regex
     const likesMatch = metaContent.match(/(\d+(?:,\d+)*) likes/);
@@ -118,9 +116,7 @@ const testFunction = async function (url) {
 
     return {
       likesCount: likesMatch ? parseInt(likesMatch[1].replace(/,/g, "")) : 0,
-      commentsCount: commentsMatch
-        ? parseInt(commentsMatch[1].replace(/,/g, ""))
-        : 0,
+      commentsCount: commentsMatch ? parseInt(commentsMatch[1].replace(/,/g, "")) : 0,
       username: usernameMatch ? usernameMatch[1] : "",
       postDate: dateMatch ? dateMatch[1] : "",
     };
@@ -148,9 +144,10 @@ const testFunction = async function (url) {
     const getContainerState = () => {
       const container = document.querySelector("._a9z6._a9z9._a9za");
       if (!container) return null;
+      const numOfCommentsInDOM = document.querySelectorAll("._a9zr").length;
 
       return {
-        childCount: container.children.length,
+        numOfCommentsInDOM,
         scrollHeight: container.scrollHeight,
         scrollTop: container.scrollTop,
       };
@@ -170,9 +167,7 @@ const testFunction = async function (url) {
     // Check LoadMoreCommentsBTN is available or not if exists then it returns true
     // NOTE: this function Works in page context
     const checkIsBTNExists = async function () {
-      const btn = document.querySelector(
-        'svg[aria-label="Load more comments"]'
-      );
+      const btn = document.querySelector('svg[aria-label="Load more comments"]');
       return btn !== null;
     };
 
@@ -184,23 +179,14 @@ const testFunction = async function (url) {
       // Get state after clicking
       const afterState = await this.page.evaluate(getContainerState);
       if (!afterState) {
-        console.log(
-          `Comments Container (ie. "._a9z6._a9z9._a9za") not found after clicking`
-        );
+        console.log(`Comments Container (ie. "._a9z6._a9z9._a9za") not found after clicking`);
         return false;
       }
 
       // Compare states to determine if click was successful
-      const isSuccess =
-        afterState.childCount > beforeState.childCount ||
-        afterState.scrollHeight > beforeState.scrollHeight;
+      const isSuccess = afterState.numOfCommentsInDOM > beforeState.numOfCommentsInDOM || afterState.scrollHeight > beforeState.scrollHeight;
 
-      if (isSuccess)
-        console.log(
-          ` - ${
-            afterState.childCount - beforeState.childCount
-          }, More Comments loaded.`
-        );
+      if (isSuccess) console.log(` - ${afterState.numOfCommentsInDOM - beforeState.numOfCommentsInDOM}, More Comments loaded.`);
       else console.log(`No New comments loaded.`);
 
       return isSuccess;
@@ -209,9 +195,7 @@ const testFunction = async function (url) {
     // Get state before clicking
     const beforeState = await this.page.evaluate(getContainerState);
     if (!beforeState) {
-      console.log(
-        `Comments Container (ie. "._a9z6._a9z9._a9za") not found before clicking`
-      );
+      console.log(`Comments Container (ie. "._a9z6._a9z9._a9za") not found before clicking`);
       return false;
     }
     // Try scrolling down first
@@ -219,10 +203,7 @@ const testFunction = async function (url) {
     const scrolled = await this.page.evaluate(scrollDownInCommentsDataBox);
     if (!scrolled) console.log(`Try but cannot scroll in Comments Container.`);
 
-    isMoreCommentsLoaded = await checkIsMoreCommentsLoaded.call(
-      this,
-      beforeState
-    );
+    isMoreCommentsLoaded = await checkIsMoreCommentsLoaded.call(this, beforeState);
     if (isMoreCommentsLoaded) return isMoreCommentsLoaded;
 
     const isBTNExists = await this.page.evaluate(checkIsBTNExists);
@@ -231,10 +212,7 @@ const testFunction = async function (url) {
     // Click the button
     await this.page.clickNotClickable('svg[aria-label="Load more comments"]');
 
-    isMoreCommentsLoaded = await checkIsMoreCommentsLoaded.call(
-      this,
-      beforeState
-    );
+    isMoreCommentsLoaded = await checkIsMoreCommentsLoaded.call(this, beforeState);
     return isMoreCommentsLoaded;
   };
 
@@ -282,10 +260,7 @@ const testFunction = async function (url) {
     });
 
     // Continue loading comments until we have all or reach max attempts
-    while (
-      uniqueComments.size < metadata.commentsCount &&
-      loadAttempts < MAX_LOAD_ATTEMPTS
-    ) {
+    while (uniqueComments.size < metadata.commentsCount && loadAttempts < MAX_LOAD_ATTEMPTS) {
       // If scrolling didn't work or we're at the bottom, try clicking "Load more"
 
       const isMoreCommentsLoaded = await loadMoreCommentsBTN.call(this);
