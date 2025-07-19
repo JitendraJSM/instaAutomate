@@ -1,4 +1,5 @@
 const db = require("./db.js");
+const path = require("path");
 const fs = require("fs-extra");
 
 // const testFunction = async function () {
@@ -216,6 +217,12 @@ const testFunction = async function (url) {
     return isMoreCommentsLoaded;
   };
 
+  // NOTE: this function Works in page context
+  const checkForEndOfCommentsContainer = () => {
+    const viewHiddenCommentsElement = document.querySelector('[aria-label="View hidden comments"]');
+    return viewHiddenCommentsElement !== null;
+  };
+
   // Function to extract comments from DOM
   // NOTE: this function Works in page context
   const extractComments = () => {
@@ -264,6 +271,7 @@ const testFunction = async function (url) {
       // If scrolling didn't work or we're at the bottom, try clicking "Load more"
 
       const isMoreCommentsLoaded = await loadMoreCommentsBTN.call(this);
+
       if (isMoreCommentsLoaded) loadAttempts = 0;
       else {
         loadAttempts++;
@@ -277,13 +285,33 @@ const testFunction = async function (url) {
       currentComments.forEach((comment) => {
         uniqueComments.set(comment.username + "|" + comment.text, comment);
       });
-      if (uniqueComments.size === metadata.commentsCount) {
+
+      const isEndOfCommentsContainer = await this.page.evaluate(checkForEndOfCommentsContainer);
+      if (uniqueComments.size === metadata.commentsCount || isEndOfCommentsContainer) {
         console.log(
           `Breaking the loop as total comments scraped is equal to total comments in the post.(ie uniqueComments.size: ${uniqueComments.size} and metadata.commentsCoun: ${metadata.commentsCoun})`
         );
         break;
       }
     }
+    // ---- 👇 temp for checking 👇 ----
+    const returnObj = {
+      postMetadata: metadata,
+      mediaId,
+      comments: Array.from(uniqueComments.values()),
+      totalCommentsScraped: uniqueComments.size,
+    };
+    // postURL = "https://www.instagram.com/chandani144__/reel/DMA1p8ahX33/"
+
+    const parentFolderPath = path.join(__dirname, `../data/instaScrapedData/postsData/${metadata.username}`);
+    // Ensure logs directory exists
+    await fs.ensureDir(parentFolderPath);
+
+    const postCode = url.split("/").at(-2);
+    const fileName = `${postCode}.json`;
+    const filePath = path.join(parentFolderPath, fileName);
+    await fs.writeFile(filePath, JSON.stringify(returnObj, null, 2));
+    // ---- 👆 temp for checking 👆 ----
 
     // Prepare final result
     return {
