@@ -100,6 +100,8 @@ const fs = require("fs-extra");
 // };
 
 const testFunction = async function (url) {
+  const containerSelector = "._a9z6._a9z9._a9za";
+  const commentElementSelector = "._a9zr";
   await this.page.navigateTo(url);
   console.log(`ok`);
 
@@ -142,10 +144,10 @@ const testFunction = async function (url) {
 
     // Get initial state of container
     // NOTE: this function Works in page context
-    const getContainerState = () => {
-      const container = document.querySelector("._a9z6._a9z9._a9za");
+    const getContainerState = (containerSelector, commentElementSelector) => {
+      const container = document.querySelector(containerSelector);
       if (!container) return null;
-      const numOfCommentsInDOM = document.querySelectorAll("._a9zr").length;
+      const numOfCommentsInDOM = document.querySelectorAll(commentElementSelector).length;
 
       return {
         numOfCommentsInDOM,
@@ -156,8 +158,8 @@ const testFunction = async function (url) {
 
     // Function to scroll down in comments container
     // NOTE: this function Works in page context
-    const scrollDownInCommentsDataBox = () => {
-      const container = document.querySelector("._a9z6._a9z9._a9za");
+    const scrollDownInCommentsDataBox = (containerSelector) => {
+      const container = document.querySelector(containerSelector);
       if (container) {
         container.scrollTop = container.scrollHeight;
         return true;
@@ -178,9 +180,9 @@ const testFunction = async function (url) {
       // await this.page.waitForNetworkIdle();
 
       // Get state after clicking
-      const afterState = await this.page.evaluate(getContainerState);
+      const afterState = await this.page.evaluate(getContainerState, containerSelector, commentElementSelector);
       if (!afterState) {
-        console.log(`Comments Container (ie. "._a9z6._a9z9._a9za") not found after clicking`);
+        console.log(`Comments Container (ie. ${containerSelector}) not found after clicking`);
         return false;
       }
 
@@ -194,14 +196,14 @@ const testFunction = async function (url) {
     };
 
     // Get state before clicking
-    const beforeState = await this.page.evaluate(getContainerState);
+    const beforeState = await this.page.evaluate(getContainerState, containerSelector, commentElementSelector);
     if (!beforeState) {
-      console.log(`Comments Container (ie. "._a9z6._a9z9._a9za") not found before clicking`);
+      console.log(`Comments Container (ie. ${containerSelector}) not found before clicking`);
       return false;
     }
     // Try scrolling down first
     // const scrolled = scrollDownInCommentsDataBox(); // Will not works as scrollDownInCommentsDataBox function Works in page context
-    const scrolled = await this.page.evaluate(scrollDownInCommentsDataBox);
+    const scrolled = await this.page.evaluate(scrollDownInCommentsDataBox, containerSelector);
     if (!scrolled) console.log(`Try but cannot scroll in Comments Container.`);
 
     isMoreCommentsLoaded = await checkIsMoreCommentsLoaded.call(this, beforeState);
@@ -225,8 +227,8 @@ const testFunction = async function (url) {
 
   // Function to extract comments from DOM
   // NOTE: this function Works in page context
-  const extractComments = () => {
-    const commentElements = document.querySelectorAll("._a9zj._a9zl");
+  const extractComments = (commentElementSelector) => {
+    const commentElements = document.querySelectorAll(commentElementSelector);
     const commentsArray = Array.from(commentElements).map((el) => el.innerText);
 
     // Parse comments into structured objects
@@ -260,7 +262,7 @@ const testFunction = async function (url) {
 
     // First extraction of available comments
     // let currentComments = extractComments(); // Will not works as extractComments function Works in page context
-    let currentComments = await this.page.evaluate(extractComments);
+    let currentComments = await this.page.evaluate(extractComments, commentElementSelector);
 
     currentComments.forEach((comment) => {
       uniqueComments.set(comment.username + "|" + comment.text, comment);
@@ -281,7 +283,7 @@ const testFunction = async function (url) {
 
       // Extract newly loaded comments
       // currentComments = extractComments();  // Will not works as extractComments function Works in page context
-      currentComments = await this.page.evaluate(extractComments);
+      currentComments = await this.page.evaluate(extractComments, commentElementSelector);
       currentComments.forEach((comment) => {
         uniqueComments.set(comment.username + "|" + comment.text, comment);
       });
