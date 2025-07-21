@@ -1,0 +1,51 @@
+this is a meta tag of current page on which i test my extractPostMetadata function 
+<meta name="description" content="178 likes, 21 comments - prity__mehra___ on November 29, 2024: &quot;Punjabi vibes ✨🫶🏻
+
+#punjabivibes #punjabisong #punjabireels #punjabi #bhangrainblood💪😉❤️😚 #trending #viral #instalike #explorepage #reelitfeelit #jharkhand&quot;. ">
+
+  const extractPostMetadata = async () => {
+    const descriptionMeta = document.querySelector('meta[name="description"]');
+    const metaContent = descriptionMeta ? descriptionMeta.getAttribute("content") : "";
+
+    // Parse metadata using regex
+    const likesMatch = metaContent.match(/(\d+(?:,\d+)*) likes/);
+    const commentsMatch = metaContent.match(/(\d+(?:,\d+)*) comments/);
+    const usernameMatch = metaContent.match(/- ([\w._]+) on/);
+    const dateMatch = metaContent.match(/on ([\w\s,]+)/);
+
+    return {
+      likesCount: likesMatch ? parseInt(likesMatch[1].replace(/,/g, "")) : 0,
+      commentsCount: commentsMatch ? parseInt(commentsMatch[1].replace(/,/g, "")) : 0,
+      username: usernameMatch ? usernameMatch[1] : "",
+      postDate: dateMatch ? dateMatch[1] : "",
+    };
+  };
+
+result of above extractPostMetadata function is as below:
+{
+    "likesCount": 178,
+    "commentsCount": 21,
+    "username": "prity__mehra___",
+    "postDate": "November 29, 2024"
+  }
+but i want the description also, description is generally after date and generally in end
+Solution:
+const extractPostMetadata = async () => {
+    const descriptionMeta = document.querySelector('meta[name="description"]');
+    const metaContent = descriptionMeta ? descriptionMeta.getAttribute("content") : "";
+
+    // Parse metadata using regex
+    const likesMatch = metaContent.match(/(\d+(?:,\d+)*) likes/);
+    const commentsMatch = metaContent.match(/(\d+(?:,\d+)*) comments/);
+    const usernameMatch = metaContent.match(/- ([\w._]+) on/);
+    const dateMatch = metaContent.match(/on ([\w\s,]+):/);
+    const descriptionMatch = metaContent.match(/on [\w\s,]+: "(.*)"/);
+
+    return {
+      likesCount: likesMatch ? parseInt(likesMatch[1].replace(/,/g, "")) : 0,
+      commentsCount: commentsMatch ? parseInt(commentsMatch[1].replace(/,/g, "")) : 0,
+      username: usernameMatch ? usernameMatch[1] : "",
+      postDate: dateMatch ? dateMatch[1] : "",
+      description: descriptionMatch ? descriptionMatch[1] : ""
+    };
+};

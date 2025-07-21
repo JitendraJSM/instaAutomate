@@ -99,11 +99,71 @@ const fs = require("fs-extra");
 //   console.log(`response listener added.`);
 // };
 
-const testFunction = async function (url) {
-  const containerSelector = "._a9z6._a9z9._a9za";
-  const commentElementSelector = "._a9zr";
+// Different Type of reels posts pages are as below:
+// 1. No Description, with View Hidden Comments Btn
+//      - URL :  https://www.instagram.com/chandani144__/reel/DMA1p8ahX33/
+//      - total 96 comments acc. to metadata, 88 scraped and 1 hidden
+// 2. With Description but without View Hidden Comments BTN but still some comments are hidden
+//      - URL :  https://www.instagram.com/prity__mehra___/reel/DC9KJd4SfBM/
+//      - total 21 comments acc. to metadata, 9 scraped
+
+const testFunction = async function () {
+  const listOfPostsURLs = [
+    "https://www.instagram.com/p/DKZ10yvzEqS/",
+    "https://www.instagram.com/p/DGvPYbATx20/",
+    "https://www.instagram.com/p/DE6pjjNTzEr/",
+    "https://www.instagram.com/p/DEpSiNHTzgy/",
+  ];
+  const resultsOfScraping = [];
+  for (const url of listOfPostsURLs) {
+    console.log(`Scraping post and comments from URL: ${url}`);
+    const result = await commentsScraper.call(this, url);
+    resultsOfScraping.push(result);
+    console.log(`------ Scraping comments of URL: ${url} is complete. ------`);
+    await this.utils.randomDelay(1, 2);
+  }
+
+  // ---- 👇 temp for checking 👇 ----
+
+  const parentFolderPath1 = path.join(__dirname, `../data/instaScrapedData/postsData/`);
+  // Ensure logs directory exists
+  await fs.ensureDir(parentFolderPath1);
+  const fileName1 = `completedData.json`;
+  const filePath1 = path.join(parentFolderPath1, fileName1);
+  await fs.writeFile(filePath1, JSON.stringify(resultsOfScraping, null, 2));
+  // ---- 👆 temp for checking 👆 ----
+  console.log(`Scraping ENDED.`);
+};
+
+const commentsScraper = async function (url) {
   await this.page.navigateTo(url);
   console.log(`ok`);
+
+  // NOTE: this function Works in page context
+  const determineTypeOfPage = () => {
+    const rootElement = document.querySelector('[id^="mount"]');
+    const idOfRootElement = rootElement.id;
+
+    let typeOfPage;
+    if (document.querySelector("._a9z6._a9za") !== null) typeOfPage = "type1";
+    else if (document.querySelector(".x5yr21d.xw2csxc.x1odjw0f.x1n2onr6") !== null) typeOfPage = "type2";
+
+    if (typeOfPage === "type1") {
+      return { typeOfPage, idOfRootElement, containerSelector: "._a9z6._a9za", commentElementSelector: "._a9ym" };
+    } else if (typeOfPage === "type2") {
+      return {
+        typeOfPage,
+        idOfRootElement,
+        containerSelector: ".x5yr21d.xw2csxc.x1odjw0f.x1n2onr6",
+        commentElementSelector:
+          ".html-div.xdj266r.x14z9mp.xat24cr.x1lziwak.xexx8yu.xyri2b.x18d9i69.x1c1uobl.x9f619.xjbqb8w.x78zum5.x15mokao.x1ga7v0g.x16uus16.xbiv7yw.x1uhb9sk.x1plvlek.xryxfnj.x1iyjqo2.x2lwn1j.xeuugli.xdt5ytf.xqjyukv.x1qjc9v5.x1oa3qoh.x1nhvcw1:not(:has(> span))",
+      };
+    }
+  };
+
+  const res = await this.page.evaluate(determineTypeOfPage);
+  console.log(res);
+  const { typeOfPage, idOfRootElement, containerSelector, commentElementSelector } = res;
 
   // Extract post metadata from meta tags
   // NOTE: this function Works in page context
@@ -115,13 +175,41 @@ const testFunction = async function (url) {
     const likesMatch = metaContent.match(/(\d+(?:,\d+)*) likes/);
     const commentsMatch = metaContent.match(/(\d+(?:,\d+)*) comments/);
     const usernameMatch = metaContent.match(/- ([\w._]+) on/);
-    const dateMatch = metaContent.match(/on ([\w\s,]+)/);
+    const dateMatch = metaContent.match(/on ([\w\s,]+):/);
+
+    // Use split method instead of regex for description extraction
+    let description = metaContent.split(":").at(-1).trim();
+
+    // Process the description: remove quotes and extract hashtags
+    let caption = "";
+    let hashtags = [];
+
+    if (description) {
+      // Remove quotes from the beginning and end of the description
+      description = description.replace(/^\"|\"\.$|\"\.?$/g, "");
+
+      // Extract hashtags using regex
+      const hashtagRegex = /#[\w\u0080-\uFFFF]+/g;
+      hashtags = description.match(hashtagRegex) || [];
+
+      // Remove hashtags from the caption
+      caption = description;
+      hashtags.forEach((tag) => {
+        caption = caption.replace(tag, "");
+      });
+
+      // Clean up the caption (remove extra spaces, newlines, etc.)
+      caption = caption.replace(/\s+/g, " ").trim();
+    }
 
     return {
       likesCount: likesMatch ? parseInt(likesMatch[1].replace(/,/g, "")) : 0,
       commentsCount: commentsMatch ? parseInt(commentsMatch[1].replace(/,/g, "")) : 0,
       username: usernameMatch ? usernameMatch[1] : "",
       postDate: dateMatch ? dateMatch[1] : "",
+      description: description,
+      caption: caption,
+      hashtags: hashtags,
     };
   };
 
@@ -252,6 +340,8 @@ const testFunction = async function (url) {
     // Get post metadata
     // const metadata = await extractPostMetadata(); // NOTE: this function Works in page context
     const metadata = await await this.page.evaluate(extractPostMetadata);
+    metadata.typeOfPage = typeOfPage;
+    metadata.idOfRootElement = idOfRootElement;
     // const mediaId = getMediaId();   // NOTE: this function Works in page context
     const mediaId = await this.page.evaluate(getMediaId);
 
@@ -289,9 +379,13 @@ const testFunction = async function (url) {
       });
 
       const isEndOfCommentsContainer = await this.page.evaluate(checkForEndOfCommentsContainer);
-      if (uniqueComments.size === metadata.commentsCount || isEndOfCommentsContainer) {
+      if (isEndOfCommentsContainer) {
+        console.log(`Breaking the loop as View Hidden comments BTN appeared in container.`);
+        break;
+      }
+      if (uniqueComments.size === metadata.commentsCount) {
         console.log(
-          `Breaking the loop as total comments scraped is equal to total comments in the post.(ie uniqueComments.size: ${uniqueComments.size} and metadata.commentsCoun: ${metadata.commentsCoun})`
+          `Breaking the loop as total comments scraped is equal to total comments in the post.(ie uniqueComments.size: ${uniqueComments.size} and metadata.commentsCount: ${metadata.commentsCount})`
         );
         break;
       }
@@ -317,6 +411,7 @@ const testFunction = async function (url) {
 
     // Prepare final result
     return {
+      postURL: url,
       postMetadata: metadata,
       mediaId,
       comments: Array.from(uniqueComments.values()),
