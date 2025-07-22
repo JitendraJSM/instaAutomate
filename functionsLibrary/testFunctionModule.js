@@ -202,87 +202,35 @@ const getMediaId = () => {
 // ---------------------------------------------------------------------------------------------------------
 const likeScraper = async function () {
   console.log(`likeScraper function started....`);
+
+  this.state.targetToScrape = {}; // temporary defining as it is not completely integrated.
+
   await this.page.navigateTo("https://www.instagram.com/p/DKZ10yvzEqS/");
+
   const metadata = await this.page.evaluate(extractPostMetadata);
-  // url:   https://www.instagram.com/api/v1/media/3646182097700014738/likers/ to intercept
-  // url:   https://www.instagram.com/api/v1/media//likers/ to intercept
 
   const mediaId = await this.page.evaluate(getMediaId);
 
-  // =-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-
-  // TODO: Intercept the request to get the likers of the post
-  // 1. Use a method available on page object of puppeteer, but that must intercept the request only once.
-  // 2. Intercept the request with url `https://www.instagram.com/api/v1/media/${mediaId}/likers/`
+  const likers = [];
 
-  // TODO: This given below statement creates a problem when some posts are already scraped
-  // if (!this.state.targetToScrape.currentPostsLikers) this.state.targetToScrape.currentPostsLikers = []; // Initialize likers array if not already initialized
-  this.state.targetToScrape.currentPostsLikers = [];
-
-  // Posts Scraping from response
-  const extractLikersFromResponse = async function (responseJSON) {
-    // Scrape the post nodes & pushes then to this.state.targetToScrape.currentPostsLikers
-    responseJSON.data.xdt_api__v1__likes__media_id__likers.users.forEach((liker) => {
-      if (this.state.targetToScrape.currentPostsLikers.some((existingLiker) => existingLiker.userName === liker.username)) return;
-      try {
-        const newLiker = {
-          userName: liker.username,
-          fullName: liker.full_name,
-        };
-
-        this.state.targetToScrape.currentPostsLikers.push(newLiker);
-      } catch (error) {
-        console.log(error);
-
-        console.log(`-=-=-=-=-=-=-=-`);
-        console.log(`Cannot extract data from liker: ${liker}`);
-        console.log(`-=-=-=-=-=-=-=-`);
-      }
-    });
-    if (responseJSON.extensions.is_final) return "stop Scrolling";
-    else return "scroll";
-  };
-
-  // Filter function - process requests
-  const likersScrapingRequestFilterFn = async (request, response) => {
-    if (request.url() === "https://www.instagram.com/graphql/query") {
-      const isTargetReq = request.headers()["x-fb-friendly-name"] === "PolarisPostLikedByListDialogQuery" && request.headers()["x-root-field-name"] === "xdt_api__v1__likes__media_id__likers";
-      return isTargetReq;
-    }
-  };
-
-  // Handler function - successful requests
-  const likersScrapingRequestHandlerFn = async (request, response) => {
-    // const postsScrapingHandlerFn = async (request, response) => {
-    const resJSON = await response.json();
-
-    console.log(`==============================================`); // for testing purpose only
-    await fs.appendFile("./scraperTesting/responseAsItIs.json", JSON.stringify(resJSON, null, 2) + ",\n"); // for testing purpose only
-    console.log(`Currently length of scrapedDataOfPosts for likers is : ${this.state.targetToScrape.latestScrapedMetaData.currentPostsLikers.length}`); // for testing purpose only
-    console.log(`==============================================`); // for testing purpose only
-
-    this.state.targetToScrape.scrapingVariables.has_more_likers = await extractLikersFromResponse.call(this, resJSON);
-
-    this.state.targetToScrape.scrapingVariables.likerPagesScraped++;
-  };
-  //
-  console.log(`Starting to response Listener for posts scraping ....`);
-
-  this.state.targetToScrape.scrapingVariables = { likerPagesScraped: 0, has_more_likers: true };
-  this.state.targetToScrape.removeResponseListenerForLiker = await this.page.addResponseListener.call(this, likersScrapingRequestFilterFn.bind(this), likersScrapingRequestHandlerFn.bind(this));
-
+  // Click to open likers modal
   await this.page.clickNotClickable(`span ::-p-text(${metadata.likesCount} likes)`);
 
-  while (this.state.targetToScrape.scrapingVariables.has_more_likers !== "stop Scrolling") {
-    await this.utils.randomDelay(1.5, 0.5); // Wait for 1.5 seconds before next request
-    if (this.state.targetToScrape.scrapingVariables.has_more_likers === "scroll") {
-      // Scroll down for next posts requests
-      await this.page.evaluate(() => {
-        Array.from(document.querySelectorAll("button")).at(-1).scrollIntoView({ behavior: "smooth" });
-      });
-      // this.scrapingVariables.has_more_likers = "wait";
-    }
-    console.log(`--- After wait for response has_next_page is as: ${this.scrapingVariables.has_more_likers}`);
-  }
+  // Wait for the likers response
+  const likersResponse = await this.page.waitForResponse((response) => response.url() === `https://www.instagram.com/api/v1/media/${mediaId}/likers/` && response.status() === 200, { timeout: 60000 });
+
+  // Process likers data
+  const likersData = await likersResponse.json();
+  likersData.users.forEach((liker) => {
+    if (likers.some((l) => l.userName === liker.username)) return; // Skip if liker already exists
+    likers.push({
+      id: liker.pk,
+      userName: liker.username,
+      fullName: liker.full_name,
+    });
+  });
+  // await fs.appendFile("./scraperTesting/responseAsItIs.json", JSON.stringify(likersData, null, 2) + ",\n");
+  console.log(`Likers data intercepted successfully`);
 
   return true;
 };
