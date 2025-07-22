@@ -1,0 +1,277 @@
+{
+  "payload": {
+    "payloads": {
+      "/santosh_king2491/": {
+        "error": false,
+        "result": {
+          "type": "route_definition",
+          "exports": {
+            "actorID": "17841474954198317",
+            "rootView": {
+              "allResources": [{ "__jsr": "PolarisProfilePostsTabRoot.react" }, { "__jsr": "PolarisProfilePostsTabRoot.entrypoint" }, { "__jsr": "PolarisProfileRoot.react" }],
+              "resource": { "__jsr": "PolarisProfilePostsTabRoot.react" },
+              "props": {
+                "id": "47148638398",
+                "show_suggested_profiles": false,
+                "page_logging": { "name": "profilePage", "params": { "page_id": "profilePage_47148638398", "profile_id": "47148638398", "sub_path": "posts" } },
+                "qr": false,
+                "polaris_preload": {
+                  "gated": {
+                    "expose": false,
+                    "preloaderID": "4485830995876238290",
+                    "request": { "method": "GET", "url": "/api/v1/web/get_ruling_for_content/", "params": { "query": { "content_type": "PROFILE", "target_id": "47148638398" } } },
+                    "preloadEnabledOnInit": false,
+                    "preloadEnabledOnNav": false
+                  },
+                  "profile": {
+                    "expose": false,
+                    "preloaderID": "1841283052777724729",
+                    "request": { "method": "GET", "url": "/api/v1/users/web_profile_info/", "params": { "query": { "username": "santosh_king2491" } } },
+                    "preloadEnabledOnInit": false,
+                    "preloadEnabledOnNav": false
+                  },
+                  "timeline": {
+                    "expose": false,
+                    "preloaderID": "4954380167877407043",
+                    "request": { "method": "GET", "url": "/api/v1/feed/user/{username}/username/", "params": { "path": { "username": "santosh_king2491" }, "query": { "count": 12 } } },
+                    "preloadEnabledOnInit": false,
+                    "preloadEnabledOnNav": false
+                  },
+                  "profile_extras": {
+                    "expose": false,
+                    "preloaderID": "776808808086665572",
+                    "request": {
+                      "method": "GET",
+                      "url": "/graphql/query/",
+                      "params": {
+                        "query": {
+                          "query_id": "9957820854288654",
+                          "user_id": "47148638398",
+                          "include_chaining": false,
+                          "include_reel": true,
+                          "include_suggested_users": false,
+                          "include_logged_out_extras": false,
+                          "include_live_status": false,
+                          "include_highlight_reels": true
+                        }
+                      }
+                    },
+                    "preloadEnabledOnInit": false,
+                    "preloadEnabledOnNav": false
+                  }
+                },
+                "enable_seo_crawling_pool": false,
+                "enable_relay_profile_header": true,
+                "enable_highlights_query": true,
+                "enable_suggested_users_query": true,
+                "hide_half_sheet_upsell": false,
+                "is_crawler_relay": false,
+                "is_lox_relay": false,
+                "is_lox_ssr": false,
+                "business_profile_h2_tag_var": "control",
+                "should_preload_lox_ayml_query": true,
+                "lox_private_profile_use_open_instagram": false,
+                "number_of_preloaded_posts": 12,
+                "enable_sharer_sender_query": false,
+                "is_in_skip_deeplink_experiment": false,
+                "is_non_migrated_iap_user": false,
+                "should_show_ayml_sharer": false,
+                "should_show_related_searches": false,
+                "should_open_app_on_tap": false,
+                "is_desktop_minimal_profile_enabled": false,
+                "enable_profile_picture_open_app_interaction": false
+              },
+              "entryPoint": { "__dr": "PolarisProfilePostsTabRoot.entrypoint" }
+            },
+            "tracePolicy": "polaris.profilePage",
+            "meta": { "title": "Santosh Harijan (\u0040santosh_king2491) \u2022 Instagram photos and videos", "accessory": null, "favicon": null },
+            "prefetchable": true,
+            "canonicalRouteName": "comet.igweb.PolarisProfilePostsTabRoute",
+            "entityKeyConfig": { "entity_type": { "source": "constant", "value": "profile" }, "entity_id": { "source": "prop", "value": "id" } },
+            "hostableView": {
+              "allResources": [{ "__jsr": "PolarisProfilePostsTabRoot.react" }, { "__jsr": "PolarisProfilePostsTabRoot.entrypoint" }, { "__jsr": "PolarisProfileRoot.react" }],
+              "resource": { "__jsr": "PolarisProfilePostsTabRoot.react" },
+              "props": {
+                "id": "47148638398",
+                "show_suggested_profiles": false,
+                "page_logging": { "name": "profilePage", "params": { "page_id": "profilePage_47148638398", "profile_id": "47148638398", "sub_path": "posts" } },
+                "qr": false,
+                "polaris_preload": {
+                  "gated": {
+                    "expose": false,
+                    "preloaderID": "4485830995876238290",
+                    "request": { "method": "GET", "url": "/api/v1/web/get_ruling_for_content/", "params": { "query": { "content_type": "PROFILE", "target_id": "47148638398" } } },
+                    "preloadEnabledOnInit": false,
+                    "preloadEnabledOnNav": false
+                  },
+                  "profile": {
+                    "expose": false,
+                    "preloaderID": "1841283052777724729",
+                    "request": { "method": "GET", "url": "/api/v1/users/web_profile_info/", "params": { "query": { "username": "santosh_king2491" } } },
+                    "preloadEnabledOnInit": false,
+                    "preloadEnabledOnNav": false
+                  },
+                  "timeline": {
+                    "expose": false,
+                    "preloaderID": "4954380167877407043",
+                    "request": { "method": "GET", "url": "/api/v1/feed/user/{username}/username/", "params": { "path": { "username": "santosh_king2491" }, "query": { "count": 12 } } },
+                    "preloadEnabledOnInit": false,
+                    "preloadEnabledOnNav": false
+                  },
+                  "profile_extras": {
+                    "expose": false,
+                    "preloaderID": "776808808086665572",
+                    "request": {
+                      "method": "GET",
+                      "url": "/graphql/query/",
+                      "params": {
+                        "query": {
+                          "query_id": "9957820854288654",
+                          "user_id": "47148638398",
+                          "include_chaining": false,
+                          "include_reel": true,
+                          "include_suggested_users": false,
+                          "include_logged_out_extras": false,
+                          "include_live_status": false,
+                          "include_highlight_reels": true
+                        }
+                      }
+                    },
+                    "preloadEnabledOnInit": false,
+                    "preloadEnabledOnNav": false
+                  }
+                },
+                "enable_seo_crawling_pool": false,
+                "enable_relay_profile_header": true,
+                "enable_highlights_query": true,
+                "enable_suggested_users_query": true,
+                "hide_half_sheet_upsell": false,
+                "is_crawler_relay": false,
+                "is_lox_relay": false,
+                "is_lox_ssr": false,
+                "business_profile_h2_tag_var": "control",
+                "should_preload_lox_ayml_query": true,
+                "lox_private_profile_use_open_instagram": false,
+                "number_of_preloaded_posts": 12,
+                "enable_sharer_sender_query": false,
+                "is_in_skip_deeplink_experiment": false,
+                "is_non_migrated_iap_user": false,
+                "should_show_ayml_sharer": false,
+                "should_show_related_searches": false,
+                "should_open_app_on_tap": false,
+                "is_desktop_minimal_profile_enabled": false,
+                "enable_profile_picture_open_app_interaction": false
+              },
+              "entryPoint": { "__dr": "PolarisProfilePostsTabRoot.entrypoint" }
+            },
+            "stripParams": ["a_tt", "a_mpk", "enable_persistent_cta", "c", "__tn__", "e", "entry_point", "sc_t"],
+            "polarisRouteConfig": { "shellProps": { "skipOpenAppDeeplinkAttempt": null, "isSeoClxEnabled": false }, "pageID": "profilePage" },
+            "canonicalUrl": null
+          },
+          "route_match_infos": [
+            {
+              "instanceParams": {
+                "username": "santosh_king2491",
+                "tab": null,
+                "show_story_unavailable": null,
+                "show_shared_access_dialog": false,
+                "view_type": null,
+                "show_pro_dash_dialog": false,
+                "pro_dash_tool": "",
+                "show_ad_partnerships_dialog": false,
+                "a_tt": null,
+                "a_mpk": null,
+                "c": null,
+                "__tn__": null,
+                "e": null,
+                "enable_persistent_cta": false,
+                "entry_point": null,
+                "sc_t": null,
+                "igshid": null,
+                "pcs": null,
+                "gclid": null,
+                "campaign_id": null,
+                "partner_id": null,
+                "tracking_id": null,
+                "extra_1": null,
+                "extra_2": null,
+                "event_time": null,
+                "sem_attr_id": null,
+                "placement": null,
+                "creative": null,
+                "keyword": null,
+                "igsh": null,
+                "utm_source": null,
+                "utm_medium": null,
+                "utm_campaign": null,
+                "dl_source": null,
+                "ig_rid": null
+              },
+              "routeConflicts": null,
+              "routeParams": {
+                "username": { "legacyNames": [], "default": null, "path": true, "significant": true, "coercibleType": "STRING" },
+                "tab": { "legacyNames": [], "default": null, "path": false, "significant": true, "coercibleType": "ENUM", "enumType": 1 },
+                "show_story_unavailable": { "legacyNames": [], "default": null, "path": false, "significant": false, "coercibleType": "STRING" },
+                "show_shared_access_dialog": { "legacyNames": [], "default": false, "path": false, "significant": false, "coercibleType": "BOOL" },
+                "view_type": { "legacyNames": [], "default": null, "path": false, "significant": false, "coercibleType": "ENUM", "enumType": 1 },
+                "show_pro_dash_dialog": { "legacyNames": [], "default": false, "path": false, "significant": false, "coercibleType": "BOOL" },
+                "pro_dash_tool": { "legacyNames": [], "default": "", "path": false, "significant": false, "coercibleType": "STRING" },
+                "show_ad_partnerships_dialog": { "legacyNames": [], "default": false, "path": false, "significant": false, "coercibleType": "BOOL" },
+                "a_tt": { "legacyNames": [], "default": null, "path": false, "significant": true, "coercibleType": "STRING" },
+                "a_mpk": { "legacyNames": [], "default": null, "path": false, "significant": true, "coercibleType": "STRING" },
+                "c": { "legacyNames": [], "default": null, "path": false, "significant": true, "coercibleType": "STRING_VECTOR" },
+                "__tn__": { "legacyNames": [], "default": null, "path": false, "significant": true, "coercibleType": "STRING" },
+                "e": { "legacyNames": [], "default": null, "path": false, "significant": true, "coercibleType": "STRING" },
+                "enable_persistent_cta": { "legacyNames": [], "default": false, "path": false, "significant": true, "coercibleType": "BOOL" },
+                "entry_point": { "legacyNames": [], "default": null, "path": false, "significant": true, "coercibleType": "STRING" },
+                "sc_t": { "legacyNames": [], "default": null, "path": false, "significant": true, "coercibleType": "STRING" },
+                "igshid": { "legacyNames": [], "default": null, "path": false, "significant": true, "coercibleType": "STRING" },
+                "pcs": { "legacyNames": [], "default": null, "path": false, "significant": true, "coercibleType": "INT" },
+                "gclid": { "legacyNames": [], "default": null, "path": false, "significant": false, "coercibleType": "STRING" },
+                "campaign_id": { "legacyNames": [], "default": null, "path": false, "significant": false, "coercibleType": "INT" },
+                "partner_id": { "legacyNames": [], "default": null, "path": false, "significant": false, "coercibleType": "STRING" },
+                "tracking_id": { "legacyNames": [], "default": null, "path": false, "significant": false, "coercibleType": "STRING" },
+                "extra_1": { "legacyNames": [], "default": null, "path": false, "significant": false, "coercibleType": "STRING" },
+                "extra_2": { "legacyNames": [], "default": null, "path": false, "significant": false, "coercibleType": "STRING" },
+                "event_time": { "legacyNames": [], "default": null, "path": false, "significant": false, "coercibleType": "INT" },
+                "sem_attr_id": { "legacyNames": [], "default": null, "path": false, "significant": false, "coercibleType": "STRING" },
+                "placement": { "legacyNames": [], "default": null, "path": false, "significant": false, "coercibleType": "STRING" },
+                "creative": { "legacyNames": [], "default": null, "path": false, "significant": false, "coercibleType": "STRING" },
+                "keyword": { "legacyNames": [], "default": null, "path": false, "significant": false, "coercibleType": "STRING" },
+                "igsh": { "legacyNames": [], "default": null, "path": false, "significant": true, "coercibleType": "STRING" },
+                "utm_source": { "legacyNames": [], "default": null, "path": false, "significant": true, "coercibleType": "STRING" },
+                "utm_medium": { "legacyNames": [], "default": null, "path": false, "significant": true, "coercibleType": "STRING" },
+                "utm_campaign": { "legacyNames": [], "default": null, "path": false, "significant": true, "coercibleType": "STRING" },
+                "dl_source": { "legacyNames": [], "default": null, "path": false, "significant": true, "coercibleType": "STRING" },
+                "ig_rid": { "legacyNames": [], "default": null, "path": false, "significant": true, "coercibleType": "STRING" }
+              },
+              "routePath": "/{username}/{?tab}/{?view_type}/{?igshid}/"
+            }
+          ]
+        }
+      }
+    },
+    "sr_payload": {
+      "hsrp": { "hblp": { "consistency": { "rev": 1025002794 }, "rsrcMap": { "csr:_2p_0_Ev": { "type": "csr", "src": ":1,2,56", "c": 1 } }, "indexUpgrades": {} } },
+      "jsmods": {
+        "require": [
+          [
+            "emptyFunction",
+            "thatReturns",
+            ["JSResourceReferenceImpl"],
+            [[{ "__jsr": "PolarisProfilePostsTabRoot.react" }, { "__jsr": "PolarisProfilePostsTabRoot.entrypoint" }, { "__jsr": "PolarisProfileRoot.react" }]]
+          ],
+          ["PolarisProfilePostsTabRoot.entrypoint"],
+          ["emptyFunction", "thatReturns", ["RequireDeferredReference"], [[{ "__dr": "PolarisProfilePostsTabRoot.entrypoint" }, { "__dr": "PolarisProfilePostsTabRoot.entrypoint" }]]],
+          ["RequireDeferredReference", "unblock", [], [["PolarisProfilePostsTabRoot.entrypoint"], "sd"]],
+          ["RequireDeferredReference", "unblock", [], [["PolarisProfilePostsTabRoot.entrypoint"], "css"]]
+        ]
+      },
+      "allResources": ["csr:_2p_0_Ev"],
+      "tieredResources": { "r": ["csr:_2p_0_Ev"], "rdfds": [], "rds": [] }
+    },
+    "log_roots": ["PolarisProfilePostsTabJSRoot"]
+  },
+  "dtsgAsyncGetToken": null,
+  "dtsgToken": null
+}

@@ -274,12 +274,10 @@ const scrapeProfilePosts = async function () {
 
   // Filter function - process requests
   const postsScrapingFilterFn = async (request, response) => {
-    {
-      if (request.url() === "https://www.instagram.com/graphql/query") {
-        const headers = request.headers()["x-fb-friendly-name"];
-        console.log("Request Headers:", headers);
-        return true;
-      }
+    if (request.url() === "https://www.instagram.com/graphql/query") {
+      const headers = request.headers()["x-fb-friendly-name"];
+      console.log("Request Headers:", headers);
+      return true;
     }
   };
 

@@ -5,10 +5,10 @@ const fs = require("fs-extra");
 // const testFunction = async function () {
 //   console.log(`testFunction started.`);
 //   // Posts Scraping from response
-//   const extractPostsFromResponse = async function (responseJSON) {
-//     // Scrape the post nodes & pushes then to this.state.targetToScrape.latestScrapedMetaData.posts
+//   const extractLikersFromResponse = async function (responseJSON) {
+//     // Scrape the post nodes & pushes then to this.state.targetToScrape.currentPostsLikers
 //     responseJSON.data.xdt_api__v1__feed__user_timeline_graphql_connection.edges.forEach((postNode) => {
-//       if (this.state.targetToScrape.latestScrapedMetaData.posts.some((post) => post.code === postNode.node.code)) return;
+//       if (this.state.targetToScrape.currentPostsLikers.some((post) => post.code === postNode.node.code)) return;
 //       try {
 //         const node = {
 //           code: postNode.node.code,
@@ -35,7 +35,7 @@ const fs = require("fs-extra");
 //           node.carousel_media = [];
 //           node.carousel_media_count = postNode.node.carousel_media.forEach((obj, i) => node.carousel_media.push({ url: obj.image_versions2.candidates[0].url, imgIndex: i }));
 //         }
-//         this.state.targetToScrape.latestScrapedMetaData.posts.push(node);
+//         this.state.targetToScrape.currentPostsLikers.push(node);
 //       } catch (error) {
 //         console.log(error);
 
@@ -47,7 +47,7 @@ const fs = require("fs-extra");
 //     });
 
 //     // Sort posts by taken_at date in descending order
-//     this.state.targetToScrape.latestScrapedMetaData.posts.sort((a, b) => b.taken_at - a.taken_at);
+//     this.state.targetToScrape.currentPostsLikers.sort((a, b) => b.taken_at - a.taken_at);
 
 //     // responseJSON.data.xdt_api__v1__feed__user_timeline_graphql_connection.page_info.has_next_page decides to scroll for more posts (true) or all posts are scraped (false).
 
@@ -78,10 +78,10 @@ const fs = require("fs-extra");
 
 //       console.log(`==============================================`); // for testing purpose only
 //       await fs.appendFile("./scraperTesting/responseAsItIs.json", JSON.stringify(resJSON, null, 2) + ",\n"); // for testing purpose only
-//       // console.log(`Currently length of scrapedMetaDataOfPosts is : ${this.state.targetToScrape.latestScrapedMetaData.posts.length}`); // for testing purpose only
+//       // console.log(`Currently length of scrapedMetaDataOfPosts is : ${this.state.targetToScrape.currentPostsLikers.length}`); // for testing purpose only
 //       console.log(`==============================================`); // for testing purpose only
 
-//       // this.state.targetToScrape.scrapingVariables.has_next_page = await extractPostsFromResponse.call(this, resJSON);
+//       // this.state.targetToScrape.scrapingVariables.has_next_page = await extractLikersFromResponse.call(this, resJSON);
 
 //       // this.state.targetToScrape.scrapingVariables.pagesScraped++;
 //       // await fs.writeFile("./scraperTesting/extractedPosts.json", JSON.stringify(this.state.currentResourceData.posts, null, 2));
@@ -91,8 +91,8 @@ const fs = require("fs-extra");
 //   console.log(`Starting to response Listener for posts scraping ....`);
 
 //   // this.state.targetToScrape.scrapingVariables = { pagesScraped: 0, has_next_page: true };
-//   // this.state.targetToScrape.removeResponseListener = await this.page.addResponseListener.call(this, commentsScrapingFilterFn.bind(this), commentsScrapingHandlerFn.bind(this));
-//   this.state.removeResponseListener = await this.page.addResponseListener.call(this, commentsScrapingFilterFn.bind(this), commentsScrapingHandlerFn.bind(this));
+//   // this.state.targetToScrape.removeResponseListenerForLiker = await this.page.addResponseListener.call(this, commentsScrapingFilterFn.bind(this), commentsScrapingHandlerFn.bind(this));
+//   this.state.removeResponseListenerForLiker = await this.page.addResponseListener.call(this, commentsScrapingFilterFn.bind(this), commentsScrapingHandlerFn.bind(this));
 
 //   await this.page.navigateTo(`https://www.instagram.com/chandani144__/reel/DMCDU3CBqIc/`); // Navigate to a new tab to reset the page state
 //   // await this.page.navigateTo(`https://www.instagram.com/${this.state.targetToScrape?.targetString}/`);
@@ -109,12 +109,18 @@ const fs = require("fs-extra");
 
 const testFunction = async function () {
   const listOfPostsURLs = [
-    "https://www.instagram.com/p/DKZ10yvzEqS/",
-    "https://www.instagram.com/p/DGvPYbATx20/",
-    "https://www.instagram.com/p/DE6pjjNTzEr/",
-    "https://www.instagram.com/p/DEpSiNHTzgy/",
+    "https://www.instagram.com/p/DCVz7D_zRKz",
+    // "https://www.instagram.com/p/DKZ10yvzEqS/",
+    // "https://www.instagram.com/p/DGvPYbATx20/",
+    // "https://www.instagram.com/p/DE6pjjNTzEr/",
+    // "https://www.instagram.com/p/DEpSiNHTzgy/",
   ];
   const resultsOfScraping = [];
+
+  const res = await likeScraper.call(this);
+  console.log(`Like Scraping completed with result: ${res}`);
+
+  process.exit(0);
   for (const url of listOfPostsURLs) {
     console.log(`Scraping post and comments from URL: ${url}`);
     const result = await commentsScraper.call(this, url);
@@ -135,6 +141,152 @@ const testFunction = async function () {
   console.log(`Scraping ENDED.`);
 };
 
+// Extract post metadata from meta tags
+// NOTE: this function Works in page context
+const extractPostMetadata = async () => {
+  const descriptionMeta = document.querySelector('meta[name="description"]');
+  const metaContent = descriptionMeta ? descriptionMeta.getAttribute("content") : "";
+
+  // Parse metadata using regex
+  const likesMatch = metaContent.match(/(\d+(?:,\d+)*) likes/);
+  const commentsMatch = metaContent.match(/(\d+(?:,\d+)*) comments/);
+  const usernameMatch = metaContent.match(/- ([\w._]+) on/);
+  const dateMatch = metaContent.match(/on ([\w\s,]+):/);
+
+  // Use split method instead of regex for description extraction
+  let description = metaContent.split(":").at(-1).trim();
+
+  // Process the description: remove quotes and extract hashtags
+  let caption = "";
+  let hashtags = [];
+
+  if (description) {
+    // Remove quotes from the beginning and end of the description
+    description = description.replace(/^\"|\"\.$|\"\.?$/g, "");
+
+    // Extract hashtags using regex
+    const hashtagRegex = /#[\w\u0080-\uFFFF]+/g;
+    hashtags = description.match(hashtagRegex) || [];
+
+    // Remove hashtags from the caption
+    caption = description;
+    hashtags.forEach((tag) => {
+      caption = caption.replace(tag, "");
+    });
+
+    // Clean up the caption (remove extra spaces, newlines, etc.)
+    caption = caption.replace(/\s+/g, " ").trim();
+  }
+
+  return {
+    likesCount: likesMatch ? parseInt(likesMatch[1].replace(/,/g, "")) : 0,
+    commentsCount: commentsMatch ? parseInt(commentsMatch[1].replace(/,/g, "")) : 0,
+    username: usernameMatch ? usernameMatch[1] : "",
+    postDate: dateMatch ? dateMatch[1] : "",
+    description: description,
+    caption: caption,
+    hashtags: hashtags,
+  };
+};
+// Extract media ID for potential video content
+// NOTE: this function Works in page context
+const getMediaId = () => {
+  const mediaMetaTag = document.querySelector('meta[property="al:ios:url"]');
+  if (!mediaMetaTag) return null;
+
+  const mediaContent = mediaMetaTag.getAttribute("content");
+  const mediaIdMatch = mediaContent.match(/id=(\d+)/);
+  return mediaIdMatch ? mediaIdMatch[1] : null;
+};
+
+// ---------------------------------------------------------------------------------------------------------
+const likeScraper = async function () {
+  console.log(`likeScraper function started....`);
+  await this.page.navigateTo("https://www.instagram.com/p/DKZ10yvzEqS/");
+  const metadata = await this.page.evaluate(extractPostMetadata);
+  // url:   https://www.instagram.com/api/v1/media/3646182097700014738/likers/ to intercept
+  // url:   https://www.instagram.com/api/v1/media//likers/ to intercept
+
+  const mediaId = await this.page.evaluate(getMediaId);
+
+  // =-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-
+  // TODO: Intercept the request to get the likers of the post
+  // 1. Use a method available on page object of puppeteer, but that must intercept the request only once.
+  // 2. Intercept the request with url `https://www.instagram.com/api/v1/media/${mediaId}/likers/`
+
+  // TODO: This given below statement creates a problem when some posts are already scraped
+  // if (!this.state.targetToScrape.currentPostsLikers) this.state.targetToScrape.currentPostsLikers = []; // Initialize likers array if not already initialized
+  this.state.targetToScrape.currentPostsLikers = [];
+
+  // Posts Scraping from response
+  const extractLikersFromResponse = async function (responseJSON) {
+    // Scrape the post nodes & pushes then to this.state.targetToScrape.currentPostsLikers
+    responseJSON.data.xdt_api__v1__likes__media_id__likers.users.forEach((liker) => {
+      if (this.state.targetToScrape.currentPostsLikers.some((existingLiker) => existingLiker.userName === liker.username)) return;
+      try {
+        const newLiker = {
+          userName: liker.username,
+          fullName: liker.full_name,
+        };
+
+        this.state.targetToScrape.currentPostsLikers.push(newLiker);
+      } catch (error) {
+        console.log(error);
+
+        console.log(`-=-=-=-=-=-=-=-`);
+        console.log(`Cannot extract data from liker: ${liker}`);
+        console.log(`-=-=-=-=-=-=-=-`);
+      }
+    });
+    if (responseJSON.extensions.is_final) return "stop Scrolling";
+    else return "scroll";
+  };
+
+  // Filter function - process requests
+  const likersScrapingRequestFilterFn = async (request, response) => {
+    if (request.url() === "https://www.instagram.com/graphql/query") {
+      const isTargetReq = request.headers()["x-fb-friendly-name"] === "PolarisPostLikedByListDialogQuery" && request.headers()["x-root-field-name"] === "xdt_api__v1__likes__media_id__likers";
+      return isTargetReq;
+    }
+  };
+
+  // Handler function - successful requests
+  const likersScrapingRequestHandlerFn = async (request, response) => {
+    // const postsScrapingHandlerFn = async (request, response) => {
+    const resJSON = await response.json();
+
+    console.log(`==============================================`); // for testing purpose only
+    await fs.appendFile("./scraperTesting/responseAsItIs.json", JSON.stringify(resJSON, null, 2) + ",\n"); // for testing purpose only
+    console.log(`Currently length of scrapedDataOfPosts for likers is : ${this.state.targetToScrape.latestScrapedMetaData.currentPostsLikers.length}`); // for testing purpose only
+    console.log(`==============================================`); // for testing purpose only
+
+    this.state.targetToScrape.scrapingVariables.has_more_likers = await extractLikersFromResponse.call(this, resJSON);
+
+    this.state.targetToScrape.scrapingVariables.likerPagesScraped++;
+  };
+  //
+  console.log(`Starting to response Listener for posts scraping ....`);
+
+  this.state.targetToScrape.scrapingVariables = { likerPagesScraped: 0, has_more_likers: true };
+  this.state.targetToScrape.removeResponseListenerForLiker = await this.page.addResponseListener.call(this, likersScrapingRequestFilterFn.bind(this), likersScrapingRequestHandlerFn.bind(this));
+
+  await this.page.clickNotClickable(`span ::-p-text(${metadata.likesCount} likes)`);
+
+  while (this.state.targetToScrape.scrapingVariables.has_more_likers !== "stop Scrolling") {
+    await this.utils.randomDelay(1.5, 0.5); // Wait for 1.5 seconds before next request
+    if (this.state.targetToScrape.scrapingVariables.has_more_likers === "scroll") {
+      // Scroll down for next posts requests
+      await this.page.evaluate(() => {
+        Array.from(document.querySelectorAll("button")).at(-1).scrollIntoView({ behavior: "smooth" });
+      });
+      // this.scrapingVariables.has_more_likers = "wait";
+    }
+    console.log(`--- After wait for response has_next_page is as: ${this.scrapingVariables.has_more_likers}`);
+  }
+
+  return true;
+};
+// ---------------------------------------------------------------------------------------------------------
 const commentsScraper = async function (url) {
   await this.page.navigateTo(url);
   console.log(`ok`);
@@ -164,65 +316,6 @@ const commentsScraper = async function (url) {
   const res = await this.page.evaluate(determineTypeOfPage);
   console.log(res);
   const { typeOfPage, idOfRootElement, containerSelector, commentElementSelector } = res;
-
-  // Extract post metadata from meta tags
-  // NOTE: this function Works in page context
-  const extractPostMetadata = async () => {
-    const descriptionMeta = document.querySelector('meta[name="description"]');
-    const metaContent = descriptionMeta ? descriptionMeta.getAttribute("content") : "";
-
-    // Parse metadata using regex
-    const likesMatch = metaContent.match(/(\d+(?:,\d+)*) likes/);
-    const commentsMatch = metaContent.match(/(\d+(?:,\d+)*) comments/);
-    const usernameMatch = metaContent.match(/- ([\w._]+) on/);
-    const dateMatch = metaContent.match(/on ([\w\s,]+):/);
-
-    // Use split method instead of regex for description extraction
-    let description = metaContent.split(":").at(-1).trim();
-
-    // Process the description: remove quotes and extract hashtags
-    let caption = "";
-    let hashtags = [];
-
-    if (description) {
-      // Remove quotes from the beginning and end of the description
-      description = description.replace(/^\"|\"\.$|\"\.?$/g, "");
-
-      // Extract hashtags using regex
-      const hashtagRegex = /#[\w\u0080-\uFFFF]+/g;
-      hashtags = description.match(hashtagRegex) || [];
-
-      // Remove hashtags from the caption
-      caption = description;
-      hashtags.forEach((tag) => {
-        caption = caption.replace(tag, "");
-      });
-
-      // Clean up the caption (remove extra spaces, newlines, etc.)
-      caption = caption.replace(/\s+/g, " ").trim();
-    }
-
-    return {
-      likesCount: likesMatch ? parseInt(likesMatch[1].replace(/,/g, "")) : 0,
-      commentsCount: commentsMatch ? parseInt(commentsMatch[1].replace(/,/g, "")) : 0,
-      username: usernameMatch ? usernameMatch[1] : "",
-      postDate: dateMatch ? dateMatch[1] : "",
-      description: description,
-      caption: caption,
-      hashtags: hashtags,
-    };
-  };
-
-  // Extract media ID for potential video content
-  // NOTE: this function Works in page context
-  const getMediaId = () => {
-    const mediaMetaTag = document.querySelector('meta[property="al:ios:url"]');
-    if (!mediaMetaTag) return null;
-
-    const mediaContent = mediaMetaTag.getAttribute("content");
-    const mediaIdMatch = mediaContent.match(/id=(\d+)/);
-    return mediaIdMatch ? mediaIdMatch[1] : null;
-  };
 
   //  Scroll & click "Load more comments" button, wait and checks for more new comments loaded or not
   //  if more new comments loaded it returns true
@@ -339,7 +432,7 @@ const commentsScraper = async function (url) {
   try {
     // Get post metadata
     // const metadata = await extractPostMetadata(); // NOTE: this function Works in page context
-    const metadata = await await this.page.evaluate(extractPostMetadata);
+    const metadata = await this.page.evaluate(extractPostMetadata);
     metadata.typeOfPage = typeOfPage;
     metadata.idOfRootElement = idOfRootElement;
     // const mediaId = getMediaId();   // NOTE: this function Works in page context
