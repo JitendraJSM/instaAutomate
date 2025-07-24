@@ -148,7 +148,7 @@ const getUserDataPathByUserName = async function (userName) {
  * @function readUserProfileData
  * @param {string} userName - The username of the profile to read data for.
  * @returns {Promise<Object>} The user data object read from the file.
- * @throws {Error} If the userName is provided or the user data file does not exist.
+ * @throws {Error} If the userName is not provided or the user data file does not exist.
  *
  * @example
  * const userData = await readUserProfileData.call(this,userName); // "this" is App instance

@@ -39,7 +39,7 @@
 # To Develop
 
 1. Profile Scraper Done
-2. Posts liker, commenters, comments and other meta-data Scraper to target.
+2. Posts liker, commenters, comments and other meta-data Scraper to target. Done
 3. Restricter module / function / script.
 4. Controller module / function / script.
 
@@ -47,7 +47,7 @@
 
 Controller decides which task should be assigned to which agent or scraper and when that task should be done.
 
-# Posts Scraper
+# Posts Scraper Done
 
 - From posts page $('meta[name="description"]') content will have all meta data of post number of likes, comments, date of post and the description of post, as given below
 <meta name="description" content="19 likes, 0 comments - javascript_tips on April 25, 2018: &quot;Hey fellows!
@@ -56,3 +56,36 @@ Just a simple tips today: short-circuits conditionals.
 #javascript #js #ecmascript #ecmascript6 #es6 #tips #tricks #daily #programming&quot;. ">
 
 - The link of image if it is image is $(".\_aagv img").src
+
+#### Date 22/07/2025
+
+Now approximatly everything can be done by automation the code is developed, now it's time to decide what flow is best.
+Most things that can be done by automation are as below:-
+
+- follow any account by username
+- like any post by url or by username
+- scrape the whole profile with followers, followings and all post's media with their number of likes and comments.
+- scrape all comments of any post by postURL.
+- scrape at max 100 likers of a post by postURL.
+- edit reel and edit image to try not to get copyright issue.
+
+# Requirements from automation -
+
+## Controller -
+
+## Agents -
+
+- Upload posts with a consistency.
+- follow Target Accounts to get engagement.
+- like Target Accounts posts to get engagement.
+- comment on Target Accounts posts to get engagement.
+- DM Target Accounts to get engagement.
+- insta app on time must be at least 1 hr everyday.
+- NOTE: after doing any of above action data must be updated.
+
+## Scrapers -
+
+- Scrape posts, profiles, metaData, likers, commenters, comments ,....etc.
+- NOTE: after doing any of above action data must be updated.
+
+# Flow -
