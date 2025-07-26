@@ -11,25 +11,24 @@
 // === Base Imports ===
 const Monitor = require("./MonitorModule.js");
 const executeAction = require("./appExecutor.js");
-const appLoggerInit = require("../functionsLibrary/appLogger.js");
+const appLoggerInit = require("./appLogger.js");
 const utils = require("../utils/utils.js");
-const EventEmitter = require("events");
 
 // === Functions Library Imports ===
 const chrome = require("../functionsLibrary/chrome.js");
+const db = require("../functionsLibrary/db.js");
 const devOrTest = require("../functionsLibrary/devOrTest.js");
 const instaAuto = require("../functionsLibrary/instaAuto.js");
-const db = require("../functionsLibrary/db.js");
 const instaScraper = require("../functionsLibrary/instaScraper.js");
 const testFunctionModule = require("../functionsLibrary/testFunctionModule.js");
 
-class App extends EventEmitter {
+class App {
   constructor() {
-    super();
     // == functionsLibraries ==
     this.utils = utils;
     this.chrome = chrome;
     this.devOrTest = devOrTest;
+    t;
     this.instaAuto = instaAuto;
     this.db = db;
     this.instaScraper = instaScraper;
@@ -49,11 +48,6 @@ class App extends EventEmitter {
     this.isApp = true; // Flag to identify this as an App instance
     // console.log(`Your Automation-App (i.e. app) Instanciated.`);
     this.counter = 1;
-  }
-
-  async init() {
-    // Initialize app components
-    console.log(`App initialized.`);
   }
 
   next(error) {
@@ -110,7 +104,7 @@ class App extends EventEmitter {
     console.log(this.state);
 
     // Logging the state in the end
-    this.appLogger.logState();
+    if (this.appLogger) this.appLogger.logState();
   }
 
   async stop() {

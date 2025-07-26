@@ -186,7 +186,7 @@ const writeUserProfileData = async function (userData) {
 // ==== Combined (for Agent / Scraper / Resource) Task Related Data Functions ====
 const addNewProfile = async function () {
   let userInput = await this.utils.askUser(`Do you want to add new profile? (y/n): `);
-  if (userInput.toLowerCase() === "n") return false;
+  if (userInput.toLowerCase() !== "y") return false;
 
   // Create a new profile object
   let newProfile = {};
@@ -407,6 +407,7 @@ const filterProfilesToAutomate = async function () {
   // 1. All Agent Profiles having DueTasks
   // this.state.profilesToLoop = this.state.profilesData.filter((profile) => profile.type === "agent");
   this.state.profilesToLoop = this.state.profilesData.filter((profile) => profile.type === "agent" && profile.dueTasks.length !== 0);
+  // TODO: Sort by number to dueTasks.length
 
   // 2. When agent tasks completed start scraper tasks
   if (this.state.profilesToLoop.length === 0) this.state.profilesToLoop = this.state.profilesData.filter((profile) => profile.type === "scraper" && profile.dueTasks.length !== 0);

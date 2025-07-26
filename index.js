@@ -12,8 +12,6 @@ initialTestTask_copy.taskName = "initialTestTask_copy";
 const instaAutomationTask = require("./tasks/instaAutomationTask.json");
 instaAutomationTask.taskName = "instaAutomationTask";
 
-// === Testing Purpose ===
-
 async function main() {
   console.log(`Main function Started.`);
 

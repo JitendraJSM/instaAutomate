@@ -407,6 +407,346 @@ const updateDatabaseAfterProfileScraping = async function () {
 
 // =-=-=-=-=-=-= 👇 POST Scraping function 👇 =-=-=-=-=-=-=
 
+// ------ 9. Extract post metadata from meta tags ------
+// NOTE: this function Works in page context
+const extractPostMetadata = async () => {
+  const descriptionMeta = document.querySelector('meta[name="description"]');
+  const metaContent = descriptionMeta ? descriptionMeta.getAttribute("content") : "";
+
+  // Parse metadata using regex
+  const likesMatch = metaContent.match(/(\d+(?:,\d+)*) likes/);
+  const commentsMatch = metaContent.match(/(\d+(?:,\d+)*) comments/);
+  const usernameMatch = metaContent.match(/- ([\w._]+) on/);
+  const dateMatch = metaContent.match(/on ([\w\s,]+):/);
+
+  // Use split method instead of regex for description extraction
+  let description = metaContent.split(":").at(-1).trim();
+
+  // Process the description: remove quotes and extract hashtags
+  let caption = "";
+  let hashtags = [];
+
+  if (description) {
+    // Remove quotes from the beginning and end of the description
+    description = description.replace(/^\"|\"\.$|\"\.?$/g, "");
+
+    // Extract hashtags using regex
+    const hashtagRegex = /#[\w\u0080-\uFFFF]+/g;
+    hashtags = description.match(hashtagRegex) || [];
+
+    // Remove hashtags from the caption
+    caption = description;
+    hashtags.forEach((tag) => {
+      caption = caption.replace(tag, "");
+    });
+
+    // Clean up the caption (remove extra spaces, newlines, etc.)
+    caption = caption.replace(/\s+/g, " ").trim();
+  }
+
+  return {
+    likesCount: likesMatch ? parseInt(likesMatch[1].replace(/,/g, "")) : 0,
+    commentsCount: commentsMatch ? parseInt(commentsMatch[1].replace(/,/g, "")) : 0,
+    username: usernameMatch ? usernameMatch[1] : "",
+    postDate: dateMatch ? dateMatch[1] : "",
+    description: description,
+    caption: caption,
+    hashtags: hashtags,
+  };
+};
+
+// ------ 10. Extract media ID for potential video content ------
+// NOTE: this function Works in page context
+const getMediaId = () => {
+  const mediaMetaTag = document.querySelector('meta[property="al:ios:url"]');
+  if (!mediaMetaTag) return null;
+
+  const mediaContent = mediaMetaTag.getAttribute("content");
+  const mediaIdMatch = mediaContent.match(/id=(\d+)/);
+  return mediaIdMatch ? mediaIdMatch[1] : null;
+};
+
+// ------ 11. Likes Scraper ------
+const likesScraper = async function () {
+  console.log(`likeScraper function started....`);
+
+  this.state.targetToScrape = {}; // temporary defining as it is not completely integrated.
+
+  await this.page.navigateTo("https://www.instagram.com/p/DKZ10yvzEqS/");
+
+  const metadata = await this.page.evaluate(extractPostMetadata);
+
+  const mediaId = await this.page.evaluate(getMediaId);
+
+  const likers = [];
+
+  // Click to open likers modal
+  await this.page.clickNotClickable(`span ::-p-text(${metadata.likesCount} likes)`);
+
+  // Wait for the likers response
+  const likersResponse = await this.page.waitForResponse((response) => response.url() === `https://www.instagram.com/api/v1/media/${mediaId}/likers/` && response.status() === 200, { timeout: 60000 });
+
+  // Process likers data
+  const likersData = await likersResponse.json();
+  likersData.users.forEach((liker) => {
+    if (likers.some((l) => l.userName === liker.username)) return; // Skip if liker already exists
+    likers.push({
+      id: liker.pk,
+      userName: liker.username,
+      fullName: liker.full_name,
+    });
+  });
+  // await fs.appendFile("./scraperTesting/responseAsItIs.json", JSON.stringify(likersData, null, 2) + ",\n");
+  console.log(`Likers data intercepted successfully`);
+
+  return true;
+};
+
+// ------ 12. Comments Scraper function ------
+const commentsScraper = async function (url) {
+  await this.page.navigateTo(url);
+  console.log(`ok`);
+
+  // NOTE: this function Works in page context
+  const determineTypeOfPage = () => {
+    const rootElement = document.querySelector('[id^="mount"]');
+    const idOfRootElement = rootElement.id;
+
+    let typeOfPage;
+    if (document.querySelector("._a9z6._a9za") !== null) typeOfPage = "type1";
+    else if (document.querySelector(".x5yr21d.xw2csxc.x1odjw0f.x1n2onr6") !== null) typeOfPage = "type2";
+
+    if (typeOfPage === "type1") {
+      return { typeOfPage, idOfRootElement, containerSelector: "._a9z6._a9za", commentElementSelector: "._a9ym" };
+    } else if (typeOfPage === "type2") {
+      return {
+        typeOfPage,
+        idOfRootElement,
+        containerSelector: ".x5yr21d.xw2csxc.x1odjw0f.x1n2onr6",
+        commentElementSelector:
+          ".html-div.xdj266r.x14z9mp.xat24cr.x1lziwak.xexx8yu.xyri2b.x18d9i69.x1c1uobl.x9f619.xjbqb8w.x78zum5.x15mokao.x1ga7v0g.x16uus16.xbiv7yw.x1uhb9sk.x1plvlek.xryxfnj.x1iyjqo2.x2lwn1j.xeuugli.xdt5ytf.xqjyukv.x1qjc9v5.x1oa3qoh.x1nhvcw1:not(:has(> span))",
+      };
+    }
+  };
+
+  const res = await this.page.evaluate(determineTypeOfPage);
+  console.log(res);
+  const { typeOfPage, idOfRootElement, containerSelector, commentElementSelector } = res;
+
+  //  Scroll & click "Load more comments" button, wait and checks for more new comments loaded or not
+  //  if more new comments loaded it returns true
+  //  if more new comments not loaded it returns false
+  const loadMoreCommentsBTN = async function () {
+    let isMoreCommentsLoaded = false;
+
+    // Get initial state of container
+    // NOTE: this function Works in page context
+    const getContainerState = (containerSelector, commentElementSelector) => {
+      const container = document.querySelector(containerSelector);
+      if (!container) return null;
+      const numOfCommentsInDOM = document.querySelectorAll(commentElementSelector).length;
+
+      return {
+        numOfCommentsInDOM,
+        scrollHeight: container.scrollHeight,
+        scrollTop: container.scrollTop,
+      };
+    };
+
+    // Function to scroll down in comments container
+    // NOTE: this function Works in page context
+    const scrollDownInCommentsDataBox = (containerSelector) => {
+      const container = document.querySelector(containerSelector);
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+        return true;
+      }
+      return false;
+    };
+
+    // Check LoadMoreCommentsBTN is available or not if exists then it returns true
+    // NOTE: this function Works in page context
+    const checkIsBTNExists = async function () {
+      const btn = document.querySelector('svg[aria-label="Load more comments"]');
+      return btn !== null;
+    };
+
+    const checkIsMoreCommentsLoaded = async function (beforeState) {
+      // Wait a moment for content to load
+      await this.utils.randomDelay(1, 2); // Adjust delay as needed
+      // await this.page.waitForNetworkIdle();
+
+      // Get state after clicking
+      const afterState = await this.page.evaluate(getContainerState, containerSelector, commentElementSelector);
+      if (!afterState) {
+        console.log(`Comments Container (ie. ${containerSelector}) not found after clicking`);
+        return false;
+      }
+
+      // Compare states to determine if click was successful
+      const isSuccess = afterState.numOfCommentsInDOM > beforeState.numOfCommentsInDOM || afterState.scrollHeight > beforeState.scrollHeight;
+
+      if (isSuccess) console.log(` - ${afterState.numOfCommentsInDOM - beforeState.numOfCommentsInDOM}, More Comments loaded.`);
+      else console.log(`No New comments loaded.`);
+
+      return isSuccess;
+    };
+
+    // Get state before clicking
+    const beforeState = await this.page.evaluate(getContainerState, containerSelector, commentElementSelector);
+    if (!beforeState) {
+      console.log(`Comments Container (ie. ${containerSelector}) not found before clicking`);
+      return false;
+    }
+    // Try scrolling down first
+    // const scrolled = scrollDownInCommentsDataBox(); // Will not works as scrollDownInCommentsDataBox function Works in page context
+    const scrolled = await this.page.evaluate(scrollDownInCommentsDataBox, containerSelector);
+    if (!scrolled) console.log(`Try but cannot scroll in Comments Container.`);
+
+    isMoreCommentsLoaded = await checkIsMoreCommentsLoaded.call(this, beforeState);
+    if (isMoreCommentsLoaded) return isMoreCommentsLoaded;
+
+    const isBTNExists = await this.page.evaluate(checkIsBTNExists);
+    if (!isBTNExists) return isBTNExists;
+
+    // Click the button
+    await this.page.clickNotClickable('svg[aria-label="Load more comments"]');
+
+    isMoreCommentsLoaded = await checkIsMoreCommentsLoaded.call(this, beforeState);
+    return isMoreCommentsLoaded;
+  };
+
+  // NOTE: this function Works in page context
+  const checkForEndOfCommentsContainer = () => {
+    const viewHiddenCommentsElement = document.querySelector('[aria-label="View hidden comments"]');
+    return viewHiddenCommentsElement !== null;
+  };
+
+  // Function to extract comments from DOM
+  // NOTE: this function Works in page context
+  const extractComments = (commentElementSelector) => {
+    const commentElements = document.querySelectorAll(commentElementSelector);
+    const commentsArray = Array.from(commentElements).map((el) => el.innerText);
+
+    // Parse comments into structured objects
+    return commentsArray
+      .map((comment) => {
+        const parts = comment.split("\n");
+        if (parts.length >= 2) {
+          return {
+            username: parts[0],
+            text: parts[1],
+            metadata: parts.slice(2).join(" "), // Time, likes, reply info
+          };
+        }
+        return null;
+      })
+      .filter(Boolean); // Remove any null entries
+  };
+
+  // Main execution
+  try {
+    // Get post metadata
+    // const metadata = await extractPostMetadata(); // NOTE: this function Works in page context
+    const metadata = await this.page.evaluate(extractPostMetadata);
+    metadata.typeOfPage = typeOfPage;
+    metadata.idOfRootElement = idOfRootElement;
+    // const mediaId = getMediaId();   // NOTE: this function Works in page context
+    const mediaId = await this.page.evaluate(getMediaId);
+
+    // Initialize comments collection with deduplication
+    const uniqueComments = new Map();
+    let loadAttempts = 0;
+    const MAX_LOAD_ATTEMPTS = 20; // Prevent infinite loops
+
+    // First extraction of available comments
+    // let currentComments = extractComments(); // Will not works as extractComments function Works in page context
+    let currentComments = await this.page.evaluate(extractComments, commentElementSelector);
+
+    currentComments.forEach((comment) => {
+      uniqueComments.set(comment.username + "|" + comment.text, comment);
+    });
+
+    // Continue loading comments until we have all or reach max attempts
+    while (uniqueComments.size < metadata.commentsCount && loadAttempts < MAX_LOAD_ATTEMPTS) {
+      // If scrolling didn't work or we're at the bottom, try clicking "Load more"
+
+      const isMoreCommentsLoaded = await loadMoreCommentsBTN.call(this);
+
+      if (isMoreCommentsLoaded) loadAttempts = 0;
+      else {
+        loadAttempts++;
+        console.log(`Load more comments try number ${loadAttempts} failed. `);
+        continue;
+      }
+
+      // Extract newly loaded comments
+      // currentComments = extractComments();  // Will not works as extractComments function Works in page context
+      currentComments = await this.page.evaluate(extractComments, commentElementSelector);
+      currentComments.forEach((comment) => {
+        uniqueComments.set(comment.username + "|" + comment.text, comment);
+      });
+
+      const isEndOfCommentsContainer = await this.page.evaluate(checkForEndOfCommentsContainer);
+      if (isEndOfCommentsContainer) {
+        console.log(`Breaking the loop as View Hidden comments BTN appeared in container.`);
+        break;
+      }
+      if (uniqueComments.size === metadata.commentsCount) {
+        console.log(
+          `Breaking the loop as total comments scraped is equal to total comments in the post.(ie uniqueComments.size: ${uniqueComments.size} and metadata.commentsCount: ${metadata.commentsCount})`
+        );
+        break;
+      }
+    }
+    // ---- 👇 temp for checking 👇 ----
+    const returnObj = {
+      postMetadata: metadata,
+      mediaId,
+      comments: Array.from(uniqueComments.values()),
+      totalCommentsScraped: uniqueComments.size,
+    };
+    // postURL = "https://www.instagram.com/chandani144__/reel/DMA1p8ahX33/"
+
+    const parentFolderPath = path.join(__dirname, `../data/instaScrapedData/postsData/${metadata.username}`);
+    // Ensure logs directory exists
+    await fs.ensureDir(parentFolderPath);
+
+    const postCode = url.split("/").at(-2);
+    const fileName = `${postCode}.json`;
+    const filePath = path.join(parentFolderPath, fileName);
+    await fs.writeFile(filePath, JSON.stringify(returnObj, null, 2));
+    // ---- 👆 temp for checking 👆 ----
+
+    // Prepare final result
+    return {
+      postURL: url,
+      postMetadata: metadata,
+      mediaId,
+      comments: Array.from(uniqueComments.values()),
+      totalCommentsScraped: uniqueComments.size,
+    };
+  } catch (error) {
+    console.error("Error scraping post and comments:", error);
+    return { error: error.message };
+  }
+
+  // Check btn is clicked or not
+  // Create a function that checks if the button is clicked or not
+  // Apply this trick to check if the button is clicked or not
+  // first check the number of child elements in the container brfore clicking the button
+  //  Check the height of the container before clicking the button
+  // then click the button using await this.page.clickNotClickable('svg[aria-label="Load more comments"]');
+  // then check the number of child elements in the container after clicking the button
+  //  Check the height of the container after clicking the button
+  // if the number of child elements is increased and the height of the container is increased then the button is clicked
+  // if the number of child elements is same and the height of the container is same then the button is not clicked in that case random wait for 1 to 2 seconds and click the button again and check again and so on until the button is clicked.
+
+  console.log(`====================================-===-=-=-=--=-=-=-==-=-`);
+  console.log(scrollRes);
+  console.log(`====================================-===-=-=-=--=-=-=-==-=-`);
+};
+
 // =-=-=-=-=-=-= ☝ POST Scraping function 👆 =-=-=-=-=-=-=
 
 // ===== Exports =====
