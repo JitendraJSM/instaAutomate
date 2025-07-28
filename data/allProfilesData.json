@@ -4,6 +4,7 @@
     "userName": "manisha.sen.25",
     "password": "hhjsm001",
     "type": "agent",
+    "linkedResourceUserName": "notYetDefined",
     "userDataPath": "data/instaProfilesData/agentsData/manisha.sen.25-data.json",
     "dueTasks": [
       {
@@ -19,6 +20,7 @@
     "userName": "kajalmahioffical143",
     "password": "hhjsm001",
     "type": "agent",
+    "linkedResourceUserName": "notYetDefined",
     "userDataPath": "data/instaProfilesData/agentsData/kajalmahioffical143-data.json",
     "dueTasks": [
       {
@@ -73,6 +75,7 @@
   {
     "userName": "sweet_sonu.001",
     "type": "agent",
+    "linkedResourceUserName": "notYetDefined",
     "password": "hhjsm001",
     "profileTarget": "6",
     "userDataPath": "./data/instaProfilesData/agentsData/sweet_sonu.001-data.json",

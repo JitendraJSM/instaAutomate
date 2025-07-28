@@ -28,7 +28,6 @@ class App {
     this.utils = utils;
     this.chrome = chrome;
     this.devOrTest = devOrTest;
-    t;
     this.instaAuto = instaAuto;
     this.db = db;
     this.instaScraper = instaScraper;

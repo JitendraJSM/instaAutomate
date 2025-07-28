@@ -213,6 +213,7 @@ const addNewProfile = async function () {
 
   newProfile.dueTasks = [];
   newProfile.automatedFollow = [];
+  if (newProfile.type === "agent") newProfile.linkedResourceUserName = "notYetDefined";
 
   this.state.profilesData.push(newProfile);
 
@@ -400,19 +401,16 @@ const updateDatabaseOnFollow = async function (userObject) {
 
 // ==== General Purpose / Other Functions ====
 const filterProfilesToAutomate = async function () {
-  // As agent's dueTasks are more important than scraper's dueTasks.
-  console.log(`Before this.state.profilesToLoop`);
-  console.log(this.state.profilesToLoop);
-
   // 1. All Agent Profiles having DueTasks
-  // this.state.profilesToLoop = this.state.profilesData.filter((profile) => profile.type === "agent");
   this.state.profilesToLoop = this.state.profilesData.filter((profile) => profile.type === "agent" && profile.dueTasks.length !== 0);
-  // TODO: Sort by number to dueTasks.length
+  this.state.profilesToLoop.sort((a, b) => b.dueTasks.length - a.dueTasks.length);
 
   // 2. When agent tasks completed start scraper tasks
   if (this.state.profilesToLoop.length === 0) this.state.profilesToLoop = this.state.profilesData.filter((profile) => profile.type === "scraper" && profile.dueTasks.length !== 0);
-  console.log(`Before this.state.profilesToLoop`);
-  console.log(this.state.profilesToLoop);
+  this.state.profilesData
+    .filter((profile) => profile.type === "scraper" && profile.dueTasks.length !== 0)
+    .sort((a, b) => a.dueTasks.length - b.dueTasks.length)
+    .forEach((Profile) => this.state.profilesToLoop.push(Profile));
 
   if (this.state.profilesToLoop.length === 0) throw new Error(`No profiles to loop`);
   return true;

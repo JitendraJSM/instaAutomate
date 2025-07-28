@@ -29,14 +29,6 @@ const restrictor = require("./restrictor.js");
 
 const db = require("./db.js");
 
-// ======= Event Listeners =======
-// const startListeners = async function () {
-//   this.on("follow", async (userObject) => {
-//     await this.db.updateDatabaseOnFollow.call(this, userObject);
-//   });
-//   console.log(`Listeners started.`);
-// };
-
 const updateUserData = async function (needUpadte) {
   let userData;
 
@@ -234,12 +226,13 @@ const updateCurrentProfileInMemory = async function (userName) {
 };
 updateCurrentProfileInMemory.doNotParseArgumentsString = true;
 
-const performDueTasks = async function () {
+// ======= Controller Functions =======
+const pushProfileDueTasksToCurrentActionsArray = function (profile) {
   const agentPreDueTasks = [
     {
       parentModuleName: "instaAuto",
       actionName: "updateCurrentProfileInMemory",
-      argumentsString: `${this.state.currentProfile.userName}`,
+      argumentsString: `${profile.userName}`,
     },
     {
       parentModuleName: "devOrTest",
@@ -256,79 +249,7 @@ const performDueTasks = async function () {
       parentModuleName: "chrome",
       actionName: "closeBrowser",
     },
-  ];
-  // Deep copy of dueTasks, handling multilevel nested arrays/objects
-  const copyOfDueTasks = JSON.parse(JSON.stringify(this.state.currentProfile.dueTasks, null, 2));
-  this.task.splice(this.currentActionIndex + 1, 0, ...agentPreDueTasks, ...copyOfDueTasks, ...agentPostDueTasks);
-  return true;
-};
-
-/*const performDueTasks = async function () {
-  // const lastTask = this.task.pop();
-  // const agentPreDueTasks = [
-  //   {
-  //     expression: `this.state.profileTarget = ${this.state.currentProfile.profileTarget}*1`,
-  //   },
-  //   {
-  //     parentModuleName: "chrome",
-  //     actionName: "initializeBrowser",
-  //   },
-  //   {
-  //     parentModuleName: "instaAuto",
-  //     actionName: "updateUserData",
-  //   },
-  //   {
-  //     parentModuleName: "instaAuto",
-  //     actionName: "follow",
-  //     argumentsString: `ritika_paswan._`,
-  //     doNotParseArgumentsString: true, // must be true if arugumentString contains dot or /
-  //   },
-  // ];
-  // this.task = [...this.task, ...agentPreDueTasks, lastTask];
-  // console.log(`let's returning from instaAutomation to main tasks-----`);
-  // return;
-  // agentPreDueTasks are as below
-  this.state.profileTarget = this.state.currentProfile.profileTarget;
-  // 1. Initialize the browser
-  await this.chrome.initializeBrowser.call(this);
-  // 2. Get dueTasks Array of currentProfile
-  const dueTasks = this.state.currentProfile.dueTasks;
-  console.log(`-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-xx-x-x-x-xx-x-x-`);
-  console.log(this.state.currentProfile.dueTasks);
-  console.log(`-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-xx-x-x-x-xx-x-x-`);
-  console.log(`-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-==-=-=-`);
-  console.log(this);
-  console.log(`-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-==-=-=-`);
-  await this.utils.devWaitCheckContinue();
-
-  const stateFilePath = path.join(__dirname, "../data/stateAtCompletion.json");
-  fs.writeFileSync(stateFilePath, JSON.stringify(this.state, null, 2));
-  console.log(`State written to ${stateFilePath}`);
-
-  // await follow.call(this, "riya9669singh");
-  // await follow.call(this, "sona_sengupta_");
-  // await follow.call(this, "roshnigupta0075");
-};*/
-
-// ======= Controller Functions =======
-
-const instaAutomation = async function () {
-  /* Given below loop fills all the dueTasks to this.currentActions Array but in reverse order still it doesn't matter if in future it 
-  is needed then first sort this.state.profilesToLoop as number of dueTasks. */
-  this.state.currentProfileIndex = 0;
-  while (this.state.currentProfileIndex < this.state.profilesToLoop.length) {
-    this.state.currentProfile = this.state.profilesToLoop[this.state.currentProfileIndex];
-
-    // console.log(`currentProfile to loop over is as: `);
-    // console.log(this.state.currentProfile);
-    console.log(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`);
-    // console.log(`Before this.tasks`);
-    // console.log(this.task);
-
-    await performDueTasks.call(this);
-    console.log(`After this.tasks`);
-    console.log(this.task);
-
+    // TODO: Add this given below IPchange task as agentPostDueTasks. only if this.isMobile is true.
     /* Change IP address
      let ipChanged = false;
      while (!ipChanged) {
@@ -338,15 +259,20 @@ const instaAutomation = async function () {
        const newIP = await this.utils.getCurrentIP();
        ipChanged = currentIP !== newIP;
      }  */
-
-    this.state.currentProfileIndex++;
-  }
-  await this.utils.devWaitCheckContinue();
-
-  // console.log(`---- All Tasks Added ----`);
+  ];
+  // Deep copy of dueTasks, handling multilevel nested arrays/objects
+  const copyOfDueTasks = JSON.parse(JSON.stringify(profile.dueTasks, null, 2));
+  this.task.splice(this.currentActionIndex + 1, 0, ...agentPreDueTasks, ...copyOfDueTasks, ...agentPostDueTasks);
+  return true;
 };
 
-const scrapeContentOfUser = async function () {};
+const instaAutomation = async function () {
+  /* Given below loop fills all the dueTasks to this.currentActions Array */
+  this.state.profilesToLoop.forEach((profile) => {
+    pushProfileDueTasksToCurrentActionsArray.call(this, profile);
+  });
+  return true;
+};
 
 // === Interface ===
 const catchAsync = require("../utils/catchAsync.js");

@@ -18,35 +18,8 @@ async function main() {
   let app = new App();
 
   // ------------------ Testing purpose ---------------------------
-
   // await app.run(initialTestTask);
-  // await app.run(instaAutomationTask);
-  await app.run(initialTestTask_copy);
-  // console.log(`=================================`);
-  // console.log(app);
-  // console.log(`=================================`);
-  // console.log(`app.state is as below : `);
-  // console.log(app.state);
-
-  // console.log(`app is as below : `);
-  // console.log(app);
-
-  // console.log(`New member to add is as below :`);
-  // console.log(app.state.newMemberToAdd);
-  // console.log(
-  //   `Next available chrome profile is : ${app.state.nextAvailableChromeProfile}`
-  // );
-  // -----------------------------------------------------------
-  // const pages = await app.browser.pages();
-  // console.log(`${pages.length} pages opened.`);
-  // // Print URLs of all open pages
-  // console.log(`================================`);
-  // for (const page of pages) {
-  //   console.log(`Page URL: ${page.url()}`);
-  // }
-  // console.log(`================================`);
-  // ------------------ Testing purpose ---------------------------
-
-  // console.log(`---END---`);
+  await app.run(instaAutomationTask);
+  // await app.run(initialTestTask_copy);
 }
 main();
