@@ -10,9 +10,9 @@ const fs = require("fs-extra");
 
 // ------ 1. targetToScrape function ------
 const targetScraper = async function (targetString) {
-  if (!targetString) throw new Error(`targetScraper Function needs a URL string targetString as Argument.`);
+  // if (!targetString) throw new Error(`targetScraper Function needs a URL string targetString as Argument.`);
 
-  this.state.targetToScrape = { targetString };
+  this.state.targetToScrape ||= { targetString };
 
   this.state.targetToScrape.targetStringType = await targetStringAnalyzer.call(this);
 

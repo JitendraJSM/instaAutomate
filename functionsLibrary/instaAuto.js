@@ -217,6 +217,14 @@ const like = async function (likeOptions) {
   }
   console.log(`Random Post likes is Completed.`);
 };
+// must Call with this as app
+const runScraper = async function () {
+  if (this.state.currentProfile.type !== "scraper") return;
+  this.state.targetStringsToScrape = await this.db.readTargetStringsToScrape();
+  this.state.currentTargetStringsToScrape = this.state.targetStringsToScrape[0];
+  this.state.currentTargetStringsToScrape.isApproved = this.restrictor.checkForApprovalToScrape();
+  if (this.state.currentTargetStringsToScrape.isApproved) this.state.currentTargetStringsToScrape.isScrapingSuccessful = await this.instaScraper.targetScraper();
+};
 
 // updateCurrentProfileInMemory is actually needed because when duetasks of a profile gets completed and a new profile's dueTasks execution is going to start at that point accokrding to tasks the old chrome profile instance gets closed but in memeory it doesn't actually gets changed. As generally it is used kon start of each profile automation.
 const updateCurrentProfileInMemory = async function (userName) {
@@ -260,6 +268,13 @@ const pushProfileDueTasksToCurrentActionsArray = function (profile) {
        ipChanged = currentIP !== newIP;
      }  */
   ];
+
+  // NOTE: this given below lines of code is temporary until the InstatProfile class's code isn't created.
+  if (profile.type === "scraper")
+    agentPreDueTasks.push({
+      parentModuleName: "instaAuto",
+      actionName: "runScraper",
+    });
   // Deep copy of dueTasks, handling multilevel nested arrays/objects
   const copyOfDueTasks = JSON.parse(JSON.stringify(profile.dueTasks, null, 2));
   this.task.splice(this.currentActionIndex + 1, 0, ...agentPreDueTasks, ...copyOfDueTasks, ...agentPostDueTasks);
@@ -282,6 +297,7 @@ module.exports = {
   updateUserData: catchAsync(updateUserData),
   follow: catchAsync(follow),
   like: catchAsync(like),
+  runScraper: catchAsync(runScraper),
   // targetScraper: catchAsync(targetScraper),
   // startListeners: catchAsync(startListeners),
   // scrapeUserData: catchAsync(scrapeUserData),

@@ -23,7 +23,10 @@ const checkForFollowDueTask = async function (taskHistory) {
   console.log(`Number of follow actions done today by ${this.state.currentProfile.userName} is : ${followActionCount}`);
   return true;
 };
-
+const checkForApprovalToScrape = async function () {
+  // NOTE: or TODO as of now just approve every scrape task until you decide the limits of scraping
+  return true;
+};
 // Needs to be called with "this"
 const isDueTaskApprovedToPerform = async function (dueTaskObj = this.currentAction) {
   console.log(`isDueTaskApprovedToPerform is started....`);
@@ -38,4 +41,5 @@ const isDueTaskApprovedToPerform = async function (dueTaskObj = this.currentActi
 const catchAsync = require("../utils/catchAsync.js");
 module.exports = {
   isDueTaskApprovedToPerform: catchAsync(isDueTaskApprovedToPerform),
+  checkForApprovalToScrape: catchAsync(checkForApprovalToScrape),
 };

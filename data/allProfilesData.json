@@ -6,14 +6,7 @@
     "type": "agent",
     "linkedResourceUserName": "notYetDefined",
     "userDataPath": "data/instaProfilesData/agentsData/manisha.sen.25-data.json",
-    "dueTasks": [
-      {
-        "parentModuleName": "instaAuto",
-        "actionName": "updateUserData",
-        "argumentsString": true,
-        "assignedAt": "2025-07-10T13:33:55.374Z"
-      }
-    ]
+    "dueTasks": []
   },
   {
     "profileTarget": "22",
@@ -22,14 +15,7 @@
     "type": "agent",
     "linkedResourceUserName": "notYetDefined",
     "userDataPath": "data/instaProfilesData/agentsData/kajalmahioffical143-data.json",
-    "dueTasks": [
-      {
-        "parentModuleName": "instaAuto",
-        "actionName": "updateUserData",
-        "argumentsString": true,
-        "assignedAt": "2025-07-10T13:31:10.907Z"
-      }
-    ]
+    "dueTasks": []
   },
   {
     "profileTarget": "21",
@@ -37,14 +23,7 @@
     "password": "hhjsm001",
     "type": "scraper",
     "userDataPath": "data/instaProfilesData/scrapersData/best.frnds.jsm-data.json",
-    "dueTasks": [
-      {
-        "parentModuleName": "instaAuto",
-        "actionName": "follow",
-        "argumentsString": "sweet_sonu.001",
-        "assignedAt": "2025-07-08T13:54:38.206Z"
-      }
-    ]
+    "dueTasks": []
   },
   {
     "userName": "ashu.samota.1612",
@@ -79,26 +58,7 @@
     "password": "hhjsm001",
     "profileTarget": "6",
     "userDataPath": "./data/instaProfilesData/agentsData/sweet_sonu.001-data.json",
-    "dueTasks": [
-      {
-        "parentModuleName": "instaAuto",
-        "actionName": "follow",
-        "argumentsString": "bad.8323",
-        "assignedAt": "2025-07-10T13:33:55.374Z"
-      },
-      {
-        "parentModuleName": "instaAuto",
-        "actionName": "follow",
-        "argumentsString": "arman7168khan",
-        "assignedAt": "2025-07-10T13:33:55.374Z"
-      },
-      {
-        "parentModuleName": "instaAuto",
-        "actionName": "updateUserData",
-        "argumentsString": true,
-        "assignedAt": "2025-07-11T21:10:01.874Z"
-      }
-    ],
+    "dueTasks": [],
     "automatedFollow": []
   }
 ]

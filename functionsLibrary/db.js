@@ -399,6 +399,26 @@ const updateDatabaseOnFollow = async function (userObject) {
   return true;
 };
 
+// ==== Target String Related Functions ====
+
+const readTargetStringsToScrape = async () => JSON.parse(await fs.readFile("./data/targetStringsToScrape.json"));
+readTargetStringsToScrape.shouldStoreState = "targetStringsToScrape";
+
+const writeTargetStringsToScrape = async function (targetStringsToScrape) {
+  if (!Array.isArray(targetStringsToScrape)) throw new Error("targetStringsToScrape must be an array");
+  await fs.writeFile("../data/targetStringsToScrape.json", JSON.stringify(targetStringsToScrape, null, 2));
+  return true;
+};
+
+const readTargetStringsAlreadyScraped = async () => JSON.parse(await fs.readFile("./data/targetStringsAlreadyScraped.json"));
+readTargetStringsAlreadyScraped.shouldStoreState = "targetStringsAlreadyScraped";
+
+const writeTargetStringsAlreadyScraped = async function (targetStringsAlreadyScraped) {
+  if (!Array.isArray(targetStringsAlreadyScraped)) throw new Error("targetStringsAlreadyScraped must be an array");
+  await fs.writeFile("../data/targetStringsAlreadyScraped.json", JSON.stringify(targetStringsAlreadyScraped, null, 2));
+  return true;
+};
+
 // ==== General Purpose / Other Functions ====
 const filterProfilesToAutomate = async function () {
   // 1. All Agent Profiles having DueTasks
@@ -406,9 +426,8 @@ const filterProfilesToAutomate = async function () {
   this.state.profilesToLoop.sort((a, b) => b.dueTasks.length - a.dueTasks.length);
 
   // 2. When agent tasks completed start scraper tasks
-  if (this.state.profilesToLoop.length === 0) this.state.profilesToLoop = this.state.profilesData.filter((profile) => profile.type === "scraper" && profile.dueTasks.length !== 0);
   this.state.profilesData
-    .filter((profile) => profile.type === "scraper" && profile.dueTasks.length !== 0)
+    .filter((profile) => profile.type === "scraper")
     .sort((a, b) => a.dueTasks.length - b.dueTasks.length)
     .forEach((Profile) => this.state.profilesToLoop.push(Profile));
 
@@ -476,6 +495,12 @@ module.exports = {
   updateDatabaseOnFollow: catchAsync(updateDatabaseOnFollow),
   addNewProfile: catchAsync(addNewProfile),
   filterProfilesToAutomate: catchAsync(filterProfilesToAutomate),
+
+  readTargetStringsToScrape: catchAsync(readTargetStringsToScrape),
+  writeTargetStringsToScrape: catchAsync(writeTargetStringsToScrape),
+  readTargetStringsAlreadyScraped: catchAsync(readTargetStringsAlreadyScraped),
+  writeTargetStringsAlreadyScraped: catchAsync(writeTargetStringsAlreadyScraped),
+
   readTaskHistrory,
   writeTasksHistory,
   pushCompletedTask,
