@@ -1,23 +1,8 @@
 [
   {
     "targetString": "https://www.instagram.com/chandani144__/reel/DMA1p8ahX33/",
-    "type": "reel",
-    "scrapeLikes": true,
-    "scrapeComments": true,
-    "scrapeMedia": true,
-    "owner": "chandani144__",
-    "isOwnerLinkedToAgent": false
-  },
-  {
-    "targetString": "https://www.instagram.com/chandani144__/reel/DMA1p8ahX33/",
-    "comment_Counts_of_above_link": 84,
-    "mediaId": 2,
-    "targetString2": "https://www.instagram.com/chandani144__/reel/DMFB4ArBCEz/"
-  },
-  {
-    "targetString": "https://www.instagram.com/chandani144__/reel/DMA1p8ahX33/",
     "userName": "chandani144__",
     "dataPath": "./data/instaScrapedData/PostTargetsData/chandani144__-DMA1p8ahX33-data.json",
-    "lastScraped": "31/7/2025"
+    "lastScraped": "1/8/2025"
   }
 ]

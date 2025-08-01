@@ -56,7 +56,9 @@ const closeBrowser = async function () {
   console.log(`Before closing the browser.`);
   console.log(this.browser);
 
-  const userInput = await this.utils.askUser("Are you sure you want to close the browser? (y/n): ");
+  const userInput = await this.utils.askUser(
+    "Are you sure you want to close the browser? (y/n): "
+  );
   if (userInput.toLowerCase() === "n") {
     console.log("Browser close operation cancelled.");
     return;

@@ -1,32 +1,36 @@
 {
   "targetString": "https://www.instagram.com/chandani144__/reel/DMA1p8ahX33/",
+  "targetType": "teraBoxTargets",
+  "isScrapeComments": true,
+  "isScrapelikers": true,
+  "isScrapeMedia": true,
+  "owner": "chandani144__",
+  "isOwnerLinkedToAgent": false,
   "type": "Post",
   "isApproved": true,
   "postCode": "DMA1p8ahX33",
   "pageType": "postPage",
   "postMetadata": {
-    "likesCount": 2337,
+    "likesCount": 2334,
     "commentsCount": 97,
     "username": "chandani144__",
     "postDate": "",
-    "description": "2,337 likes, 97 comments - chandani144__ on July 12, 2025",
-    "caption": "2,337 likes, 97 comments - chandani144__ on July 12, 2025",
+    "description": "2,334 likes, 97 comments - chandani144__ on July 12, 2025",
+    "caption": "2,334 likes, 97 comments - chandani144__ on July 12, 2025",
     "hashtags": [],
     "typeOfPage": "type1",
-    "idOfRootElement": "mount_0_0_hk"
+    "idOfRootElement": "mount_0_0_Vc"
   },
   "userName": "chandani144__",
-  "isScrapeComments": true,
-  "isScrapelikers": true,
   "comments": [
-    {
-      "username": "monuprajapati4262",
-      "text": "😍😍😍",
-      "metadata": "2w1 likeReply"
-    },
     {
       "username": "davinder.singh.mani",
       "text": "😮😍🔥🔥🔥🔥😮😮😍😍😍😍",
+      "metadata": "2w1 likeReply"
+    },
+    {
+      "username": "monuprajapati4262",
+      "text": "😍😍😍",
       "metadata": "2w1 likeReply"
     },
     {
@@ -442,7 +446,7 @@
     {
       "username": "__suraj__hari__78",
       "text": "🔥🔥🔥🔥🔥🔥🔥",
-      "metadata": "6dReply"
+      "metadata": "5dReply"
     }
   ],
   "totalCommentsScraped": 85,
@@ -507,6 +511,11 @@
       "id": "75403502111",
       "userName": "v871225",
       "fullName": "v, laxman"
+    },
+    {
+      "id": "69559320865",
+      "userName": "anupsinghanup1112",
+      "fullName": "anup singh"
     },
     {
       "id": "64598981415",
@@ -606,7 +615,7 @@
     {
       "id": "75159684681",
       "userName": "suman8892414",
-      "fullName": "Vishvnath Kumar Kumar"
+      "fullName": "suman kumari"
     },
     {
       "id": "72922694730",
@@ -627,6 +636,11 @@
       "id": "48604968025",
       "userName": "mohim7320",
       "fullName": "Md Mohim"
+    },
+    {
+      "id": "68888733016",
+      "userName": "umashankarkumar6980",
+      "fullName": "Umashankar Kumar"
     },
     {
       "id": "59816666459",
@@ -684,14 +698,14 @@
       "fullName": "Laddu Kumar"
     },
     {
-      "id": "75856652151",
-      "userName": "rathodomkar560",
-      "fullName": "rathod omkar"
-    },
-    {
       "id": "72862176119",
       "userName": "ydhj.id",
       "fullName": "Syamu Gautam"
+    },
+    {
+      "id": "75856652151",
+      "userName": "rathodomkar560",
+      "fullName": "rathod omkar"
     },
     {
       "id": "58204849787",
@@ -724,11 +738,6 @@
       "fullName": "tallent_boy_gati143"
     },
     {
-      "id": "69802103429",
-      "userName": "shivamvishwakarma5647",
-      "fullName": "shivam vishwakarma"
-    },
-    {
       "id": "73411206533",
       "userName": "bijendra8027",
       "fullName": "Bijendra Singh"
@@ -757,11 +766,6 @@
       "id": "68355464089",
       "userName": "santo_shsahu248",
       "fullName": "Santosh Sahu"
-    },
-    {
-      "id": "53021185948",
-      "userName": "ashokshah4878",
-      "fullName": "Ashok Shah"
     },
     {
       "id": "64250096029",
@@ -869,9 +873,9 @@
       "fullName": "Harender Kumar"
     },
     {
-      "id": "32443254494",
-      "userName": "_mr._stylish_1",
-      "fullName": "Neeraj Chaurasia NC"
+      "id": "58665459165",
+      "userName": "sk3590272",
+      "fullName": "Surendra Kumar"
     },
     {
       "id": "65729546976",
