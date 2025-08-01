@@ -1,7 +1,6 @@
 const fs = require("fs-extra");
 const utils = require("../utils/utils.js");
-const instaScraper = require("./instaScraper.js");
-const restrictor = require("./restrictor.js");
+
 // ====== Flow ======
 /* 
 1. Read profilesData.json file.
@@ -44,7 +43,7 @@ const updateUserData = async function (needUpadte) {
 
   if (needUpadte) {
     console.log(`UserData of ${this.state.currentProfile.userName} needs to be updated.`);
-
+    this.instaScraper ||= require("./instaScraper.js");
     const scrapedUserData = await instaScraper.scrapeMetaDataOfProfile.call(this, this.state.currentProfile.userName);
 
     this.state.currentProfile.postsCount = scrapedUserData.edge_owner_to_timeline_media.count;
@@ -87,7 +86,8 @@ const goInstaHome = async function () {
 };
 
 const follow = async function (userName, likeOptions) {
-  if ((await restrictor.isDueTaskApprovedToPerform.call(this)) === "not Allowed") {
+  this.restrictor ||= require("./restrictor.js");
+  if ((await this.restrictor.isDueTaskApprovedToPerform.call(this)) === "not Allowed") {
     console.log(`More Follow due Tasks by ${this.state.currentProfile.userName} are not allowed, so returning true as done. `);
     return true;
   }
@@ -139,7 +139,7 @@ const follow = async function (userName, likeOptions) {
   return true;
 };
 follow.doNotParseArgumentsString = true;
-// follow.preCondition = restrictor.isDueTaskApprovedToPerform;
+// follow.preCondition = this.restrictor.isDueTaskApprovedToPerform;
 
 const like = async function (likeOptions) {
   const { userName, minNumberOfPostsToLike = 1, maxNumberOfPostsToLike = 5 } = likeOptions;
@@ -221,9 +221,12 @@ const like = async function (likeOptions) {
 const runScraper = async function () {
   if (this.state.currentProfile.type !== "scraper") return;
   this.state.targetStringsToScrape = await this.db.readTargetStringsToScrape();
-  this.state.currentTargetStringsToScrape = this.state.targetStringsToScrape[0];
-  this.state.currentTargetStringsToScrape.isApproved = this.restrictor.checkForApprovalToScrape();
-  if (this.state.currentTargetStringsToScrape.isApproved) this.state.currentTargetStringsToScrape.isScrapingSuccessful = await this.instaScraper.targetScraper();
+  this.state.targetToScrape = this.state.targetStringsToScrape[0];
+  this.restrictor ||= require("./restrictor.js");
+  this.state.targetToScrape.isApproved = await this.restrictor.checkForApprovalToScrape();
+
+  this.instaScraper ||= require("./instaScraperV2.js");
+  if (this.state.targetToScrape.isApproved) this.state.targetToScrape.isScrapingSuccessful = await this.instaScraper.targetScraper.call(this);
 };
 
 // updateCurrentProfileInMemory is actually needed because when duetasks of a profile gets completed and a new profile's dueTasks execution is going to start at that point accokrding to tasks the old chrome profile instance gets closed but in memeory it doesn't actually gets changed. As generally it is used kon start of each profile automation.

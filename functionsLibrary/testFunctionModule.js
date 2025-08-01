@@ -107,40 +107,57 @@ const fs = require("fs-extra");
 //      - URL :  https://www.instagram.com/prity__mehra___/reel/DC9KJd4SfBM/
 //      - total 21 comments acc. to metadata, 9 scraped
 
+// ------------------------------------------------------------------
+
+// const testFunction = async function () {
+//   const listOfPostsURLs = [
+//     "https://www.instagram.com/p/DCVz7D_zRKz",
+//     // "https://www.instagram.com/p/DKZ10yvzEqS/",
+//     // "https://www.instagram.com/p/DGvPYbATx20/",
+//     // "https://www.instagram.com/p/DE6pjjNTzEr/",
+//     // "https://www.instagram.com/p/DEpSiNHTzgy/",
+//   ];
+//   const resultsOfScraping = [];
+
+//   const res = await likeScraper.call(this);
+//   console.log(`Like Scraping completed with result: ${res}`);
+
+//   process.exit(0);
+//   for (const url of listOfPostsURLs) {
+//     console.log(`Scraping post and comments from URL: ${url}`);
+//     const result = await commentsScraper.call(this, url);
+//     resultsOfScraping.push(result);
+//     console.log(`------ Scraping comments of URL: ${url} is complete. ------`);
+//     await this.utils.randomDelay(1, 2);
+//   }
+
+//   // ---- 👇 temp for checking 👇 ----
+
+//   const parentFolderPath1 = path.join(__dirname, `../data/instaScrapedData/postsData/`);
+//   // Ensure logs directory exists
+//   await fs.ensureDir(parentFolderPath1);
+//   const fileName1 = `completedData.json`;
+//   const filePath1 = path.join(parentFolderPath1, fileName1);
+//   await fs.writeFile(filePath1, JSON.stringify(resultsOfScraping, null, 2));
+//   // ---- 👆 temp for checking 👆 ----
+//   console.log(`Scraping ENDED.`);
+// };
+
+// ------------------------------------------------------------------
+
 const testFunction = async function () {
-  const listOfPostsURLs = [
-    "https://www.instagram.com/p/DCVz7D_zRKz",
-    // "https://www.instagram.com/p/DKZ10yvzEqS/",
-    // "https://www.instagram.com/p/DGvPYbATx20/",
-    // "https://www.instagram.com/p/DE6pjjNTzEr/",
-    // "https://www.instagram.com/p/DEpSiNHTzgy/",
-  ];
-  const resultsOfScraping = [];
+  console.log(`===== Test started. ======`);
 
-  const res = await likeScraper.call(this);
-  console.log(`Like Scraping completed with result: ${res}`);
+  console.log(`-=-=-=-=- 1 -=-=-=-=-`);
+  await this.page.listAllPages();
+  console.log(`-=-=-=-=- 2 -=-=-=-=-`);
+  await this.page.clickNotClickable(`span ::-p-text( likes)`);
+  console.log(`-=-=-=-=- 3 -=-=-=-=-`);
 
+  console.log(`===== Test ENDED. ======`);
   process.exit(0);
-  for (const url of listOfPostsURLs) {
-    console.log(`Scraping post and comments from URL: ${url}`);
-    const result = await commentsScraper.call(this, url);
-    resultsOfScraping.push(result);
-    console.log(`------ Scraping comments of URL: ${url} is complete. ------`);
-    await this.utils.randomDelay(1, 2);
-  }
-
-  // ---- 👇 temp for checking 👇 ----
-
-  const parentFolderPath1 = path.join(__dirname, `../data/instaScrapedData/postsData/`);
-  // Ensure logs directory exists
-  await fs.ensureDir(parentFolderPath1);
-  const fileName1 = `completedData.json`;
-  const filePath1 = path.join(parentFolderPath1, fileName1);
-  await fs.writeFile(filePath1, JSON.stringify(resultsOfScraping, null, 2));
-  // ---- 👆 temp for checking 👆 ----
-  console.log(`Scraping ENDED.`);
 };
-
+// ==================================================================
 // Extract post metadata from meta tags
 // NOTE: this function Works in page context
 const extractPostMetadata = async () => {

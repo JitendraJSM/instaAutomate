@@ -1,10 +1,11 @@
 const db = require("./db.js");
 const fs = require("fs-extra");
+const path = require("path");
 // ========= Flow =========
 // 1. targetScraper called with a targetString
 //      - 1.1 Creates targetToScrape on this.state
-//      - 1.2 Calls targetStringAnalyzer to determine the type of targetString i.e. targetToScrape.targetStringType.
-//      - 1.3 On the basis of targetStringType
+//      - 1.2 Calls targetStringAnalyzer to determine the type of targetString i.e. targetToScrape.type.
+//      - 1.3 On the basis of type
 //              - if userName then function scrapeInstaProfile gets called to scrape the profile whose userName is targetString.
 //              - if postUrl then function scrapeInstaPost gets called to scrape the post whose url is targetString.
 
@@ -14,12 +15,12 @@ const targetScraper = async function (targetString) {
 
   this.state.targetToScrape ||= { targetString };
 
-  this.state.targetToScrape.targetStringType = await targetStringAnalyzer.call(this);
+  if (this.state.targetToScrape.type === "Profile") this.state.targetToScrape.isScrapingDone = await scrapeInstaProfile.call(this);
+  else this.state.targetToScrape.isScrapingDone = await scrapeInstaPost.call(this);
 
-  if (this.state.targetToScrape.targetStringType === "userName") await scrapeInstaProfile.call(this);
-  else if (this.state.targetToScrape.targetStringType === "postUrl") await scrapeInstaPost.call(this);
-
+  await this.db.updateScrapedData.call(this);
   console.log(`-=-=- Target Scraping Completed. -=-=-`);
+  return true;
 };
 targetScraper.doNotParseArgumentsString = true; // This is used to skip parsing of argumentsString as it is not needed here.
 
@@ -28,18 +29,22 @@ const targetStringAnalyzer = async function (targetString) {
   targetString ||= this.state.targetToScrape.targetString;
 
   // 1. Analyze the targetString to identify the type of scraping required (e.g., user profile, hashtag, location).
-  let targetStringType;
-  if (!targetString.startsWith("https://www.instagram.com/")) targetStringType = "userName";
-  //   TODO: add one more else if for instagram profile url, that gives profileURL or just extract user name from that and replace target string by user name and then return targetStringType as userName.
+  let type;
   //   TODO: as targetStringAnalyzer function it is responsibility of this function to check that userName or postUrl or other url really exists or not.
   //            - use node fetch to request to instagram to check the targetString's relaiblity, for that intercrpt requests.
-  else if (targetString.includes("/p/")) targetStringType = "postUrl"; // i.e. a post modal window opened, it can be a image post or video post or carousel post.
-  else if (targetString.includes("/reels/")) targetStringType = "reelsHomePageUrl"; // i.e. Reels home page ex. https://www.instagram.com/nanu_cute_00/reels/.
-  else if (targetString.includes("/reel/")) targetStringType = "reelUrl"; // i.e. a reel modal window opened, it is a video post. ex. https://www.instagram.com/reel/DLKZmEATRYH/
-  else if (targetString.includes("/highlights/")) targetStringType = "highlightsUrl"; // ex. https://www.instagram.com/stories/its_cute_girl__85/
-  else if (targetString.includes("/stories/")) targetStringType = "storiesUrl";
-  else throw new Error(`Target String: ${targetString} doesn't fall into any category of targetStringType.`);
-  return targetStringType;
+  if (targetString.includes("/reel/")) {
+    pageType = "postPage"; // i.e. a reel modal window opened, it is a video post. ex. https://www.instagram.com/chandani144__/reel/DMA1p8ahX33/
+    this.state.targetToScrape.postCode = this.state.targetToScrape.targetString.split("/")[5];
+  } else if (targetString.includes("/p/")) pageType = "postUrl"; // i.e. a post modal window opened, it can be a image post or video post or carousel post.
+  else if (targetString.includes("/reels/")) pageType = "reelsHomePageUrl"; // i.e. Reels home page ex. https://www.instagram.com/nanu_cute_00/reels/.
+  else if (targetString.includes("/highlights/")) pageType = "highlightsUrl"; // ex. https://www.instagram.com/stories/its_cute_girl__85/
+  else if (targetString.includes("/stories/")) pageType = "storiesUrl";
+  else throw new Error(`Target String: ${targetString} doesn't fall into any category of pageType.`);
+
+  this.state.targetToScrape.pageType = pageType;
+  // TODO: Extract postCode form targetString and store that in this.state.targetToScrape.postCode.
+
+  return true;
 };
 
 // =-=-=-=-=-=-= 👇 Profile Scraping function 👇 =-=-=-=-=-=-=
@@ -467,21 +472,14 @@ const getMediaId = () => {
 };
 
 // ------ 11. Likes Scraper ------
-const likesScraper = async function () {
-  console.log(`likeScraper function started....`);
-
-  this.state.targetToScrape = {}; // temporary defining as it is not completely integrated.
-
-  await this.page.navigateTo("https://www.instagram.com/p/DKZ10yvzEqS/");
-
-  const metadata = await this.page.evaluate(extractPostMetadata);
-
+const likersScraper = async function (url) {
   const mediaId = await this.page.evaluate(getMediaId);
 
-  const likers = [];
+  this.state.targetToScrape.likers = [];
 
   // Click to open likers modal
-  await this.page.clickNotClickable(`span ::-p-text(${metadata.likesCount} likes)`);
+  // await this.page.clickNotClickable(`span ::-p-text(${metadata.likesCount} likes)`);
+  await this.page.clickNotClickable(`span ::-p-text( likes)`); //NOTE: i think this works generally but when comments are also likes then not.
 
   // Wait for the likers response
   const likersResponse = await this.page.waitForResponse((response) => response.url() === `https://www.instagram.com/api/v1/media/${mediaId}/likers/` && response.status() === 200, { timeout: 60000 });
@@ -489,8 +487,8 @@ const likesScraper = async function () {
   // Process likers data
   const likersData = await likersResponse.json();
   likersData.users.forEach((liker) => {
-    if (likers.some((l) => l.userName === liker.username)) return; // Skip if liker already exists
-    likers.push({
+    if (this.state.targetToScrape.likers.some((l) => l.userName === liker.username)) return; // Skip if liker already exists
+    this.state.targetToScrape.likers.push({
       id: liker.pk,
       userName: liker.username,
       fullName: liker.full_name,
@@ -504,10 +502,7 @@ const likesScraper = async function () {
 
 // ------ 12. Comments Scraper function ------
 const commentsScraper = async function (url) {
-  await this.page.navigateTo(url);
-  console.log(`ok`);
-
-  // NOTE: this function Works in page context
+  // NOTE: this function Works in page context and decides which selectors available.
   const determineTypeOfPage = () => {
     const rootElement = document.querySelector('[id^="mount"]');
     const idOfRootElement = rootElement.id;
@@ -647,12 +642,8 @@ const commentsScraper = async function (url) {
   // Main execution
   try {
     // Get post metadata
-    // const metadata = await extractPostMetadata(); // NOTE: this function Works in page context
-    const metadata = await this.page.evaluate(extractPostMetadata);
-    metadata.typeOfPage = typeOfPage;
-    metadata.idOfRootElement = idOfRootElement;
-    // const mediaId = getMediaId();   // NOTE: this function Works in page context
-    const mediaId = await this.page.evaluate(getMediaId);
+    this.state.targetToScrape.postMetadata.typeOfPage = typeOfPage;
+    this.state.targetToScrape.postMetadata.idOfRootElement = idOfRootElement;
 
     // Initialize comments collection with deduplication
     const uniqueComments = new Map();
@@ -668,7 +659,7 @@ const commentsScraper = async function (url) {
     });
 
     // Continue loading comments until we have all or reach max attempts
-    while (uniqueComments.size < metadata.commentsCount && loadAttempts < MAX_LOAD_ATTEMPTS) {
+    while (uniqueComments.size < this.state.targetToScrape.postMetadata.commentsCount && loadAttempts < MAX_LOAD_ATTEMPTS) {
       // If scrolling didn't work or we're at the bottom, try clicking "Load more"
 
       const isMoreCommentsLoaded = await loadMoreCommentsBTN.call(this);
@@ -692,59 +683,43 @@ const commentsScraper = async function (url) {
         console.log(`Breaking the loop as View Hidden comments BTN appeared in container.`);
         break;
       }
-      if (uniqueComments.size === metadata.commentsCount) {
+      if (uniqueComments.size === this.state.targetToScrape.postMetadata.commentsCount) {
         console.log(
-          `Breaking the loop as total comments scraped is equal to total comments in the post.(ie uniqueComments.size: ${uniqueComments.size} and metadata.commentsCount: ${metadata.commentsCount})`
+          `Breaking the loop as total comments scraped is equal to total comments in the post.(ie uniqueComments.size: ${uniqueComments.size} and this.state.targetToScrape.postMetadata.commentsCount: ${this.state.targetToScrape.postMetadata.commentsCount})`
         );
         break;
       }
     }
-    // ---- 👇 temp for checking 👇 ----
-    const returnObj = {
-      postMetadata: metadata,
-      mediaId,
-      comments: Array.from(uniqueComments.values()),
-      totalCommentsScraped: uniqueComments.size,
-    };
-    // postURL = "https://www.instagram.com/chandani144__/reel/DMA1p8ahX33/"
 
-    const parentFolderPath = path.join(__dirname, `../data/instaScrapedData/postsData/${metadata.username}`);
-    // Ensure logs directory exists
-    await fs.ensureDir(parentFolderPath);
-
-    const postCode = url.split("/").at(-2);
-    const fileName = `${postCode}.json`;
-    const filePath = path.join(parentFolderPath, fileName);
-    await fs.writeFile(filePath, JSON.stringify(returnObj, null, 2));
-    // ---- 👆 temp for checking 👆 ----
-
+    this.state.targetToScrape.comments = Array.from(uniqueComments.values());
+    this.state.targetToScrape.totalCommentsScraped = uniqueComments.size;
     // Prepare final result
-    return {
-      postURL: url,
-      postMetadata: metadata,
-      mediaId,
-      comments: Array.from(uniqueComments.values()),
-      totalCommentsScraped: uniqueComments.size,
-    };
+    return true;
   } catch (error) {
     console.error("Error scraping post and comments:", error);
     return { error: error.message };
   }
+};
 
-  // Check btn is clicked or not
-  // Create a function that checks if the button is clicked or not
-  // Apply this trick to check if the button is clicked or not
-  // first check the number of child elements in the container brfore clicking the button
-  //  Check the height of the container before clicking the button
-  // then click the button using await this.page.clickNotClickable('svg[aria-label="Load more comments"]');
-  // then check the number of child elements in the container after clicking the button
-  //  Check the height of the container after clicking the button
-  // if the number of child elements is increased and the height of the container is increased then the button is clicked
-  // if the number of child elements is same and the height of the container is same then the button is not clicked in that case random wait for 1 to 2 seconds and click the button again and check again and so on until the button is clicked.
+// ------ 13. Single Post Page Scraper function ------
+const scrapeInstaPost = async function () {
+  await targetStringAnalyzer.call(this);
 
-  console.log(`====================================-===-=-=-=--=-=-=-==-=-`);
-  console.log(scrollRes);
-  console.log(`====================================-===-=-=-=--=-=-=-==-=-`);
+  if (this.state.targetToScrape.pageType !== "postPage") throw new Error("scrapeInstaPost() can only be used for postPage scraping(ie. single post.");
+
+  await this.page.navigateTo(this.state.targetToScrape.targetString);
+
+  this.state.targetToScrape.postMetadata = await this.page.evaluate(extractPostMetadata);
+  this.state.targetToScrape.userName = this.state.targetToScrape.postMetadata.username;
+
+  this.state.targetToScrape.isScrapeComments = true; // temprarily set to true
+  this.state.targetToScrape.isScrapelikers = true; // temprarily set to true
+  if (this.state.targetToScrape.isScrapeComments) this.state.targetToScrape.isCommentsScraped = await commentsScraper.call(this, this.state.targetToScrape.targetString);
+  if (this.state.targetToScrape.isScrapelikers) this.state.targetToScrape.isLikersScraped = await likersScraper.call(this, this.state.targetToScrape.targetString);
+
+  console.log(`Target to scrape Data: `);
+  console.log(this.state.targetToScrape);
+  return true;
 };
 
 // =-=-=-=-=-=-= ☝ POST Scraping function 👆 =-=-=-=-=-=-=

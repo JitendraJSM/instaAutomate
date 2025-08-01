@@ -406,7 +406,7 @@ readTargetStringsToScrape.shouldStoreState = "targetStringsToScrape";
 
 const writeTargetStringsToScrape = async function (targetStringsToScrape) {
   if (!Array.isArray(targetStringsToScrape)) throw new Error("targetStringsToScrape must be an array");
-  await fs.writeFile("../data/targetStringsToScrape.json", JSON.stringify(targetStringsToScrape, null, 2));
+  await fs.writeFile("./data/instaScrapedData/targetStringsToScrape.json", JSON.stringify(targetStringsToScrape, null, 2));
   return true;
 };
 
@@ -415,8 +415,93 @@ readTargetStringsAlreadyScraped.shouldStoreState = "targetStringsAlreadyScraped"
 
 const writeTargetStringsAlreadyScraped = async function (targetStringsAlreadyScraped) {
   if (!Array.isArray(targetStringsAlreadyScraped)) throw new Error("targetStringsAlreadyScraped must be an array");
-  await fs.writeFile("../data/targetStringsAlreadyScraped.json", JSON.stringify(targetStringsAlreadyScraped, null, 2));
+  await fs.writeFile("./data/instaScrapedData/targetStringsAlreadyScraped.json", JSON.stringify(targetStringsAlreadyScraped, null, 2));
   return true;
+};
+
+const writeScrapedTarget = async function () {
+  const basePath = this.state.targetToScrape.dataPath.replace(/\/[^\/]*$/, "");
+  await fs.ensureDir(basePath);
+  await fs.writeFile(this.state.targetToScrape.dataPath, JSON.stringify(this.state.targetToScrape, null, 2));
+  return true;
+};
+
+const addNewTargetString = async function () {
+  let userInput = await this.utils.askUser(`Do you want to add new Target to scrape? , 1  or y for 'yes' : `);
+  if (userInput.toLowerCase().trim() !== "1" || userInput !== "y") return false;
+
+  this.state.targetStringsToScrape ||= await readTargetStringsToScrape();
+  this.state.targetStringsAlreadyScraped ||= await readTargetStringsAlreadyScraped();
+
+  // Create a new target object
+  let newTarget = {};
+
+  newTarget.targetString = await this.utils.askUser(`Enter target string: `).toLowerCase().trim();
+  if (this.state.targetStringsAlreadyScraped.includes((targetAlreadyScraped) => targetAlreadyScraped.targetString === newTarget.targetString)) {
+    console.log(`Profile with user name: ${newTarget.targetString} already exists`);
+    return false;
+  }
+
+  userInput = undefined;
+  userInput = await this.utils.askUser("Enter targetType of Target: 1 for 'teraBox', 2 for 'movies' or 3 for 'other': ");
+  if (userInput === "1") newTarget.targetType = "teraBox";
+  else if (userInput === "2") newTarget.targetType = "movies";
+  else if (userInput === "3") newTarget.targetType = "other";
+  else throw new Error(`Invalid input, input must be 1 or 2 or 3.`);
+
+  userInput = undefined;
+  userInput = await this.utils.askUser("Target is a Profile, 1  or y for 'yes' : ");
+  if (userInput.toLowerCase().trim() === "1" || userInput === "y") newTarget.type = "Profile";
+  else newTarget.type = "Post";
+
+  newTarget.dataPath = newTarget.profileTarget = await this.utils.askUser("Enter profile target: ");
+  if (this.state.profilesData.find((profile) => profile.profileTarget == newTarget.profileTarget)) throw new Error(`Profile with target ${newTarget.profileTarget} already exists`);
+
+  // NOTE: As userName cannot be always scraped from the target string so it is commented here and dataPath is added by instaScraper.
+  // newTarget.dataPath = `./data/instaScrapedData/${newTarget.type}TargetsData/${newTarget.userName}-data.json`;
+
+  this.state.targetStringsToScrape.push(newTarget);
+
+  await writeTargetStringsToScrape.call(this, this.state.targetStringsToScrape);
+
+  console.log(`New Target to scrape is added successfully.`);
+  return true;
+};
+
+const updateScrapedData = async function () {
+  if (!this.state.targetToScrape.isScrapingDone) return false;
+
+  // 1. Check and set the dataPath for targetToScrape on the basis of
+  //        i  - if this this.state.targetToScrape.type === "Profile"
+  //        ii - if this this.state.targetToScrape.type === "Post"
+  if (this.state.targetToScrape.type === "Profile") {
+    this.state.targetToScrape.dataPath = `./data/instaScrapedData/${this.state.targetToScrape.type}TargetsData/${this.state.targetToScrape.userName}-data.json`;
+  } else if (this.state.targetToScrape.type === "Post") {
+    this.state.targetToScrape.dataPath ||= `./data/instaScrapedData/${this.state.targetToScrape.type}TargetsData/${this.state.targetToScrape.userName}-${this.state.targetToScrape.postCode}-data.json`;
+
+    // 2. Remove targetToScrape from this.state.targetStringsToScrape
+    const indexOfTargetToScrape = this.state.targetStringsToScrape.findIndex((targetToScrape) => targetToScrape.targetString === this.state.targetToScrape.targetString);
+    if (indexOfTargetToScrape !== -1) this.state.targetStringsToScrape.splice(indexOfTargetToScrape, 1);
+
+    // 3. Add targetToScrape to this.state.targetStringsAlreadyScraped
+    this.state.targetStringsAlreadyScraped ||= await readTargetStringsAlreadyScraped();
+    const targetScraped = {
+      targetString: this.state.targetToScrape.targetString,
+      userName: this.state.targetToScrape.userName,
+      dataPath: this.state.targetToScrape.dataPath,
+      lastScraped: new Date().toLocaleDateString(),
+    };
+    this.state.targetStringsAlreadyScraped.push(targetScraped);
+
+    // 4. Write the updated targetStringsToScrape and targetStringsAlreadyScraped to their respective files
+    await writeTargetStringsToScrape.call(this, this.state.targetStringsToScrape);
+    await writeTargetStringsAlreadyScraped.call(this, this.state.targetStringsAlreadyScraped);
+
+    // 5. Write the updated targetToScrape data to its dataPath
+    await writeScrapedTarget.call(this);
+
+    return true;
+  }
 };
 
 // ==== General Purpose / Other Functions ====
@@ -437,52 +522,6 @@ const filterProfilesToAutomate = async function () {
 
 // ==== Resource Task Related Data Functions ====
 
-// (async () => {
-//   try {
-//     // const profilesData = await readProfilesData();
-//     // console.log(`Profiles data read successfully:`, profilesData.length, `profiles found.`);
-//     // console.log(profilesData);
-//     const userDataPath = await getUserDataPathByUserName("its_cute_girl__85");
-//     console.log(`Resource data path for user 'its_cute_girl__85':`, userDataPath);
-//     // const userData = await readUserProfileData("its_cute_girl__85");
-//     // console.log(`User data for "its_cute_girl__85" is as Below: `);
-//     // console.log(userData);
-//     /*
-//     const userData = {
-//       userName: "its_cute_girl__85",
-//       userDataPath: "./data/instaResourcesData/its_cute_girl__85/its_cute_girl__85-data.json",
-//       posts: [
-//         {
-//           postId: "1",
-//           postUrl: "https://www.instagram.com/p/1/",
-//           postType: "image",
-//           postDate: "2025-06-17T12:00:00Z",
-//           likesCount: 951,
-//           commentsCount: 7,
-//           caption: "Cute",
-//         },
-//         {
-//           postId: "2",
-//           postUrl: "https://www.instagram.com/p/2/",
-//           postType: "video",
-//           postDate: "2025-06-22T12:00:00Z",
-//           likesCount: 754,
-//           commentsCount: 84,
-//           caption: "Cute video",
-//         },
-//       ],
-//       followers: [],
-//       followings: [],
-//       tempProp: "testVal",
-//     };
-// */
-//     const res = await writeUserProfileData.call(this, userData);
-//     console.log(`User data written or not  res is as: ${res}.`);
-//   } catch (err) {
-//     console.error("Error in IIFE:", err);
-//   }
-// })();
-
 // === Interface ===
 const catchAsync = require("../utils/catchAsync.js");
 module.exports = {
@@ -500,6 +539,8 @@ module.exports = {
   writeTargetStringsToScrape: catchAsync(writeTargetStringsToScrape),
   readTargetStringsAlreadyScraped: catchAsync(readTargetStringsAlreadyScraped),
   writeTargetStringsAlreadyScraped: catchAsync(writeTargetStringsAlreadyScraped),
+  addNewTargetString: catchAsync(addNewTargetString),
+  updateScrapedData: catchAsync(updateScrapedData),
 
   readTaskHistrory,
   writeTasksHistory,

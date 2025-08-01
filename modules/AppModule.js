@@ -19,7 +19,7 @@ const chrome = require("../functionsLibrary/chrome.js");
 const db = require("../functionsLibrary/db.js");
 const devOrTest = require("../functionsLibrary/devOrTest.js");
 const instaAuto = require("../functionsLibrary/instaAuto.js");
-const instaScraper = require("../functionsLibrary/instaScraper.js");
+const instaScraper = require("../functionsLibrary/instaScraperV2.js");
 const testFunctionModule = require("../functionsLibrary/testFunctionModule.js");
 
 class App {
