@@ -9,6 +9,10 @@
   },
   {
     "parentModuleName": "db",
+    "actionName": "addNewTargetString"
+  },
+  {
+    "parentModuleName": "db",
     "actionName": "filterProfilesToAutomate"
   },
   {

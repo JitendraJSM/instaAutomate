@@ -53,6 +53,7 @@ const targetStringAnalyzer = async function (targetString) {
 const scrapeInstaProfile = async function (userName) {
   userName ||= this.state.targetToScrape.targetString;
 
+  if (userName.includes("https://www.instagram.com/")) userName = userName.split("/")[3];
   this.state.targetToScrape.alreadyExistedProfileData = await db.readUserProfileData.call(this, userName);
   // Check if we need to scrape based on lastScrapingDate and MIN_DAYS_TO_CHECK_RESOURCE
   if (!this.state.targetToScrape.mustScrapeProfile && this.state.targetToScrape.alreadyExistedProfileData.lastScrapingDate) {
