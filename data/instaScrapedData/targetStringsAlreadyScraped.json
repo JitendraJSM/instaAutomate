@@ -1,8 +1,9 @@
 [
   {
-    "targetString": "https://www.instagram.com/chandani144__/reel/DMA1p8ahX33/",
+    "targetString": "https://www.instagram.com/chandani144__/",
     "userName": "chandani144__",
-    "dataPath": "./data/instaScrapedData/PostTargetsData/chandani144__-DMA1p8ahX33-data.json",
-    "lastScraped": "1/8/2025"
+    "type": "Profile",
+    "dataPath": "./data/instaScrapedData/teraBoxTargetsData/chandani144__-data.json",
+    "lastScraped": "3/8/2025"
   }
 ]

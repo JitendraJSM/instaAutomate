@@ -129,13 +129,17 @@ const getProfileByUserName = async function (userName) {
 
   const profile = allProfilesData.find((profile) => profile.userName === userName);
   if (!profile) {
-    console.log(`There is no profile in allProfilesData.json by userName : ${userName}.`);
+    console.log(`Profile with userName: ${userName} not found in allProfilesData.json.`);
     return false;
   }
   return profile;
 };
+
 const getUserDataPathByUserName = async function (userName) {
-  const userDataPath = (await getProfileByUserName(userName))?.userDataPath;
+  const profile = await getProfileByUserName.call(this, userName);
+  if (!profile) throw new Error(`Profile with userName: ${userName} not found in allProfilesData.json.`);
+
+  const userDataPath = profile.userDataPath;
   if (!userDataPath) throw new Error(`userDataPath property does not exists on ${userName}'s profile in allProfilesData.json.`);
 
   // Check if file exists
@@ -482,33 +486,33 @@ const updateScrapedData = async function () {
   //        i  - if this this.state.targetToScrape.type === "Profile"
   //        ii - if this this.state.targetToScrape.type === "Post"
   if (this.state.targetToScrape.type === "Profile") {
-    this.state.targetToScrape.dataPath = `./data/instaScrapedData/${this.state.targetToScrape.type}TargetsData/${this.state.targetToScrape.userName}-data.json`;
-  } else if (this.state.targetToScrape.type === "Post") {
-    this.state.targetToScrape.dataPath ||= `./data/instaScrapedData/${this.state.targetToScrape.type}TargetsData/${this.state.targetToScrape.userName}-${this.state.targetToScrape.postCode}-data.json`;
+    this.state.targetToScrape.dataPath = `./data/instaScrapedData/${this.state.targetToScrape.targetType}TargetsData/${this.state.targetToScrape.userName}-data.json`;
+  } else if (this.state.targetToScrape.type === "Post")
+    this.state.targetToScrape.dataPath ||= `./data/instaScrapedData/${this.state.targetToScrape.targetType}TargetsData/${this.state.targetToScrape.userName}-${this.state.targetToScrape.postCode}-data.json`;
 
-    // 2. Remove targetToScrape from this.state.targetStringsToScrape
-    const indexOfTargetToScrape = this.state.targetStringsToScrape.findIndex((targetToScrape) => targetToScrape.targetString === this.state.targetToScrape.targetString);
-    if (indexOfTargetToScrape !== -1) this.state.targetStringsToScrape.splice(indexOfTargetToScrape, 1);
+  // 2. Remove targetToScrape from this.state.targetStringsToScrape
+  const indexOfTargetToScrape = this.state.targetStringsToScrape.findIndex((targetToScrape) => targetToScrape.targetString === this.state.targetToScrape.targetString);
+  if (indexOfTargetToScrape !== -1) this.state.targetStringsToScrape.splice(indexOfTargetToScrape, 1);
 
-    // 3. Add targetToScrape to this.state.targetStringsAlreadyScraped
-    this.state.targetStringsAlreadyScraped ||= await readTargetStringsAlreadyScraped();
-    const targetScraped = {
-      targetString: this.state.targetToScrape.targetString,
-      userName: this.state.targetToScrape.userName,
-      dataPath: this.state.targetToScrape.dataPath,
-      lastScraped: new Date().toLocaleDateString(),
-    };
-    this.state.targetStringsAlreadyScraped.push(targetScraped);
+  // 3. Add targetToScrape to this.state.targetStringsAlreadyScraped
+  this.state.targetStringsAlreadyScraped ||= await readTargetStringsAlreadyScraped();
+  const targetScraped = {
+    targetString: this.state.targetToScrape.targetString,
+    userName: this.state.targetToScrape.userName,
+    type: this.state.targetToScrape.type,
+    dataPath: this.state.targetToScrape.dataPath,
+    lastScraped: new Date().toLocaleDateString(),
+  };
+  this.state.targetStringsAlreadyScraped.push(targetScraped);
 
-    // 4. Write the updated targetStringsToScrape and targetStringsAlreadyScraped to their respective files
-    await writeTargetStringsToScrape.call(this, this.state.targetStringsToScrape);
-    await writeTargetStringsAlreadyScraped.call(this, this.state.targetStringsAlreadyScraped);
+  // 4. Write the updated targetStringsToScrape and targetStringsAlreadyScraped to their respective files
+  await writeTargetStringsToScrape.call(this, this.state.targetStringsToScrape);
+  await writeTargetStringsAlreadyScraped.call(this, this.state.targetStringsAlreadyScraped);
 
-    // 5. Write the updated targetToScrape data to its dataPath
-    await writeScrapedTarget.call(this);
+  // 5. Write the updated targetToScrape data to its dataPath
+  await writeScrapedTarget.call(this);
 
-    return true;
-  }
+  return true;
 };
 
 // ==== General Purpose / Other Functions ====
@@ -549,6 +553,7 @@ module.exports = {
   addNewTargetString: catchAsync(addNewTargetString),
   updateScrapedData: catchAsync(updateScrapedData),
 
+  getProfileByUserName, // Didn't wrap in catchAsync as it is used in other functions that are already wrapped
   readTaskHistrory,
   writeTasksHistory,
   pushCompletedTask,

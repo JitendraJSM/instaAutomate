@@ -54,7 +54,9 @@ const scrapeInstaProfile = async function (userName) {
   userName ||= this.state.targetToScrape.targetString;
 
   if (userName.includes("https://www.instagram.com/")) userName = userName.split("/")[3];
-  this.state.targetToScrape.alreadyExistedProfileData = await db.readUserProfileData.call(this, userName);
+  if (await this.db.getProfileByUserName.call(this, userName)) this.state.targetToScrape.alreadyExistedProfileData = await db.readUserProfileData.call(this, userName);
+  else this.state.targetToScrape.alreadyExistedProfileData = [];
+
   // Check if we need to scrape based on lastScrapingDate and MIN_DAYS_TO_CHECK_RESOURCE
   if (!this.state.targetToScrape.mustScrapeProfile && this.state.targetToScrape.alreadyExistedProfileData.lastScrapingDate) {
     const lastScrapingDate = new Date(this.state.targetToScrape.alreadyExistedProfileData.lastScrapingDate);
@@ -153,18 +155,18 @@ const scrapeMetaDataOfProfile = async function (userName) {
 const getInstaProfileScraperConfig = async function () {
   // 1. needFollowers
   const followersDifference = this.state.targetToScrape.latestScrapedMetaData.edge_followed_by.count - (this.state.targetToScrape.alreadyExistedProfileData?.followers?.length || 0);
-  if (followersDifference > 10 && followersDifference < 100) this.state.targetToScrape.needFollowers = true;
-  else this.state.targetToScrape.needFollowers = false;
+  if (followersDifference > 10 && followersDifference < 100) this.state.targetToScrape.needFollowers ||= true;
+  else this.state.targetToScrape.needFollowers ||= false;
 
   // 2. needFollowings
   const followingsDifference = this.state.targetToScrape.latestScrapedMetaData.edge_follow.count - (this.state.targetToScrape.alreadyExistedProfileData?.followings?.length || 0);
-  if (followingsDifference > 10 && followingsDifference < 100) this.state.targetToScrape.needFollowings = true;
-  else this.state.targetToScrape.needFollowings = false;
+  if (followingsDifference > 10 && followingsDifference < 100) this.state.targetToScrape.needFollowings ||= true;
+  else this.state.targetToScrape.needFollowings ||= false;
 
   // 3. needPosts
   const postsDifference = this.state.targetToScrape.latestScrapedMetaData.edge_owner_to_timeline_media.count - (this.state.targetToScrape.alreadyExistedProfileData?.posts?.length || 0);
-  if (postsDifference > 10) this.state.targetToScrape.needPosts = true;
-  else this.state.targetToScrape.needPosts = false;
+  if (postsDifference > 10 && postsDifference < 500) this.state.targetToScrape.needPosts ||= true;
+  else this.state.targetToScrape.needPosts ||= false;
 
   return true;
 };
@@ -376,14 +378,15 @@ const scrapeProfilePosts = async function () {
 const updateDatabaseAfterProfileScraping = async function () {
   const userName = this.state.targetToScrape.targetString;
   //  1. Update user's Data
-  this.state.targetToScrape.latestScrapedMetaData.postsCount = this.state.targetToScrape.latestScrapedMetaData.posts.length;
+  this.state.targetToScrape.latestScrapedMetaData.postsCount =
+    this.state.targetToScrape.latestScrapedMetaData.posts?.length || this.state.targetToScrape.latestScrapedMetaData.edge_owner_to_timeline_media.count || 0;
   this.state.targetToScrape.latestScrapedMetaData.followersCount = this.state.targetToScrape.latestScrapedMetaData.edge_followed_by.count;
   this.state.targetToScrape.latestScrapedMetaData.followingsCount = this.state.targetToScrape.latestScrapedMetaData.edge_follow.count;
   this.state.targetToScrape.latestScrapedMetaData.lastScrapingDate = new Date().toISOString();
 
   // 2. Get profile in allProfilesData.json
   if (!this?.state?.profilesData) this.state.profilesData = await db.readProfilesData();
-  this.state.targetToScrape.profile = this.state.profilesData.find((profile) => profile.userName === userName);
+  this.state.targetToScrape.profile = (await db.getProfileByUserName.call(this, userName)) || {};
 
   // 3. Update allProfilesData.json
   this.state.targetToScrape.profile.postsCount = this.state.targetToScrape.latestScrapedMetaData.postsCount;
@@ -391,14 +394,20 @@ const updateDatabaseAfterProfileScraping = async function () {
   this.state.targetToScrape.profile.followingsCount = this.state.targetToScrape.latestScrapedMetaData.followingsCount;
   this.state.targetToScrape.profile.lastScrapingDate = new Date().toISOString();
 
-  await db.removeDueTask(this.state.currentProfile.userName, {
-    parentModuleName: "instaScraper",
-    actionName: "targetScraper",
-    argumentsString: `${this.currentAction.argumentsString}`,
-  });
+  // await db.removeDueTask(this.state.currentProfile.userName, {
+  //   parentModuleName: "instaScraper",
+  //   actionName: "targetScraper",
+  //   argumentsString: `${this.currentAction.argumentsString}`,
+  // });
 
-  await db.writeUserProfileData.call(this, { ...this.state.targetToScrape.alreadyExistedProfileData, ...this.state.targetToScrape.latestScrapedMetaData });
-  await db.writeProfilesData.call(this, this.state.profilesData);
+  this.state.targetToScrape = {
+    ...this.state.targetToScrape.alreadyExistedProfileData,
+    ...this.state.targetToScrape,
+    ...this.state.targetToScrape.profile,
+    ...this.state.targetToScrape.latestScrapedMetaData,
+    isScrapingDone: true,
+  };
+  await db.updateScrapedData.call(this);
 
   return true;
   // this.state.targetToScrape.profile.postsDownloaded ||= 0;   // This data should only be mutated in instaMediaDownloader.js
@@ -686,7 +695,7 @@ const commentsScraper = async function (url) {
       }
       if (uniqueComments.size === this.state.targetToScrape.postMetadata.commentsCount) {
         console.log(
-          `Breaking the loop as total comments scraped is equal to total comments in the post.(ie uniqueComments.size: ${uniqueComments.size} and this.state.targetToScrape.postMetadata.commentsCount: ${this.state.targetToScrape.postMetadata.commentsCount})`
+          `Breaking the loop as total comments scraped is equal to total comments in the post.(ie. uniqueComments.size: ${uniqueComments.size} and this.state.targetToScrape.postMetadata.commentsCount: ${this.state.targetToScrape.postMetadata.commentsCount})`
         );
         break;
       }
