@@ -34,7 +34,9 @@ class Database {
     if (Object.keys(query).length === 0) {
       return collection;
     }
-    return collection.filter((doc) => Object.entries(query).every(([key, value]) => doc[key] === value));
+    return collection.filter((doc) =>
+      Object.entries(query).every(([key, value]) => doc[key] === value)
+    );
   }
 
   // Update documents in collection
@@ -59,7 +61,10 @@ class Database {
     const collection = this.collections.get(collectionName);
     this.collections.set(
       collectionName,
-      collection.filter((doc) => !Object.entries(query).every(([key, value]) => doc[key] === value))
+      collection.filter(
+        (doc) =>
+          !Object.entries(query).every(([key, value]) => doc[key] === value)
+      )
     );
     return true;
   }
@@ -91,12 +96,14 @@ class Database {
 //   }
 // };
 
-// Create a class name of list
-//  -  this list class's instance are actually array of objects
+// Create a class name of dataList
+//  -  this dataList class's instance are actually array of objects
 //  -  but these arrays have some methods to perform operations on them
 //  -  these objects are some what similar to then given object:
 //        {uniqueProperty:value, dataPath: pathString,creationDateProperty: dateString, lastUpdateDateProperty: dateString, ...otherProperties}
-//  Suppose we created a new instance of list class and called it as "allProfilesData", then allProfilesData is actually an array of objects and what operations / methods we need on it are as below:
+//  Suppose we created a new instance of dataList class as given below line
+// const allProfilesData = new DataList("./data/allProfilesData.json","uniquePropertyName");
+// and called it as "allProfilesData", then allProfilesData is actually an array of objects and what operations / methods we need on it are as below:
 // 1. this.state.allProfilesData = await allProfilesData.read()
 // 2. await allProfilesData.write(this.state.allProfilesData)
 // 3. allProfilesData.checkElementExistsOrNot = (query) => {
@@ -127,7 +134,7 @@ class Database {
 // 5. allProfilesData.update = (query, newData) => {
 //         - check if data is already exists or not
 //          const isElementExists = allProfilesData.checkElementExistsOrNot(query);
-//          if (isElementExists) return false;
+//          if (!isElementExists) return false;
 //         - if exists then update it
 //          allProfilesData[isElementExists] = {...allProfilesData[isElementExists],...newData };
 //         - write the updated allProfilesData to the file
@@ -137,10 +144,7 @@ class Database {
 // 6. allProfilesData.delete = (query) => {
 //         - check if data is already exists or not
 //          const isElementExists = allProfilesData.checkElementExistsOrNot(query);
-//          if (!isElementExists) {
-//          console.log(`Element does not exists with ${uniqueProperty} = ${query[uniqueProperty]}`);
-//          return false;
-//          }
+//          if (!isElementExists)  return false;
 //         - if exists then delete it from the allProfilesData
 //          allProfilesData.splice(isElementExists, 1);
 //         - write the updated allProfilesData to the file
@@ -150,10 +154,15 @@ class Database {
 // 7. allProfilesData.find = (query) => {
 //         - check if data is already exists or not
 //          const isElementExists = allProfilesData.checkElementExistsOrNot(query);
-//          if (!isElementExists) {
-//          console.log(`Element does not exists with ${uniqueProperty} = ${query[uniqueProperty]}`);
-//          return false;
-//          }
+//          if (!isElementExists) return false;
 //         - if exists then return it
 //          return allProfilesData[isElementExists];
 // }
+
+// --------------------------------------------------------------------------------------
+// Create a class name of tasksList (may be extends dataList)
+//  -  this tasksList class's instance are actually 2 dataLists
+//  -  one for tasks that are not completed and another for tasks that are completed.
+//  -  these objects are some what similar to then given object:
+//  Suppose we created a new instance of tasksList class and called it as "targetStrings", then targetStrings object is actually 2 dataLists and what operations / methods we need on it are as below:
+//
