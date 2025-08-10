@@ -227,6 +227,7 @@ const runScraper = async function () {
 
   this.instaScraper ||= require("./instaScraperV2.js");
   if (this.state.targetToScrape.isApproved) this.state.targetToScrape.isScrapingSuccessful = await this.instaScraper.targetScraper.call(this);
+  return true;
 };
 
 // updateCurrentProfileInMemory is actually needed because when duetasks of a profile gets completed and a new profile's dueTasks execution is going to start at that point accokrding to tasks the old chrome profile instance gets closed but in memeory it doesn't actually gets changed. As generally it is used kon start of each profile automation.
